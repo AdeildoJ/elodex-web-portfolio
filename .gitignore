@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.env
+.env.local
+serviceAccountKey.json
+elodex-service-account.json
+secrets/*.json

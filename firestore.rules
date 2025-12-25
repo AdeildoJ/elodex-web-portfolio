@@ -1,0 +1,177 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ================================
+    // 🔧 Helpers
+    // ================================
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isSelf(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    function isAdmin() {
+      return request.auth != null && request.auth.token.admin == true;
+    }
+
+    // ================================
+    // 🔥 POKÉDEX ADMIN
+    // ================================
+
+    // Espécies base dos Pokémon (Biblioteca)
+    match /pokemonSpecies/{id} {
+      allow read:  if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Configurações mutáveis de venda dos itens (loja)
+    match /itemsConfig/{id} {
+      allow read:  if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Configurações por versão do jogo
+    match /pokedexConfig/{id} {
+      allow read:  if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Movimentos (catálogo geral de golpes)
+    match /moves/{id} {
+      allow read:  if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Learnset por espécie
+    match /pokemonMoves/{id} {
+      allow read:  if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Habilidades
+    match /abilities/{id} {
+      allow read:  if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Itens globais (Catálogo)
+    match /items/{id} {
+      allow read:  if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // ================================
+    // 🔥 ELODEX — USUÁRIOS
+    // ================================
+    match /users/{uid} {
+      allow read:  if isSelf(uid) || isAdmin();
+      allow write: if isSelf(uid) || isAdmin();
+    }
+
+    // Histórico financeiro principal (por usuário)
+    match /users/{uid}/transactions/{txId} {
+      allow read:  if isSelf(uid) || isAdmin();
+      allow write: if isSelf(uid) || isAdmin();
+    }
+
+    // ✅ collectionGroup(transactions) para admin
+    match /{path=**}/transactions/{txId} {
+      allow read: if isAdmin();
+    }
+
+    // Time principal
+    match /users/{uid}/team/{slotId} {
+      allow read:  if isSelf(uid) || isAdmin();
+      allow write: if isSelf(uid) || isAdmin();
+    }
+
+    // Box de armazenamento
+    match /users/{uid}/box/{boxEntryId} {
+      allow read:  if isSelf(uid) || isAdmin();
+      allow write: if isSelf(uid) || isAdmin();
+    }
+
+    // Inventário de itens do jogador
+    match /users/{uid}/inventory/{itemId} {
+      allow read:  if isSelf(uid) || isAdmin();
+      allow write: if isSelf(uid) || isAdmin();
+    }
+
+    // Histórico econômico
+    match /users/{uid}/economy/{eventId} {
+      allow read:  if isSelf(uid) || isAdmin();
+      allow write: if isSelf(uid) || isAdmin();
+    }
+
+    // Histórico por Pokémon
+    match /users/{uid}/pokemonHistory/{histId} {
+      allow read:  if isSelf(uid) || isAdmin();
+      allow write: if isSelf(uid) || isAdmin();
+    }
+
+    // ================================
+    // 🔥 INSTÂNCIAS DE POKÉMON
+    // ================================
+    match /pokemonInstances/{pokeInstanceId} {
+      allow read: if (isSignedIn() && isSelf(resource.data.ownerId)) || isAdmin();
+      allow write: if (isSignedIn() && isSelf(request.resource.data.ownerId)) || isAdmin();
+    }
+
+    // ================================
+    // 🔥 ESTATÍSTICAS
+    // ================================
+    match /users_stats/{uid} {
+      allow read:  if isSelf(uid) || isAdmin();
+      allow write: if isSelf(uid) || isAdmin();
+    }
+
+    match /pokemon_stats/{pokeId} {
+      allow read:  if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // ================================
+    // 🔥 LOGS / MISSÕES / EVENTOS
+    // ================================
+
+    match /encounters_log/{id} {
+      allow read:  if false;
+      allow write: if isSignedIn();
+    }
+
+    // ✅ CONFIGURAÇÃO ADMIN (NOVO) — Missões & Eventos (Admin)
+    // Coleção unificada apenas para CONFIGURAÇÃO
+    // (não é execução de jogo)
+    match /missionsEvents/{id} {
+      allow read:  if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Coleções antigas (se você ainda usa em algum lugar)
+    match /missions/{id} {
+      allow read:  if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /events/{id} {
+      allow read:  if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /audit_logs/{id} {
+      allow read:  if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // ================================
+    // 🔥 PRESENÇA (futuro)
+    // ================================
+    match /presence/{uid} {
+      allow read:  if isSignedIn();
+      allow write: if false;
+    }
+  }
+}

@@ -1,0 +1,5410 @@
+{
+  "venusaur-mega": {
+    "formId": "venusaur-mega",
+    "baseSpeciesId": "3",
+    "formType": "mega",
+    "displayName": "Venusaur Mega",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 100,
+      "defense": 123,
+      "specialAttack": 122,
+      "specialDefense": 120,
+      "speed": 80
+    },
+    "abilities": [
+      {
+        "abilityId": "thick-fat",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 2.4,
+    "weight": 155.5,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10033.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10033.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "charizard-mega-x": {
+    "formId": "charizard-mega-x",
+    "baseSpeciesId": "6",
+    "formType": "mega",
+    "displayName": "Charizard Mega X",
+    "types": [
+      "fire",
+      "dragon"
+    ],
+    "baseStats": {
+      "hp": 78,
+      "attack": 130,
+      "defense": 111,
+      "specialAttack": 130,
+      "specialDefense": 85,
+      "speed": 100
+    },
+    "abilities": [
+      {
+        "abilityId": "tough-claws",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 1.7,
+    "weight": 110.5,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10034.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10034.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "charizard-mega-y": {
+    "formId": "charizard-mega-y",
+    "baseSpeciesId": "6",
+    "formType": "mega",
+    "displayName": "Charizard Mega Y",
+    "types": [
+      "fire",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 78,
+      "attack": 104,
+      "defense": 78,
+      "specialAttack": 159,
+      "specialDefense": 115,
+      "speed": 100
+    },
+    "abilities": [
+      {
+        "abilityId": "drought",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 1.7,
+    "weight": 100.5,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10035.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10035.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "blastoise-mega": {
+    "formId": "blastoise-mega",
+    "baseSpeciesId": "9",
+    "formType": "mega",
+    "displayName": "Blastoise Mega",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 79,
+      "attack": 103,
+      "defense": 120,
+      "specialAttack": 135,
+      "specialDefense": 115,
+      "speed": 78
+    },
+    "abilities": [
+      {
+        "abilityId": "mega-launcher",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 1.6,
+    "weight": 101.1,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10036.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10036.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "alakazam-mega": {
+    "formId": "alakazam-mega",
+    "baseSpeciesId": "65",
+    "formType": "mega",
+    "displayName": "Alakazam Mega",
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 50,
+      "defense": 65,
+      "specialAttack": 175,
+      "specialDefense": 105,
+      "speed": 150
+    },
+    "abilities": [
+      {
+        "abilityId": "trace",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 1.2,
+    "weight": 48,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10037.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10037.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "gengar-mega": {
+    "formId": "gengar-mega",
+    "baseSpeciesId": "94",
+    "formType": "mega",
+    "displayName": "Gengar Mega",
+    "types": [
+      "ghost",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 65,
+      "defense": 80,
+      "specialAttack": 170,
+      "specialDefense": 95,
+      "speed": 130
+    },
+    "abilities": [
+      {
+        "abilityId": "shadow-tag",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 1.4,
+    "weight": 40.5,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10038.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10038.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "kangaskhan-mega": {
+    "formId": "kangaskhan-mega",
+    "baseSpeciesId": "115",
+    "formType": "mega",
+    "displayName": "Kangaskhan Mega",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 105,
+      "attack": 125,
+      "defense": 100,
+      "specialAttack": 60,
+      "specialDefense": 100,
+      "speed": 100
+    },
+    "abilities": [
+      {
+        "abilityId": "parental-bond",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 2.2,
+    "weight": 100,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10039.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10039.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "pinsir-mega": {
+    "formId": "pinsir-mega",
+    "baseSpeciesId": "127",
+    "formType": "mega",
+    "displayName": "Pinsir Mega",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 155,
+      "defense": 120,
+      "specialAttack": 65,
+      "specialDefense": 90,
+      "speed": 105
+    },
+    "abilities": [
+      {
+        "abilityId": "aerilate",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 1.7,
+    "weight": 59,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10040.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10040.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "gyarados-mega": {
+    "formId": "gyarados-mega",
+    "baseSpeciesId": "130",
+    "formType": "mega",
+    "displayName": "Gyarados Mega",
+    "types": [
+      "water",
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "attack": 155,
+      "defense": 109,
+      "specialAttack": 70,
+      "specialDefense": 130,
+      "speed": 81
+    },
+    "abilities": [
+      {
+        "abilityId": "mold-breaker",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 6.5,
+    "weight": 305,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10041.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10041.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "aerodactyl-mega": {
+    "formId": "aerodactyl-mega",
+    "baseSpeciesId": "142",
+    "formType": "mega",
+    "displayName": "Aerodactyl Mega",
+    "types": [
+      "rock",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 135,
+      "defense": 85,
+      "specialAttack": 70,
+      "specialDefense": 95,
+      "speed": 150
+    },
+    "abilities": [
+      {
+        "abilityId": "tough-claws",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 2.1,
+    "weight": 79,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10042.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10042.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "mewtwo-mega-x": {
+    "formId": "mewtwo-mega-x",
+    "baseSpeciesId": "150",
+    "formType": "mega",
+    "displayName": "Mewtwo Mega X",
+    "types": [
+      "psychic",
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 106,
+      "attack": 190,
+      "defense": 100,
+      "specialAttack": 154,
+      "specialDefense": 100,
+      "speed": 130
+    },
+    "abilities": [
+      {
+        "abilityId": "steadfast",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 2.3,
+    "weight": 127,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10043.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10043.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "mewtwo-mega-y": {
+    "formId": "mewtwo-mega-y",
+    "baseSpeciesId": "150",
+    "formType": "mega",
+    "displayName": "Mewtwo Mega Y",
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 106,
+      "attack": 150,
+      "defense": 70,
+      "specialAttack": 194,
+      "specialDefense": 120,
+      "speed": 140
+    },
+    "abilities": [
+      {
+        "abilityId": "insomnia",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 1.5,
+    "weight": 33,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10044.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10044.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "ampharos-mega": {
+    "formId": "ampharos-mega",
+    "baseSpeciesId": "181",
+    "formType": "mega",
+    "displayName": "Ampharos Mega",
+    "types": [
+      "electric",
+      "dragon"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 95,
+      "defense": 105,
+      "specialAttack": 165,
+      "specialDefense": 110,
+      "speed": 45
+    },
+    "abilities": [
+      {
+        "abilityId": "mold-breaker",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 1.4,
+    "weight": 61.5,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10045.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10045.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "scizor-mega": {
+    "formId": "scizor-mega",
+    "baseSpeciesId": "212",
+    "formType": "mega",
+    "displayName": "Scizor Mega",
+    "types": [
+      "bug",
+      "steel"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 150,
+      "defense": 140,
+      "specialAttack": 65,
+      "specialDefense": 100,
+      "speed": 75
+    },
+    "abilities": [
+      {
+        "abilityId": "technician",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 2,
+    "weight": 125,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10046.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10046.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "heracross-mega": {
+    "formId": "heracross-mega",
+    "baseSpeciesId": "214",
+    "formType": "mega",
+    "displayName": "Heracross Mega",
+    "types": [
+      "bug",
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 185,
+      "defense": 115,
+      "specialAttack": 40,
+      "specialDefense": 105,
+      "speed": 75
+    },
+    "abilities": [
+      {
+        "abilityId": "skill-link",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 1.7,
+    "weight": 62.5,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10047.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10047.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "houndoom-mega": {
+    "formId": "houndoom-mega",
+    "baseSpeciesId": "229",
+    "formType": "mega",
+    "displayName": "Houndoom Mega",
+    "types": [
+      "dark",
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 90,
+      "defense": 90,
+      "specialAttack": 140,
+      "specialDefense": 90,
+      "speed": 115
+    },
+    "abilities": [
+      {
+        "abilityId": "solar-power",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 1.9,
+    "weight": 49.5,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10048.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10048.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "tyranitar-mega": {
+    "formId": "tyranitar-mega",
+    "baseSpeciesId": "248",
+    "formType": "mega",
+    "displayName": "Tyranitar Mega",
+    "types": [
+      "rock",
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 164,
+      "defense": 150,
+      "specialAttack": 95,
+      "specialDefense": 120,
+      "speed": 71
+    },
+    "abilities": [
+      {
+        "abilityId": "sand-stream",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 2.5,
+    "weight": 255,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10049.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10049.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "blaziken-mega": {
+    "formId": "blaziken-mega",
+    "baseSpeciesId": "257",
+    "formType": "mega",
+    "displayName": "Blaziken Mega",
+    "types": [
+      "fire",
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 160,
+      "defense": 80,
+      "specialAttack": 130,
+      "specialDefense": 80,
+      "speed": 100
+    },
+    "abilities": [
+      {
+        "abilityId": "speed-boost",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 1.9,
+    "weight": 52,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10050.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10050.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "gardevoir-mega": {
+    "formId": "gardevoir-mega",
+    "baseSpeciesId": "282",
+    "formType": "mega",
+    "displayName": "Gardevoir Mega",
+    "types": [
+      "psychic",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 68,
+      "attack": 85,
+      "defense": 65,
+      "specialAttack": 165,
+      "specialDefense": 135,
+      "speed": 100
+    },
+    "abilities": [
+      {
+        "abilityId": "pixilate",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 1.6,
+    "weight": 48.4,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10051.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10051.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "mawile-mega": {
+    "formId": "mawile-mega",
+    "baseSpeciesId": "303",
+    "formType": "mega",
+    "displayName": "Mawile Mega",
+    "types": [
+      "steel",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 105,
+      "defense": 125,
+      "specialAttack": 55,
+      "specialDefense": 95,
+      "speed": 50
+    },
+    "abilities": [
+      {
+        "abilityId": "huge-power",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 1,
+    "weight": 23.5,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10052.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10052.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "aggron-mega": {
+    "formId": "aggron-mega",
+    "baseSpeciesId": "306",
+    "formType": "mega",
+    "displayName": "Aggron Mega",
+    "types": [
+      "steel"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 140,
+      "defense": 230,
+      "specialAttack": 60,
+      "specialDefense": 80,
+      "speed": 50
+    },
+    "abilities": [
+      {
+        "abilityId": "filter",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 2.2,
+    "weight": 395,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10053.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10053.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "medicham-mega": {
+    "formId": "medicham-mega",
+    "baseSpeciesId": "308",
+    "formType": "mega",
+    "displayName": "Medicham Mega",
+    "types": [
+      "fighting",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 100,
+      "defense": 85,
+      "specialAttack": 80,
+      "specialDefense": 85,
+      "speed": 100
+    },
+    "abilities": [
+      {
+        "abilityId": "pure-power",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 1.3,
+    "weight": 31.5,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10054.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10054.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "manectric-mega": {
+    "formId": "manectric-mega",
+    "baseSpeciesId": "310",
+    "formType": "mega",
+    "displayName": "Manectric Mega",
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 75,
+      "defense": 80,
+      "specialAttack": 135,
+      "specialDefense": 80,
+      "speed": 135
+    },
+    "abilities": [
+      {
+        "abilityId": "intimidate",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 1.8,
+    "weight": 44,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10055.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10055.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "banette-mega": {
+    "formId": "banette-mega",
+    "baseSpeciesId": "354",
+    "formType": "mega",
+    "displayName": "Banette Mega",
+    "types": [
+      "ghost"
+    ],
+    "baseStats": {
+      "hp": 64,
+      "attack": 165,
+      "defense": 75,
+      "specialAttack": 93,
+      "specialDefense": 83,
+      "speed": 75
+    },
+    "abilities": [
+      {
+        "abilityId": "prankster",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 1.2,
+    "weight": 13,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10056.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10056.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "absol-mega": {
+    "formId": "absol-mega",
+    "baseSpeciesId": "359",
+    "formType": "mega",
+    "displayName": "Absol Mega",
+    "types": [
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 150,
+      "defense": 60,
+      "specialAttack": 115,
+      "specialDefense": 60,
+      "speed": 115
+    },
+    "abilities": [
+      {
+        "abilityId": "magic-bounce",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 1.2,
+    "weight": 49,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10057.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10057.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "garchomp-mega": {
+    "formId": "garchomp-mega",
+    "baseSpeciesId": "445",
+    "formType": "mega",
+    "displayName": "Garchomp Mega",
+    "types": [
+      "dragon",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 108,
+      "attack": 170,
+      "defense": 115,
+      "specialAttack": 120,
+      "specialDefense": 95,
+      "speed": 92
+    },
+    "abilities": [
+      {
+        "abilityId": "sand-force",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 1.9,
+    "weight": 95,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10058.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10058.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "lucario-mega": {
+    "formId": "lucario-mega",
+    "baseSpeciesId": "448",
+    "formType": "mega",
+    "displayName": "Lucario Mega",
+    "types": [
+      "fighting",
+      "steel"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 145,
+      "defense": 88,
+      "specialAttack": 140,
+      "specialDefense": 70,
+      "speed": 112
+    },
+    "abilities": [
+      {
+        "abilityId": "adaptability",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 1.3,
+    "weight": 57.5,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10059.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10059.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "abomasnow-mega": {
+    "formId": "abomasnow-mega",
+    "baseSpeciesId": "460",
+    "formType": "mega",
+    "displayName": "Abomasnow Mega",
+    "types": [
+      "grass",
+      "ice"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 132,
+      "defense": 105,
+      "specialAttack": 132,
+      "specialDefense": 105,
+      "speed": 30
+    },
+    "abilities": [
+      {
+        "abilityId": "snow-warning",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 2.7,
+    "weight": 185,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10060.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10060.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "latias-mega": {
+    "formId": "latias-mega",
+    "baseSpeciesId": "380",
+    "formType": "mega",
+    "displayName": "Latias Mega",
+    "types": [
+      "dragon",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 100,
+      "defense": 120,
+      "specialAttack": 140,
+      "specialDefense": 150,
+      "speed": 110
+    },
+    "abilities": [
+      {
+        "abilityId": "levitate",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 1.8,
+    "weight": 52,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10062.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10062.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "latios-mega": {
+    "formId": "latios-mega",
+    "baseSpeciesId": "381",
+    "formType": "mega",
+    "displayName": "Latios Mega",
+    "types": [
+      "dragon",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 130,
+      "defense": 100,
+      "specialAttack": 160,
+      "specialDefense": 120,
+      "speed": 110
+    },
+    "abilities": [
+      {
+        "abilityId": "levitate",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 2.3,
+    "weight": 70,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10063.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10063.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "swampert-mega": {
+    "formId": "swampert-mega",
+    "baseSpeciesId": "260",
+    "formType": "mega",
+    "displayName": "Swampert Mega",
+    "types": [
+      "water",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 150,
+      "defense": 110,
+      "specialAttack": 95,
+      "specialDefense": 110,
+      "speed": 70
+    },
+    "abilities": [
+      {
+        "abilityId": "swift-swim",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 1.9,
+    "weight": 102,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10064.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10064.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "sceptile-mega": {
+    "formId": "sceptile-mega",
+    "baseSpeciesId": "254",
+    "formType": "mega",
+    "displayName": "Sceptile Mega",
+    "types": [
+      "grass",
+      "dragon"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 110,
+      "defense": 75,
+      "specialAttack": 145,
+      "specialDefense": 85,
+      "speed": 145
+    },
+    "abilities": [
+      {
+        "abilityId": "lightning-rod",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 1.9,
+    "weight": 55.2,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10065.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10065.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "sableye-mega": {
+    "formId": "sableye-mega",
+    "baseSpeciesId": "302",
+    "formType": "mega",
+    "displayName": "Sableye Mega",
+    "types": [
+      "dark",
+      "ghost"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 85,
+      "defense": 125,
+      "specialAttack": 85,
+      "specialDefense": 115,
+      "speed": 20
+    },
+    "abilities": [
+      {
+        "abilityId": "magic-bounce",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 0.5,
+    "weight": 161,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10066.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10066.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "altaria-mega": {
+    "formId": "altaria-mega",
+    "baseSpeciesId": "334",
+    "formType": "mega",
+    "displayName": "Altaria Mega",
+    "types": [
+      "dragon",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 110,
+      "defense": 110,
+      "specialAttack": 110,
+      "specialDefense": 105,
+      "speed": 80
+    },
+    "abilities": [
+      {
+        "abilityId": "pixilate",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 1.5,
+    "weight": 20.6,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10067.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10067.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "gallade-mega": {
+    "formId": "gallade-mega",
+    "baseSpeciesId": "475",
+    "formType": "mega",
+    "displayName": "Gallade Mega",
+    "types": [
+      "psychic",
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 68,
+      "attack": 165,
+      "defense": 95,
+      "specialAttack": 65,
+      "specialDefense": 115,
+      "speed": 110
+    },
+    "abilities": [
+      {
+        "abilityId": "inner-focus",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 1.6,
+    "weight": 56.4,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10068.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10068.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "audino-mega": {
+    "formId": "audino-mega",
+    "baseSpeciesId": "531",
+    "formType": "mega",
+    "displayName": "Audino Mega",
+    "types": [
+      "normal",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 103,
+      "attack": 60,
+      "defense": 126,
+      "specialAttack": 80,
+      "specialDefense": 126,
+      "speed": 50
+    },
+    "abilities": [
+      {
+        "abilityId": "healer",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 1.5,
+    "weight": 32,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10069.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10069.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "sharpedo-mega": {
+    "formId": "sharpedo-mega",
+    "baseSpeciesId": "319",
+    "formType": "mega",
+    "displayName": "Sharpedo Mega",
+    "types": [
+      "water",
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 140,
+      "defense": 70,
+      "specialAttack": 110,
+      "specialDefense": 65,
+      "speed": 105
+    },
+    "abilities": [
+      {
+        "abilityId": "strong-jaw",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 2.5,
+    "weight": 130.3,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10070.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10070.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "slowbro-mega": {
+    "formId": "slowbro-mega",
+    "baseSpeciesId": "80",
+    "formType": "mega",
+    "displayName": "Slowbro Mega",
+    "types": [
+      "water",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "attack": 75,
+      "defense": 180,
+      "specialAttack": 130,
+      "specialDefense": 80,
+      "speed": 30
+    },
+    "abilities": [
+      {
+        "abilityId": "shell-armor",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 2,
+    "weight": 120,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10071.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10071.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "steelix-mega": {
+    "formId": "steelix-mega",
+    "baseSpeciesId": "208",
+    "formType": "mega",
+    "displayName": "Steelix Mega",
+    "types": [
+      "steel",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 125,
+      "defense": 230,
+      "specialAttack": 55,
+      "specialDefense": 95,
+      "speed": 30
+    },
+    "abilities": [
+      {
+        "abilityId": "sand-force",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 10.5,
+    "weight": 740,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10072.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10072.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "pidgeot-mega": {
+    "formId": "pidgeot-mega",
+    "baseSpeciesId": "18",
+    "formType": "mega",
+    "displayName": "Pidgeot Mega",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 83,
+      "attack": 80,
+      "defense": 80,
+      "specialAttack": 135,
+      "specialDefense": 80,
+      "speed": 121
+    },
+    "abilities": [
+      {
+        "abilityId": "no-guard",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 2.2,
+    "weight": 50.5,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10073.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10073.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "glalie-mega": {
+    "formId": "glalie-mega",
+    "baseSpeciesId": "362",
+    "formType": "mega",
+    "displayName": "Glalie Mega",
+    "types": [
+      "ice"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 120,
+      "defense": 80,
+      "specialAttack": 120,
+      "specialDefense": 80,
+      "speed": 100
+    },
+    "abilities": [
+      {
+        "abilityId": "refrigerate",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 2.1,
+    "weight": 350.2,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10074.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10074.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "diancie-mega": {
+    "formId": "diancie-mega",
+    "baseSpeciesId": "719",
+    "formType": "mega",
+    "displayName": "Diancie Mega",
+    "types": [
+      "rock",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 160,
+      "defense": 110,
+      "specialAttack": 160,
+      "specialDefense": 110,
+      "speed": 110
+    },
+    "abilities": [
+      {
+        "abilityId": "magic-bounce",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 1.1,
+    "weight": 27.8,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10075.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10075.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "metagross-mega": {
+    "formId": "metagross-mega",
+    "baseSpeciesId": "376",
+    "formType": "mega",
+    "displayName": "Metagross Mega",
+    "types": [
+      "steel",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 145,
+      "defense": 150,
+      "specialAttack": 105,
+      "specialDefense": 110,
+      "speed": 110
+    },
+    "abilities": [
+      {
+        "abilityId": "tough-claws",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 2.5,
+    "weight": 942.9,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10076.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10076.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "rayquaza-mega": {
+    "formId": "rayquaza-mega",
+    "baseSpeciesId": "384",
+    "formType": "mega",
+    "displayName": "Rayquaza Mega",
+    "types": [
+      "dragon",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 105,
+      "attack": 180,
+      "defense": 100,
+      "specialAttack": 180,
+      "specialDefense": 100,
+      "speed": 115
+    },
+    "abilities": [
+      {
+        "abilityId": "delta-stream",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 10.8,
+    "weight": 392,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10079.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10079.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "camerupt-mega": {
+    "formId": "camerupt-mega",
+    "baseSpeciesId": "323",
+    "formType": "mega",
+    "displayName": "Camerupt Mega",
+    "types": [
+      "fire",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 120,
+      "defense": 100,
+      "specialAttack": 145,
+      "specialDefense": 105,
+      "speed": 20
+    },
+    "abilities": [
+      {
+        "abilityId": "sheer-force",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 2.5,
+    "weight": 320.5,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10087.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10087.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "lopunny-mega": {
+    "formId": "lopunny-mega",
+    "baseSpeciesId": "428",
+    "formType": "mega",
+    "displayName": "Lopunny Mega",
+    "types": [
+      "normal",
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 136,
+      "defense": 94,
+      "specialAttack": 54,
+      "specialDefense": 96,
+      "speed": 135
+    },
+    "abilities": [
+      {
+        "abilityId": "scrappy",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 1.3,
+    "weight": 28.3,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10088.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10088.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "salamence-mega": {
+    "formId": "salamence-mega",
+    "baseSpeciesId": "373",
+    "formType": "mega",
+    "displayName": "Salamence Mega",
+    "types": [
+      "dragon",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "attack": 145,
+      "defense": 130,
+      "specialAttack": 120,
+      "specialDefense": 90,
+      "speed": 120
+    },
+    "abilities": [
+      {
+        "abilityId": "aerilate",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 1.8,
+    "weight": 112.6,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10089.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10089.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "beedrill-mega": {
+    "formId": "beedrill-mega",
+    "baseSpeciesId": "15",
+    "formType": "mega",
+    "displayName": "Beedrill Mega",
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 150,
+      "defense": 40,
+      "specialAttack": 15,
+      "specialDefense": 80,
+      "speed": 145
+    },
+    "abilities": [
+      {
+        "abilityId": "adaptability",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 1.4,
+    "weight": 40.5,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10090.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10090.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "venusaur-gmax": {
+    "formId": "venusaur-gmax",
+    "baseSpeciesId": "3",
+    "formType": "gigantamax",
+    "displayName": "Venusaur Gmax",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 82,
+      "defense": 83,
+      "specialAttack": 100,
+      "specialDefense": 100,
+      "speed": 80
+    },
+    "abilities": [
+      {
+        "abilityId": "overgrow",
+        "isHidden": false,
+        "slot": 1
+      },
+      {
+        "abilityId": "chlorophyll",
+        "isHidden": true,
+        "slot": 3
+      }
+    ],
+    "height": 24,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10195.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10195.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "charizard-gmax": {
+    "formId": "charizard-gmax",
+    "baseSpeciesId": "6",
+    "formType": "gigantamax",
+    "displayName": "Charizard Gmax",
+    "types": [
+      "fire",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 78,
+      "attack": 84,
+      "defense": 78,
+      "specialAttack": 109,
+      "specialDefense": 85,
+      "speed": 100
+    },
+    "abilities": [
+      {
+        "abilityId": "blaze",
+        "isHidden": false,
+        "slot": 1
+      },
+      {
+        "abilityId": "solar-power",
+        "isHidden": true,
+        "slot": 3
+      }
+    ],
+    "height": 28,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10196.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10196.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "blastoise-gmax": {
+    "formId": "blastoise-gmax",
+    "baseSpeciesId": "9",
+    "formType": "gigantamax",
+    "displayName": "Blastoise Gmax",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 79,
+      "attack": 83,
+      "defense": 100,
+      "specialAttack": 85,
+      "specialDefense": 105,
+      "speed": 78
+    },
+    "abilities": [
+      {
+        "abilityId": "torrent",
+        "isHidden": false,
+        "slot": 1
+      },
+      {
+        "abilityId": "rain-dish",
+        "isHidden": true,
+        "slot": 3
+      }
+    ],
+    "height": 25,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10197.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10197.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "butterfree-gmax": {
+    "formId": "butterfree-gmax",
+    "baseSpeciesId": "12",
+    "formType": "gigantamax",
+    "displayName": "Butterfree Gmax",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 45,
+      "defense": 50,
+      "specialAttack": 90,
+      "specialDefense": 80,
+      "speed": 70
+    },
+    "abilities": [
+      {
+        "abilityId": "compound-eyes",
+        "isHidden": false,
+        "slot": 1
+      },
+      {
+        "abilityId": "tinted-lens",
+        "isHidden": true,
+        "slot": 3
+      }
+    ],
+    "height": 17,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10198.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10198.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "pikachu-gmax": {
+    "formId": "pikachu-gmax",
+    "baseSpeciesId": "25",
+    "formType": "gigantamax",
+    "displayName": "Pikachu Gmax",
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 35,
+      "attack": 55,
+      "defense": 40,
+      "specialAttack": 50,
+      "specialDefense": 50,
+      "speed": 90
+    },
+    "abilities": [
+      {
+        "abilityId": "static",
+        "isHidden": false,
+        "slot": 1
+      },
+      {
+        "abilityId": "lightning-rod",
+        "isHidden": true,
+        "slot": 3
+      }
+    ],
+    "height": 21,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10199.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10199.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "meowth-gmax": {
+    "formId": "meowth-gmax",
+    "baseSpeciesId": "52",
+    "formType": "gigantamax",
+    "displayName": "Meowth Gmax",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 45,
+      "defense": 35,
+      "specialAttack": 40,
+      "specialDefense": 40,
+      "speed": 90
+    },
+    "abilities": [
+      {
+        "abilityId": "pickup",
+        "isHidden": false,
+        "slot": 1
+      },
+      {
+        "abilityId": "technician",
+        "isHidden": false,
+        "slot": 2
+      },
+      {
+        "abilityId": "unnerve",
+        "isHidden": true,
+        "slot": 3
+      }
+    ],
+    "height": 33,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10200.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10200.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "machamp-gmax": {
+    "formId": "machamp-gmax",
+    "baseSpeciesId": "68",
+    "formType": "gigantamax",
+    "displayName": "Machamp Gmax",
+    "types": [
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 130,
+      "defense": 80,
+      "specialAttack": 65,
+      "specialDefense": 85,
+      "speed": 55
+    },
+    "abilities": [
+      {
+        "abilityId": "guts",
+        "isHidden": false,
+        "slot": 1
+      },
+      {
+        "abilityId": "no-guard",
+        "isHidden": false,
+        "slot": 2
+      },
+      {
+        "abilityId": "steadfast",
+        "isHidden": true,
+        "slot": 3
+      }
+    ],
+    "height": 25,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10201.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10201.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "gengar-gmax": {
+    "formId": "gengar-gmax",
+    "baseSpeciesId": "94",
+    "formType": "gigantamax",
+    "displayName": "Gengar Gmax",
+    "types": [
+      "ghost",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 65,
+      "defense": 60,
+      "specialAttack": 130,
+      "specialDefense": 75,
+      "speed": 110
+    },
+    "abilities": [
+      {
+        "abilityId": "cursed-body",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 20,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10202.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10202.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "kingler-gmax": {
+    "formId": "kingler-gmax",
+    "baseSpeciesId": "99",
+    "formType": "gigantamax",
+    "displayName": "Kingler Gmax",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 130,
+      "defense": 115,
+      "specialAttack": 50,
+      "specialDefense": 50,
+      "speed": 75
+    },
+    "abilities": [
+      {
+        "abilityId": "hyper-cutter",
+        "isHidden": false,
+        "slot": 1
+      },
+      {
+        "abilityId": "shell-armor",
+        "isHidden": false,
+        "slot": 2
+      },
+      {
+        "abilityId": "sheer-force",
+        "isHidden": true,
+        "slot": 3
+      }
+    ],
+    "height": 19,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10203.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10203.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "lapras-gmax": {
+    "formId": "lapras-gmax",
+    "baseSpeciesId": "131",
+    "formType": "gigantamax",
+    "displayName": "Lapras Gmax",
+    "types": [
+      "water",
+      "ice"
+    ],
+    "baseStats": {
+      "hp": 130,
+      "attack": 85,
+      "defense": 80,
+      "specialAttack": 85,
+      "specialDefense": 95,
+      "speed": 60
+    },
+    "abilities": [
+      {
+        "abilityId": "water-absorb",
+        "isHidden": false,
+        "slot": 1
+      },
+      {
+        "abilityId": "shell-armor",
+        "isHidden": false,
+        "slot": 2
+      },
+      {
+        "abilityId": "hydration",
+        "isHidden": true,
+        "slot": 3
+      }
+    ],
+    "height": 24,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10204.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10204.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "eevee-gmax": {
+    "formId": "eevee-gmax",
+    "baseSpeciesId": "133",
+    "formType": "gigantamax",
+    "displayName": "Eevee Gmax",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 55,
+      "defense": 50,
+      "specialAttack": 45,
+      "specialDefense": 65,
+      "speed": 55
+    },
+    "abilities": [
+      {
+        "abilityId": "run-away",
+        "isHidden": false,
+        "slot": 1
+      },
+      {
+        "abilityId": "adaptability",
+        "isHidden": false,
+        "slot": 2
+      },
+      {
+        "abilityId": "anticipation",
+        "isHidden": true,
+        "slot": 3
+      }
+    ],
+    "height": 18,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10205.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10205.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "snorlax-gmax": {
+    "formId": "snorlax-gmax",
+    "baseSpeciesId": "143",
+    "formType": "gigantamax",
+    "displayName": "Snorlax Gmax",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 160,
+      "attack": 110,
+      "defense": 65,
+      "specialAttack": 65,
+      "specialDefense": 110,
+      "speed": 30
+    },
+    "abilities": [
+      {
+        "abilityId": "immunity",
+        "isHidden": false,
+        "slot": 1
+      },
+      {
+        "abilityId": "thick-fat",
+        "isHidden": false,
+        "slot": 2
+      },
+      {
+        "abilityId": "gluttony",
+        "isHidden": true,
+        "slot": 3
+      }
+    ],
+    "height": 35,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10206.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10206.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "garbodor-gmax": {
+    "formId": "garbodor-gmax",
+    "baseSpeciesId": "569",
+    "formType": "gigantamax",
+    "displayName": "Garbodor Gmax",
+    "types": [
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 95,
+      "defense": 82,
+      "specialAttack": 60,
+      "specialDefense": 82,
+      "speed": 75
+    },
+    "abilities": [
+      {
+        "abilityId": "stench",
+        "isHidden": false,
+        "slot": 1
+      },
+      {
+        "abilityId": "weak-armor",
+        "isHidden": false,
+        "slot": 2
+      },
+      {
+        "abilityId": "aftermath",
+        "isHidden": true,
+        "slot": 3
+      }
+    ],
+    "height": 21,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10207.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10207.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "melmetal-gmax": {
+    "formId": "melmetal-gmax",
+    "baseSpeciesId": "809",
+    "formType": "gigantamax",
+    "displayName": "Melmetal Gmax",
+    "types": [
+      "steel"
+    ],
+    "baseStats": {
+      "hp": 135,
+      "attack": 143,
+      "defense": 143,
+      "specialAttack": 80,
+      "specialDefense": 65,
+      "speed": 34
+    },
+    "abilities": [
+      {
+        "abilityId": "iron-fist",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 25,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10208.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10208.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "rillaboom-gmax": {
+    "formId": "rillaboom-gmax",
+    "baseSpeciesId": "812",
+    "formType": "gigantamax",
+    "displayName": "Rillaboom Gmax",
+    "types": [
+      "grass"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 125,
+      "defense": 90,
+      "specialAttack": 60,
+      "specialDefense": 70,
+      "speed": 85
+    },
+    "abilities": [
+      {
+        "abilityId": "overgrow",
+        "isHidden": false,
+        "slot": 1
+      },
+      {
+        "abilityId": "grassy-surge",
+        "isHidden": true,
+        "slot": 3
+      }
+    ],
+    "height": 28,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10209.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10209.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "cinderace-gmax": {
+    "formId": "cinderace-gmax",
+    "baseSpeciesId": "815",
+    "formType": "gigantamax",
+    "displayName": "Cinderace Gmax",
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 116,
+      "defense": 75,
+      "specialAttack": 65,
+      "specialDefense": 75,
+      "speed": 119
+    },
+    "abilities": [
+      {
+        "abilityId": "blaze",
+        "isHidden": false,
+        "slot": 1
+      },
+      {
+        "abilityId": "libero",
+        "isHidden": true,
+        "slot": 3
+      }
+    ],
+    "height": 27,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10210.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10210.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "inteleon-gmax": {
+    "formId": "inteleon-gmax",
+    "baseSpeciesId": "818",
+    "formType": "gigantamax",
+    "displayName": "Inteleon Gmax",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 85,
+      "defense": 65,
+      "specialAttack": 125,
+      "specialDefense": 65,
+      "speed": 120
+    },
+    "abilities": [
+      {
+        "abilityId": "torrent",
+        "isHidden": false,
+        "slot": 1
+      },
+      {
+        "abilityId": "sniper",
+        "isHidden": true,
+        "slot": 3
+      }
+    ],
+    "height": 40,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10211.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10211.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "corviknight-gmax": {
+    "formId": "corviknight-gmax",
+    "baseSpeciesId": "823",
+    "formType": "gigantamax",
+    "displayName": "Corviknight Gmax",
+    "types": [
+      "flying",
+      "steel"
+    ],
+    "baseStats": {
+      "hp": 98,
+      "attack": 87,
+      "defense": 105,
+      "specialAttack": 53,
+      "specialDefense": 85,
+      "speed": 67
+    },
+    "abilities": [
+      {
+        "abilityId": "pressure",
+        "isHidden": false,
+        "slot": 1
+      },
+      {
+        "abilityId": "unnerve",
+        "isHidden": false,
+        "slot": 2
+      },
+      {
+        "abilityId": "mirror-armor",
+        "isHidden": true,
+        "slot": 3
+      }
+    ],
+    "height": 14,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10212.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10212.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "orbeetle-gmax": {
+    "formId": "orbeetle-gmax",
+    "baseSpeciesId": "826",
+    "formType": "gigantamax",
+    "displayName": "Orbeetle Gmax",
+    "types": [
+      "bug",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 45,
+      "defense": 110,
+      "specialAttack": 80,
+      "specialDefense": 120,
+      "speed": 90
+    },
+    "abilities": [
+      {
+        "abilityId": "swarm",
+        "isHidden": false,
+        "slot": 1
+      },
+      {
+        "abilityId": "frisk",
+        "isHidden": false,
+        "slot": 2
+      },
+      {
+        "abilityId": "telepathy",
+        "isHidden": true,
+        "slot": 3
+      }
+    ],
+    "height": 14,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10213.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10213.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "drednaw-gmax": {
+    "formId": "drednaw-gmax",
+    "baseSpeciesId": "834",
+    "formType": "gigantamax",
+    "displayName": "Drednaw Gmax",
+    "types": [
+      "water",
+      "rock"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 115,
+      "defense": 90,
+      "specialAttack": 48,
+      "specialDefense": 68,
+      "speed": 74
+    },
+    "abilities": [
+      {
+        "abilityId": "strong-jaw",
+        "isHidden": false,
+        "slot": 1
+      },
+      {
+        "abilityId": "shell-armor",
+        "isHidden": false,
+        "slot": 2
+      },
+      {
+        "abilityId": "swift-swim",
+        "isHidden": true,
+        "slot": 3
+      }
+    ],
+    "height": 24,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10214.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10214.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "coalossal-gmax": {
+    "formId": "coalossal-gmax",
+    "baseSpeciesId": "839",
+    "formType": "gigantamax",
+    "displayName": "Coalossal Gmax",
+    "types": [
+      "rock",
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 110,
+      "attack": 80,
+      "defense": 120,
+      "specialAttack": 80,
+      "specialDefense": 90,
+      "speed": 30
+    },
+    "abilities": [
+      {
+        "abilityId": "steam-engine",
+        "isHidden": false,
+        "slot": 1
+      },
+      {
+        "abilityId": "flame-body",
+        "isHidden": false,
+        "slot": 2
+      },
+      {
+        "abilityId": "flash-fire",
+        "isHidden": true,
+        "slot": 3
+      }
+    ],
+    "height": 42,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10215.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10215.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "flapple-gmax": {
+    "formId": "flapple-gmax",
+    "baseSpeciesId": "841",
+    "formType": "gigantamax",
+    "displayName": "Flapple Gmax",
+    "types": [
+      "grass",
+      "dragon"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 110,
+      "defense": 80,
+      "specialAttack": 95,
+      "specialDefense": 60,
+      "speed": 70
+    },
+    "abilities": [
+      {
+        "abilityId": "ripen",
+        "isHidden": false,
+        "slot": 1
+      },
+      {
+        "abilityId": "gluttony",
+        "isHidden": false,
+        "slot": 2
+      },
+      {
+        "abilityId": "hustle",
+        "isHidden": true,
+        "slot": 3
+      }
+    ],
+    "height": 24,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10216.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10216.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "appletun-gmax": {
+    "formId": "appletun-gmax",
+    "baseSpeciesId": "842",
+    "formType": "gigantamax",
+    "displayName": "Appletun Gmax",
+    "types": [
+      "grass",
+      "dragon"
+    ],
+    "baseStats": {
+      "hp": 110,
+      "attack": 85,
+      "defense": 80,
+      "specialAttack": 100,
+      "specialDefense": 80,
+      "speed": 30
+    },
+    "abilities": [
+      {
+        "abilityId": "ripen",
+        "isHidden": false,
+        "slot": 1
+      },
+      {
+        "abilityId": "gluttony",
+        "isHidden": false,
+        "slot": 2
+      },
+      {
+        "abilityId": "thick-fat",
+        "isHidden": true,
+        "slot": 3
+      }
+    ],
+    "height": 24,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10217.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10217.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "sandaconda-gmax": {
+    "formId": "sandaconda-gmax",
+    "baseSpeciesId": "844",
+    "formType": "gigantamax",
+    "displayName": "Sandaconda Gmax",
+    "types": [
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 72,
+      "attack": 107,
+      "defense": 125,
+      "specialAttack": 65,
+      "specialDefense": 70,
+      "speed": 71
+    },
+    "abilities": [
+      {
+        "abilityId": "sand-spit",
+        "isHidden": false,
+        "slot": 1
+      },
+      {
+        "abilityId": "shed-skin",
+        "isHidden": false,
+        "slot": 2
+      },
+      {
+        "abilityId": "sand-veil",
+        "isHidden": true,
+        "slot": 3
+      }
+    ],
+    "height": 22,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10218.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10218.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "toxtricity-amped-gmax": {
+    "formId": "toxtricity-amped-gmax",
+    "baseSpeciesId": "849",
+    "formType": "gigantamax",
+    "displayName": "Toxtricity Amped Gmax",
+    "types": [
+      "electric",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 98,
+      "defense": 70,
+      "specialAttack": 114,
+      "specialDefense": 70,
+      "speed": 75
+    },
+    "abilities": [
+      {
+        "abilityId": "punk-rock",
+        "isHidden": false,
+        "slot": 1
+      },
+      {
+        "abilityId": "plus",
+        "isHidden": false,
+        "slot": 2
+      },
+      {
+        "abilityId": "technician",
+        "isHidden": true,
+        "slot": 3
+      }
+    ],
+    "height": 24,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10219.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10219.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "centiskorch-gmax": {
+    "formId": "centiskorch-gmax",
+    "baseSpeciesId": "851",
+    "formType": "gigantamax",
+    "displayName": "Centiskorch Gmax",
+    "types": [
+      "fire",
+      "bug"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 115,
+      "defense": 65,
+      "specialAttack": 90,
+      "specialDefense": 90,
+      "speed": 65
+    },
+    "abilities": [
+      {
+        "abilityId": "flash-fire",
+        "isHidden": false,
+        "slot": 1
+      },
+      {
+        "abilityId": "white-smoke",
+        "isHidden": false,
+        "slot": 2
+      },
+      {
+        "abilityId": "flame-body",
+        "isHidden": true,
+        "slot": 3
+      }
+    ],
+    "height": 75,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10220.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10220.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "hatterene-gmax": {
+    "formId": "hatterene-gmax",
+    "baseSpeciesId": "858",
+    "formType": "gigantamax",
+    "displayName": "Hatterene Gmax",
+    "types": [
+      "psychic",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 57,
+      "attack": 90,
+      "defense": 95,
+      "specialAttack": 136,
+      "specialDefense": 103,
+      "speed": 29
+    },
+    "abilities": [
+      {
+        "abilityId": "healer",
+        "isHidden": false,
+        "slot": 1
+      },
+      {
+        "abilityId": "anticipation",
+        "isHidden": false,
+        "slot": 2
+      },
+      {
+        "abilityId": "magic-bounce",
+        "isHidden": true,
+        "slot": 3
+      }
+    ],
+    "height": 26,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10221.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10221.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "grimmsnarl-gmax": {
+    "formId": "grimmsnarl-gmax",
+    "baseSpeciesId": "861",
+    "formType": "gigantamax",
+    "displayName": "Grimmsnarl Gmax",
+    "types": [
+      "dark",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "attack": 120,
+      "defense": 65,
+      "specialAttack": 95,
+      "specialDefense": 75,
+      "speed": 60
+    },
+    "abilities": [
+      {
+        "abilityId": "prankster",
+        "isHidden": false,
+        "slot": 1
+      },
+      {
+        "abilityId": "frisk",
+        "isHidden": false,
+        "slot": 2
+      },
+      {
+        "abilityId": "pickpocket",
+        "isHidden": true,
+        "slot": 3
+      }
+    ],
+    "height": 32,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10222.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10222.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "alcremie-gmax": {
+    "formId": "alcremie-gmax",
+    "baseSpeciesId": "869",
+    "formType": "gigantamax",
+    "displayName": "Alcremie Gmax",
+    "types": [
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 60,
+      "defense": 75,
+      "specialAttack": 110,
+      "specialDefense": 121,
+      "speed": 64
+    },
+    "abilities": [
+      {
+        "abilityId": "sweet-veil",
+        "isHidden": false,
+        "slot": 1
+      },
+      {
+        "abilityId": "aroma-veil",
+        "isHidden": true,
+        "slot": 3
+      }
+    ],
+    "height": 30,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10223.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10223.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "copperajah-gmax": {
+    "formId": "copperajah-gmax",
+    "baseSpeciesId": "879",
+    "formType": "gigantamax",
+    "displayName": "Copperajah Gmax",
+    "types": [
+      "steel"
+    ],
+    "baseStats": {
+      "hp": 122,
+      "attack": 130,
+      "defense": 69,
+      "specialAttack": 80,
+      "specialDefense": 69,
+      "speed": 30
+    },
+    "abilities": [
+      {
+        "abilityId": "sheer-force",
+        "isHidden": false,
+        "slot": 1
+      },
+      {
+        "abilityId": "heavy-metal",
+        "isHidden": true,
+        "slot": 3
+      }
+    ],
+    "height": 23,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10224.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10224.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "duraludon-gmax": {
+    "formId": "duraludon-gmax",
+    "baseSpeciesId": "884",
+    "formType": "gigantamax",
+    "displayName": "Duraludon Gmax",
+    "types": [
+      "steel",
+      "dragon"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 95,
+      "defense": 115,
+      "specialAttack": 120,
+      "specialDefense": 50,
+      "speed": 85
+    },
+    "abilities": [
+      {
+        "abilityId": "light-metal",
+        "isHidden": false,
+        "slot": 1
+      },
+      {
+        "abilityId": "heavy-metal",
+        "isHidden": false,
+        "slot": 2
+      },
+      {
+        "abilityId": "stalwart",
+        "isHidden": true,
+        "slot": 3
+      }
+    ],
+    "height": 43,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10225.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10225.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "urshifu-single-strike-gmax": {
+    "formId": "urshifu-single-strike-gmax",
+    "baseSpeciesId": "892",
+    "formType": "gigantamax",
+    "displayName": "Urshifu Single Strike Gmax",
+    "types": [
+      "fighting",
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 130,
+      "defense": 100,
+      "specialAttack": 63,
+      "specialDefense": 60,
+      "speed": 97
+    },
+    "abilities": [
+      {
+        "abilityId": "unseen-fist",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 29,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10226.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10226.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "urshifu-rapid-strike-gmax": {
+    "formId": "urshifu-rapid-strike-gmax",
+    "baseSpeciesId": "892",
+    "formType": "gigantamax",
+    "displayName": "Urshifu Rapid Strike Gmax",
+    "types": [
+      "fighting",
+      "water"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 130,
+      "defense": 100,
+      "specialAttack": 63,
+      "specialDefense": 60,
+      "speed": 97
+    },
+    "abilities": [
+      {
+        "abilityId": "unseen-fist",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 26,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10227.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10227.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "toxtricity-low-key-gmax": {
+    "formId": "toxtricity-low-key-gmax",
+    "baseSpeciesId": "849",
+    "formType": "gigantamax",
+    "displayName": "Toxtricity Low Key Gmax",
+    "types": [
+      "electric",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 98,
+      "defense": 70,
+      "specialAttack": 114,
+      "specialDefense": 70,
+      "speed": 75
+    },
+    "abilities": [
+      {
+        "abilityId": "punk-rock",
+        "isHidden": false,
+        "slot": 1
+      },
+      {
+        "abilityId": "minus",
+        "isHidden": false,
+        "slot": 2
+      },
+      {
+        "abilityId": "technician",
+        "isHidden": true,
+        "slot": 3
+      }
+    ],
+    "height": 24,
+    "weight": 1000,
+    "sprites": {
+      "default": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10228.png",
+      "shiny": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10228.png",
+      "source": "home"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "gigantamax": {
+        "gmaxFactor": true
+      }
+    }
+  },
+  "clefable-mega": {
+    "formId": "clefable-mega",
+    "baseSpeciesId": "36",
+    "formType": "mega",
+    "displayName": "Clefable Mega",
+    "types": [
+      "fairy",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "attack": 80,
+      "defense": 93,
+      "specialAttack": 135,
+      "specialDefense": 110,
+      "speed": 70
+    },
+    "abilities": [],
+    "height": 1.7,
+    "weight": 42.3,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "victreebel-mega": {
+    "formId": "victreebel-mega",
+    "baseSpeciesId": "71",
+    "formType": "mega",
+    "displayName": "Victreebel Mega",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 125,
+      "defense": 85,
+      "specialAttack": 135,
+      "specialDefense": 95,
+      "speed": 70
+    },
+    "abilities": [],
+    "height": 4.5,
+    "weight": 125.5,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "starmie-mega": {
+    "formId": "starmie-mega",
+    "baseSpeciesId": "121",
+    "formType": "mega",
+    "displayName": "Starmie Mega",
+    "types": [
+      "water",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 140,
+      "defense": 105,
+      "specialAttack": 130,
+      "specialDefense": 105,
+      "speed": 120
+    },
+    "abilities": [],
+    "height": 2.3,
+    "weight": 80,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "dragonite-mega": {
+    "formId": "dragonite-mega",
+    "baseSpeciesId": "149",
+    "formType": "mega",
+    "displayName": "Dragonite Mega",
+    "types": [
+      "dragon",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 91,
+      "attack": 124,
+      "defense": 115,
+      "specialAttack": 145,
+      "specialDefense": 125,
+      "speed": 100
+    },
+    "abilities": [],
+    "height": 5.5,
+    "weight": 290,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "meganium-mega": {
+    "formId": "meganium-mega",
+    "baseSpeciesId": "154",
+    "formType": "mega",
+    "displayName": "Meganium Mega",
+    "types": [
+      "grass",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 92,
+      "defense": 115,
+      "specialAttack": 143,
+      "specialDefense": 115,
+      "speed": 80
+    },
+    "abilities": [],
+    "height": 2.4,
+    "weight": 201,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "feraligatr-mega": {
+    "formId": "feraligatr-mega",
+    "baseSpeciesId": "160",
+    "formType": "mega",
+    "displayName": "Feraligatr Mega",
+    "types": [
+      "water",
+      "dragon"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "attack": 160,
+      "defense": 125,
+      "specialAttack": 89,
+      "specialDefense": 93,
+      "speed": 78
+    },
+    "abilities": [],
+    "height": 2.3,
+    "weight": 108.8,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "skarmory-mega": {
+    "formId": "skarmory-mega",
+    "baseSpeciesId": "227",
+    "formType": "mega",
+    "displayName": "Skarmory Mega",
+    "types": [
+      "steel",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 140,
+      "defense": 110,
+      "specialAttack": 40,
+      "specialDefense": 100,
+      "speed": 110
+    },
+    "abilities": [],
+    "height": 1.7,
+    "weight": 40.4,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "froslass-mega": {
+    "formId": "froslass-mega",
+    "baseSpeciesId": "478",
+    "formType": "mega",
+    "displayName": "Froslass Mega",
+    "types": [
+      "ice",
+      "ghost"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 80,
+      "defense": 70,
+      "specialAttack": 140,
+      "specialDefense": 100,
+      "speed": 120
+    },
+    "abilities": [],
+    "height": 2.6,
+    "weight": 29.6,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "emboar-mega": {
+    "formId": "emboar-mega",
+    "baseSpeciesId": "500",
+    "formType": "mega",
+    "displayName": "Emboar Mega",
+    "types": [
+      "fire",
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 110,
+      "attack": 148,
+      "defense": 75,
+      "specialAttack": 110,
+      "specialDefense": 110,
+      "speed": 75
+    },
+    "abilities": [],
+    "height": 1.8,
+    "weight": 180.3,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "excadrill-mega": {
+    "formId": "excadrill-mega",
+    "baseSpeciesId": "530",
+    "formType": "mega",
+    "displayName": "Excadrill Mega",
+    "types": [
+      "ground",
+      "steel"
+    ],
+    "baseStats": {
+      "hp": 110,
+      "attack": 165,
+      "defense": 100,
+      "specialAttack": 65,
+      "specialDefense": 65,
+      "speed": 103
+    },
+    "abilities": [],
+    "height": 0.9,
+    "weight": 60,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "scolipede-mega": {
+    "formId": "scolipede-mega",
+    "baseSpeciesId": "545",
+    "formType": "mega",
+    "displayName": "Scolipede Mega",
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 140,
+      "defense": 149,
+      "specialAttack": 75,
+      "specialDefense": 99,
+      "speed": 62
+    },
+    "abilities": [],
+    "height": 3.2,
+    "weight": 230.5,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "scrafty-mega": {
+    "formId": "scrafty-mega",
+    "baseSpeciesId": "560",
+    "formType": "mega",
+    "displayName": "Scrafty Mega",
+    "types": [
+      "dark",
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 130,
+      "defense": 135,
+      "specialAttack": 55,
+      "specialDefense": 135,
+      "speed": 68
+    },
+    "abilities": [],
+    "height": 1.1,
+    "weight": 31,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "eelektross-mega": {
+    "formId": "eelektross-mega",
+    "baseSpeciesId": "604",
+    "formType": "mega",
+    "displayName": "Eelektross Mega",
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "attack": 145,
+      "defense": 80,
+      "specialAttack": 135,
+      "specialDefense": 90,
+      "speed": 80
+    },
+    "abilities": [],
+    "height": 3,
+    "weight": 180,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "chandelure-mega": {
+    "formId": "chandelure-mega",
+    "baseSpeciesId": "609",
+    "formType": "mega",
+    "displayName": "Chandelure Mega",
+    "types": [
+      "ghost",
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 75,
+      "defense": 110,
+      "specialAttack": 175,
+      "specialDefense": 110,
+      "speed": 90
+    },
+    "abilities": [],
+    "height": 2.5,
+    "weight": 69.6,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "chesnaught-mega": {
+    "formId": "chesnaught-mega",
+    "baseSpeciesId": "652",
+    "formType": "mega",
+    "displayName": "Chesnaught Mega",
+    "types": [
+      "grass",
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 88,
+      "attack": 137,
+      "defense": 172,
+      "specialAttack": 74,
+      "specialDefense": 115,
+      "speed": 44
+    },
+    "abilities": [],
+    "height": 1.6,
+    "weight": 90,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "delphox-mega": {
+    "formId": "delphox-mega",
+    "baseSpeciesId": "655",
+    "formType": "mega",
+    "displayName": "Delphox Mega",
+    "types": [
+      "fire",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 69,
+      "defense": 72,
+      "specialAttack": 159,
+      "specialDefense": 125,
+      "speed": 134
+    },
+    "abilities": [],
+    "height": 1.5,
+    "weight": 39,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "greninja-mega": {
+    "formId": "greninja-mega",
+    "baseSpeciesId": "658",
+    "formType": "mega",
+    "displayName": "Greninja Mega",
+    "types": [
+      "water",
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 72,
+      "attack": 125,
+      "defense": 77,
+      "specialAttack": 133,
+      "specialDefense": 81,
+      "speed": 142
+    },
+    "abilities": [],
+    "height": 1.5,
+    "weight": 40,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "pyroar-mega": {
+    "formId": "pyroar-mega",
+    "baseSpeciesId": "668",
+    "formType": "mega",
+    "displayName": "Pyroar Mega",
+    "types": [
+      "fire",
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 86,
+      "attack": 88,
+      "defense": 92,
+      "specialAttack": 129,
+      "specialDefense": 86,
+      "speed": 126
+    },
+    "abilities": [],
+    "height": 1.5,
+    "weight": 93.3,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "floette-mega": {
+    "formId": "floette-mega",
+    "baseSpeciesId": "670",
+    "formType": "mega",
+    "displayName": "Floette Mega",
+    "types": [
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 74,
+      "attack": 85,
+      "defense": 87,
+      "specialAttack": 155,
+      "specialDefense": 148,
+      "speed": 102
+    },
+    "abilities": [],
+    "height": 0.2,
+    "weight": 100.8,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "malamar-mega": {
+    "formId": "malamar-mega",
+    "baseSpeciesId": "687",
+    "formType": "mega",
+    "displayName": "Malamar Mega",
+    "types": [
+      "dark",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 86,
+      "attack": 102,
+      "defense": 88,
+      "specialAttack": 98,
+      "specialDefense": 120,
+      "speed": 88
+    },
+    "abilities": [],
+    "height": 2.9,
+    "weight": 69.8,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "barbaracle-mega": {
+    "formId": "barbaracle-mega",
+    "baseSpeciesId": "689",
+    "formType": "mega",
+    "displayName": "Barbaracle Mega",
+    "types": [
+      "rock",
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 72,
+      "attack": 140,
+      "defense": 130,
+      "specialAttack": 64,
+      "specialDefense": 106,
+      "speed": 88
+    },
+    "abilities": [],
+    "height": 2.2,
+    "weight": 100,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "dragalge-mega": {
+    "formId": "dragalge-mega",
+    "baseSpeciesId": "691",
+    "formType": "mega",
+    "displayName": "Dragalge Mega",
+    "types": [
+      "poison",
+      "dragon"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 85,
+      "defense": 105,
+      "specialAttack": 132,
+      "specialDefense": 163,
+      "speed": 44
+    },
+    "abilities": [],
+    "height": 2.1,
+    "weight": 100.3,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "hawlucha-mega": {
+    "formId": "hawlucha-mega",
+    "baseSpeciesId": "701",
+    "formType": "mega",
+    "displayName": "Hawlucha Mega",
+    "types": [
+      "fighting",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 78,
+      "attack": 137,
+      "defense": 100,
+      "specialAttack": 74,
+      "specialDefense": 93,
+      "speed": 118
+    },
+    "abilities": [],
+    "height": 1,
+    "weight": 25,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "zygarde-mega": {
+    "formId": "zygarde-mega",
+    "baseSpeciesId": "718",
+    "formType": "mega",
+    "displayName": "Zygarde Mega",
+    "types": [
+      "dragon",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 216,
+      "attack": 70,
+      "defense": 91,
+      "specialAttack": 216,
+      "specialDefense": 85,
+      "speed": 100
+    },
+    "abilities": [],
+    "height": 7.7,
+    "weight": 610,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "drampa-mega": {
+    "formId": "drampa-mega",
+    "baseSpeciesId": "780",
+    "formType": "mega",
+    "displayName": "Drampa Mega",
+    "types": [
+      "normal",
+      "dragon"
+    ],
+    "baseStats": {
+      "hp": 78,
+      "attack": 85,
+      "defense": 110,
+      "specialAttack": 160,
+      "specialDefense": 116,
+      "speed": 36
+    },
+    "abilities": [],
+    "height": 3,
+    "weight": 240.5,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "falinks-mega": {
+    "formId": "falinks-mega",
+    "baseSpeciesId": "870",
+    "formType": "mega",
+    "displayName": "Falinks Mega",
+    "types": [
+      "fighting"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 135,
+      "defense": 135,
+      "specialAttack": 70,
+      "specialDefense": 65,
+      "speed": 100
+    },
+    "abilities": [],
+    "height": 1.6,
+    "weight": 99,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "raichu-mega-x": {
+    "formId": "raichu-mega-x",
+    "baseSpeciesId": "26",
+    "formType": "mega",
+    "displayName": "Raichu Mega X",
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 135,
+      "defense": 95,
+      "specialAttack": 90,
+      "specialDefense": 95,
+      "speed": 110
+    },
+    "abilities": [],
+    "height": 1.2,
+    "weight": 38,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "raichu-mega-y": {
+    "formId": "raichu-mega-y",
+    "baseSpeciesId": "26",
+    "formType": "mega",
+    "displayName": "Raichu Mega Y",
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 100,
+      "defense": 55,
+      "specialAttack": 160,
+      "specialDefense": 80,
+      "speed": 130
+    },
+    "abilities": [],
+    "height": 1,
+    "weight": 26,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "staraptor-mega": {
+    "formId": "staraptor-mega",
+    "baseSpeciesId": "398",
+    "formType": "mega",
+    "displayName": "Staraptor Mega",
+    "types": [
+      "fighting",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "attack": 140,
+      "defense": 100,
+      "specialAttack": 60,
+      "specialDefense": 90,
+      "speed": 110
+    },
+    "abilities": [],
+    "height": 1.9,
+    "weight": 50,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "heatran-mega": {
+    "formId": "heatran-mega",
+    "baseSpeciesId": "485",
+    "formType": "mega",
+    "displayName": "Heatran Mega",
+    "types": [
+      "fire",
+      "steel"
+    ],
+    "baseStats": {
+      "hp": 91,
+      "attack": 120,
+      "defense": 106,
+      "specialAttack": 175,
+      "specialDefense": 141,
+      "speed": 67
+    },
+    "abilities": [],
+    "height": 2.8,
+    "weight": 570,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "darkrai-mega": {
+    "formId": "darkrai-mega",
+    "baseSpeciesId": "491",
+    "formType": "mega",
+    "displayName": "Darkrai Mega",
+    "types": [
+      "dark"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 120,
+      "defense": 130,
+      "specialAttack": 165,
+      "specialDefense": 130,
+      "speed": 85
+    },
+    "abilities": [],
+    "height": 3,
+    "weight": 240,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "golurk-mega": {
+    "formId": "golurk-mega",
+    "baseSpeciesId": "623",
+    "formType": "mega",
+    "displayName": "Golurk Mega",
+    "types": [
+      "ground",
+      "ghost"
+    ],
+    "baseStats": {
+      "hp": 89,
+      "attack": 159,
+      "defense": 105,
+      "specialAttack": 70,
+      "specialDefense": 105,
+      "speed": 55
+    },
+    "abilities": [],
+    "height": 4,
+    "weight": 330,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "meowstic-mega": {
+    "formId": "meowstic-mega",
+    "baseSpeciesId": "678",
+    "formType": "mega",
+    "displayName": "Meowstic Mega",
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 74,
+      "attack": 48,
+      "defense": 76,
+      "specialAttack": 143,
+      "specialDefense": 101,
+      "speed": 124
+    },
+    "abilities": [],
+    "height": 0.8,
+    "weight": 10.1,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "crabominable-mega": {
+    "formId": "crabominable-mega",
+    "baseSpeciesId": "740",
+    "formType": "mega",
+    "displayName": "Crabominable Mega",
+    "types": [
+      "fighting",
+      "ice"
+    ],
+    "baseStats": {
+      "hp": 97,
+      "attack": 157,
+      "defense": 122,
+      "specialAttack": 62,
+      "specialDefense": 107,
+      "speed": 33
+    },
+    "abilities": [],
+    "height": 2.6,
+    "weight": 252.8,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "golisopod-mega": {
+    "formId": "golisopod-mega",
+    "baseSpeciesId": "768",
+    "formType": "mega",
+    "displayName": "Golisopod Mega",
+    "types": [
+      "bug",
+      "steel"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 150,
+      "defense": 175,
+      "specialAttack": 70,
+      "specialDefense": 120,
+      "speed": 40
+    },
+    "abilities": [],
+    "height": 2.3,
+    "weight": 148,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "magearna-mega": {
+    "formId": "magearna-mega",
+    "baseSpeciesId": "801",
+    "formType": "mega",
+    "displayName": "Magearna Mega",
+    "types": [
+      "steel",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 125,
+      "defense": 115,
+      "specialAttack": 170,
+      "specialDefense": 115,
+      "speed": 95
+    },
+    "abilities": [],
+    "height": 1.3,
+    "weight": 248.1,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "magearna-original-mega": {
+    "formId": "magearna-original-mega",
+    "baseSpeciesId": "801",
+    "formType": "mega",
+    "displayName": "Magearna Original Mega",
+    "types": [
+      "steel",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 125,
+      "defense": 115,
+      "specialAttack": 170,
+      "specialDefense": 115,
+      "speed": 95
+    },
+    "abilities": [],
+    "height": 1.3,
+    "weight": 248.1,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "zeraora-mega": {
+    "formId": "zeraora-mega",
+    "baseSpeciesId": "807",
+    "formType": "mega",
+    "displayName": "Zeraora Mega",
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 88,
+      "attack": 157,
+      "defense": 75,
+      "specialAttack": 147,
+      "specialDefense": 80,
+      "speed": 153
+    },
+    "abilities": [],
+    "height": 1.5,
+    "weight": 44.5,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "scovillain-mega": {
+    "formId": "scovillain-mega",
+    "baseSpeciesId": "952",
+    "formType": "mega",
+    "displayName": "Scovillain Mega",
+    "types": [
+      "grass",
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 138,
+      "defense": 85,
+      "specialAttack": 138,
+      "specialDefense": 85,
+      "speed": 75
+    },
+    "abilities": [],
+    "height": 1.2,
+    "weight": 22,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "glimmora-mega": {
+    "formId": "glimmora-mega",
+    "baseSpeciesId": "970",
+    "formType": "mega",
+    "displayName": "Glimmora Mega",
+    "types": [
+      "rock",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 83,
+      "attack": 90,
+      "defense": 105,
+      "specialAttack": 150,
+      "specialDefense": 96,
+      "speed": 101
+    },
+    "abilities": [],
+    "height": 2.8,
+    "weight": 77,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "tatsugiri-curly-mega": {
+    "formId": "tatsugiri-curly-mega",
+    "baseSpeciesId": "978",
+    "formType": "mega",
+    "displayName": "Tatsugiri Curly Mega",
+    "types": [
+      "dragon",
+      "water"
+    ],
+    "baseStats": {
+      "hp": 68,
+      "attack": 65,
+      "defense": 90,
+      "specialAttack": 135,
+      "specialDefense": 125,
+      "speed": 92
+    },
+    "abilities": [],
+    "height": 0.6,
+    "weight": 24,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "tatsugiri-droopy-mega": {
+    "formId": "tatsugiri-droopy-mega",
+    "baseSpeciesId": "978",
+    "formType": "mega",
+    "displayName": "Tatsugiri Droopy Mega",
+    "types": [
+      "dragon",
+      "water"
+    ],
+    "baseStats": {
+      "hp": 68,
+      "attack": 65,
+      "defense": 90,
+      "specialAttack": 135,
+      "specialDefense": 125,
+      "speed": 92
+    },
+    "abilities": [],
+    "height": 0.6,
+    "weight": 24,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "tatsugiri-stretchy-mega": {
+    "formId": "tatsugiri-stretchy-mega",
+    "baseSpeciesId": "978",
+    "formType": "mega",
+    "displayName": "Tatsugiri Stretchy Mega",
+    "types": [
+      "dragon",
+      "water"
+    ],
+    "baseStats": {
+      "hp": 68,
+      "attack": 65,
+      "defense": 90,
+      "specialAttack": 135,
+      "specialDefense": 125,
+      "speed": 92
+    },
+    "abilities": [],
+    "height": 0.6,
+    "weight": 24,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  },
+  "chimecho-mega": {
+    "formId": "chimecho-mega",
+    "baseSpeciesId": "358",
+    "formType": "mega",
+    "displayName": "Mega Chimecho",
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 50,
+      "defense": 85,
+      "specialAttack": 125,
+      "specialDefense": 115,
+      "speed": 80
+    },
+    "abilities": [
+      {
+        "abilityId": "levitate",
+        "isHidden": false,
+        "slot": 1
+      }
+    ],
+    "height": 1.4,
+    "weight": 7.5,
+    "sprites": {
+      "default": "/sprites/pokemon/forms/chimecho-mega.png",
+      "shiny": "/sprites/pokemon/forms/shiny/chimecho-mega.png"
+    },
+    "typeEffectiveness": null,
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": "chimechonite"
+      }
+    }
+  },
+  "baxcalibur-mega": {
+    "formId": "baxcalibur-mega",
+    "baseSpeciesId": "998",
+    "formType": "mega",
+    "displayName": "Baxcalibur Mega",
+    "types": [
+      "dragon",
+      "ice"
+    ],
+    "baseStats": {
+      "hp": 115,
+      "attack": 175,
+      "defense": 117,
+      "specialAttack": 105,
+      "specialDefense": 101,
+      "speed": 87
+    },
+    "abilities": [],
+    "height": 2.1,
+    "weight": 315,
+    "sprites": {
+      "default": null,
+      "shiny": null,
+      "source": "none"
+    },
+    "typeEffectiveness": {
+      "weaknesses": [],
+      "resistances": [],
+      "immunities": [],
+      "neutral": []
+    },
+    "mechanics": {
+      "mega": {
+        "megaStoneItemId": null
+      }
+    }
+  }
+}

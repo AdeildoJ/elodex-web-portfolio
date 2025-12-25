@@ -1,0 +1,8 @@
+{
+  "projects": {
+    "default": "elodex-1c8a1",
+    "elodex": "elodex-1c8a1"
+  },
+  "targets": {},
+  "etags": {}
+}

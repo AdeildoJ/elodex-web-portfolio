@@ -1,0 +1,233 @@
+{
+  "updated": 0,
+  "missingSprite": [
+    {
+      "formId": "clefable-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/clefable-mega",
+      "source": "none"
+    },
+    {
+      "formId": "victreebel-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/victreebel-mega",
+      "source": "none"
+    },
+    {
+      "formId": "starmie-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/starmie-mega",
+      "source": "none"
+    },
+    {
+      "formId": "dragonite-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/dragonite-mega",
+      "source": "none"
+    },
+    {
+      "formId": "meganium-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/meganium-mega",
+      "source": "none"
+    },
+    {
+      "formId": "feraligatr-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/feraligatr-mega",
+      "source": "none"
+    },
+    {
+      "formId": "skarmory-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/skarmory-mega",
+      "source": "none"
+    },
+    {
+      "formId": "froslass-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/froslass-mega",
+      "source": "none"
+    },
+    {
+      "formId": "emboar-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/emboar-mega",
+      "source": "none"
+    },
+    {
+      "formId": "excadrill-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/excadrill-mega",
+      "source": "none"
+    },
+    {
+      "formId": "scolipede-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/scolipede-mega",
+      "source": "none"
+    },
+    {
+      "formId": "scrafty-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/scrafty-mega",
+      "source": "none"
+    },
+    {
+      "formId": "eelektross-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/eelektross-mega",
+      "source": "none"
+    },
+    {
+      "formId": "chandelure-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/chandelure-mega",
+      "source": "none"
+    },
+    {
+      "formId": "chesnaught-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/chesnaught-mega",
+      "source": "none"
+    },
+    {
+      "formId": "delphox-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/delphox-mega",
+      "source": "none"
+    },
+    {
+      "formId": "greninja-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/greninja-mega",
+      "source": "none"
+    },
+    {
+      "formId": "pyroar-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/pyroar-mega",
+      "source": "none"
+    },
+    {
+      "formId": "floette-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/floette-mega",
+      "source": "none"
+    },
+    {
+      "formId": "malamar-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/malamar-mega",
+      "source": "none"
+    },
+    {
+      "formId": "barbaracle-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/barbaracle-mega",
+      "source": "none"
+    },
+    {
+      "formId": "dragalge-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/dragalge-mega",
+      "source": "none"
+    },
+    {
+      "formId": "hawlucha-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/hawlucha-mega",
+      "source": "none"
+    },
+    {
+      "formId": "zygarde-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/zygarde-mega",
+      "source": "none"
+    },
+    {
+      "formId": "drampa-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/drampa-mega",
+      "source": "none"
+    },
+    {
+      "formId": "falinks-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/falinks-mega",
+      "source": "none"
+    },
+    {
+      "formId": "raichu-mega-x",
+      "url": "https://pokeapi.co/api/v2/pokemon/raichu-mega-x",
+      "source": "none"
+    },
+    {
+      "formId": "raichu-mega-y",
+      "url": "https://pokeapi.co/api/v2/pokemon/raichu-mega-y",
+      "source": "none"
+    },
+    {
+      "formId": "staraptor-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/staraptor-mega",
+      "source": "none"
+    },
+    {
+      "formId": "heatran-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/heatran-mega",
+      "source": "none"
+    },
+    {
+      "formId": "darkrai-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/darkrai-mega",
+      "source": "none"
+    },
+    {
+      "formId": "golurk-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/golurk-mega",
+      "source": "none"
+    },
+    {
+      "formId": "meowstic-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/meowstic-mega",
+      "source": "none"
+    },
+    {
+      "formId": "crabominable-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/crabominable-mega",
+      "source": "none"
+    },
+    {
+      "formId": "golisopod-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/golisopod-mega",
+      "source": "none"
+    },
+    {
+      "formId": "magearna-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/magearna-mega",
+      "source": "none"
+    },
+    {
+      "formId": "magearna-original-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/magearna-original-mega",
+      "source": "none"
+    },
+    {
+      "formId": "zeraora-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/zeraora-mega",
+      "source": "none"
+    },
+    {
+      "formId": "scovillain-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/scovillain-mega",
+      "source": "none"
+    },
+    {
+      "formId": "glimmora-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/glimmora-mega",
+      "source": "none"
+    },
+    {
+      "formId": "tatsugiri-curly-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/tatsugiri-curly-mega",
+      "source": "none"
+    },
+    {
+      "formId": "tatsugiri-droopy-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/tatsugiri-droopy-mega",
+      "source": "none"
+    },
+    {
+      "formId": "tatsugiri-stretchy-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/tatsugiri-stretchy-mega",
+      "source": "none"
+    },
+    {
+      "formId": "baxcalibur-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/baxcalibur-mega",
+      "source": "none"
+    }
+  ],
+  "failedFetch": [
+    {
+      "formId": "chimecho-mega",
+      "url": "https://pokeapi.co/api/v2/pokemon/chimecho-mega",
+      "error": "HTTP 404 em https://pokeapi.co/api/v2/pokemon/chimecho-mega"
+    }
+  ],
+  "noChange": 126
+}
