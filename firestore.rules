@@ -3,7 +3,7 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     // ================================
-    // 🔧 Helpers
+    // ðŸ”§ Helpers
     // ================================
     function isSignedIn() {
       return request.auth != null;
@@ -18,34 +18,70 @@ service cloud.firestore {
     }
 
     // ================================
-    // 🔥 POKÉDEX ADMIN
+    // ðŸ”¥ POKÃ‰DEX ADMIN
     // ================================
 
-    // Espécies base dos Pokémon (Biblioteca)
+    // EspÃ©cies base dos PokÃ©mon (Biblioteca)
     match /pokemonSpecies/{id} {
       allow read:  if isSignedIn();
       allow write: if isAdmin();
     }
 
-    // Configurações mutáveis de venda dos itens (loja)
+    // ConfiguraÃ§Ãµes mutÃ¡veis de venda dos itens (loja)
     match /itemsConfig/{id} {
       allow read:  if isSignedIn();
       allow write: if isAdmin();
     }
 
-    // Configurações por versão do jogo
+    // ConfiguraÃ§Ãµes por versÃ£o do jogo
     match /pokedexConfig/{id} {
       allow read:  if isSignedIn();
       allow write: if isAdmin();
     }
 
-    // Movimentos (catálogo geral de golpes)
+    // Configuracao de encontros por bioma (definida no Pokedex/Admin)
+    match /biomeEncounterConfig/{id} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+
+      // Subcolecoes por bioma: /groups e /individual
+      match /{document=**} {
+        allow read: if isSignedIn();
+        allow write: if isAdmin();
+      }
+    }
+
+    // Cadastro de biomas (admin/web)
+    match /biomes/{id} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Pool global de Pokemon liberados/abandonados para re-encontro em biomas
+    match /releasedPokemonPool/{id} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.sourceUid == request.auth.uid;
+      allow update: if isAdmin() || (
+        isSignedIn() &&
+        resource.data.status == "active" &&
+        request.resource.data.status == "captured"
+      );
+      allow delete: if isAdmin();
+    }
+
+    // Grupos de captura (configuracao coletiva)
+    match /captureConfigGroups/{id} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Movimentos (catÃ¡logo geral de golpes)
     match /moves/{id} {
       allow read:  if isSignedIn();
       allow write: if isAdmin();
     }
 
-    // Learnset por espécie
+    // Learnset por espÃ©cie
     match /pokemonMoves/{id} {
       allow read:  if isSignedIn();
       allow write: if isAdmin();
@@ -57,27 +93,40 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // Itens globais (Catálogo)
+    // Itens globais (CatÃ¡logo)
     match /items/{id} {
       allow read:  if isSignedIn();
       allow write: if isAdmin();
     }
 
     // ================================
-    // 🔥 ELODEX — USUÁRIOS
+    // ðŸ”¥ ELODEX â€” USUÃRIOS
     // ================================
+
+    // Perfil e dados do app mobile
+    match /players/{uid} {
+      allow read:  if isSelf(uid) || isAdmin();
+      allow write: if isSelf(uid) || isAdmin();
+
+      // Todas as subcolecoes: characters, box, time, itens, pokeballs, etc.
+      match /{document=**} {
+        allow read:  if isSelf(uid) || isAdmin();
+        allow write: if isSelf(uid) || isAdmin();
+      }
+    }
+
     match /users/{uid} {
       allow read:  if isSelf(uid) || isAdmin();
       allow write: if isSelf(uid) || isAdmin();
     }
 
-    // Histórico financeiro principal (por usuário)
+    // HistÃ³rico financeiro principal (por usuÃ¡rio)
     match /users/{uid}/transactions/{txId} {
       allow read:  if isSelf(uid) || isAdmin();
       allow write: if isSelf(uid) || isAdmin();
     }
 
-    // ✅ collectionGroup(transactions) para admin
+    // âœ… collectionGroup(transactions) para admin
     match /{path=**}/transactions/{txId} {
       allow read: if isAdmin();
     }
@@ -94,26 +143,26 @@ service cloud.firestore {
       allow write: if isSelf(uid) || isAdmin();
     }
 
-    // Inventário de itens do jogador
+    // InventÃ¡rio de itens do jogador
     match /users/{uid}/inventory/{itemId} {
       allow read:  if isSelf(uid) || isAdmin();
       allow write: if isSelf(uid) || isAdmin();
     }
 
-    // Histórico econômico
+    // HistÃ³rico econÃ´mico
     match /users/{uid}/economy/{eventId} {
       allow read:  if isSelf(uid) || isAdmin();
       allow write: if isSelf(uid) || isAdmin();
     }
 
-    // Histórico por Pokémon
+    // HistÃ³rico por PokÃ©mon
     match /users/{uid}/pokemonHistory/{histId} {
       allow read:  if isSelf(uid) || isAdmin();
       allow write: if isSelf(uid) || isAdmin();
     }
 
     // ================================
-    // 🔥 INSTÂNCIAS DE POKÉMON
+    // ðŸ”¥ INSTÃ‚NCIAS DE POKÃ‰MON
     // ================================
     match /pokemonInstances/{pokeInstanceId} {
       allow read: if (isSignedIn() && isSelf(resource.data.ownerId)) || isAdmin();
@@ -121,7 +170,7 @@ service cloud.firestore {
     }
 
     // ================================
-    // 🔥 ESTATÍSTICAS
+    // ðŸ”¥ ESTATÃSTICAS
     // ================================
     match /users_stats/{uid} {
       allow read:  if isSelf(uid) || isAdmin();
@@ -134,7 +183,7 @@ service cloud.firestore {
     }
 
     // ================================
-    // 🔥 LOGS / MISSÕES / EVENTOS
+    // ðŸ”¥ LOGS / MISSÃ•ES / EVENTOS
     // ================================
 
     match /encounters_log/{id} {
@@ -142,15 +191,15 @@ service cloud.firestore {
       allow write: if isSignedIn();
     }
 
-    // ✅ CONFIGURAÇÃO ADMIN (NOVO) — Missões & Eventos (Admin)
-    // Coleção unificada apenas para CONFIGURAÇÃO
-    // (não é execução de jogo)
+    // âœ… CONFIGURAÃ‡ÃƒO ADMIN (NOVO) â€” MissÃµes & Eventos (Admin)
+    // ColeÃ§Ã£o unificada apenas para CONFIGURAÃ‡ÃƒO
+    // (nÃ£o Ã© execuÃ§Ã£o de jogo)
     match /missionsEvents/{id} {
       allow read:  if isAdmin();
       allow write: if isAdmin();
     }
 
-    // Coleções antigas (se você ainda usa em algum lugar)
+    // ColeÃ§Ãµes antigas (se vocÃª ainda usa em algum lugar)
     match /missions/{id} {
       allow read:  if isSignedIn();
       allow write: if isAdmin();
@@ -167,11 +216,41 @@ service cloud.firestore {
     }
 
     // ================================
-    // 🔥 PRESENÇA (futuro)
+    // ðŸ”¥ PRESENÃ‡A (futuro)
     // ================================
     match /presence/{uid} {
       allow read:  if isSignedIn();
       allow write: if false;
     }
+
+    // BATTLE SYSTEM
+    match /battlePresence/{id} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+      allow delete: if isAdmin();
+    }
+
+    match /battleInvites/{id} {
+      allow create: if isSignedIn() && request.resource.data.fromUid == request.auth.uid;
+
+      allow read: if isAdmin() || (isSignedIn() && (
+        resource.data.fromUid == request.auth.uid ||
+        resource.data.toUid == request.auth.uid
+      ));
+
+      allow update: if isAdmin() || (isSignedIn() && (
+        (resource.data.toUid == request.auth.uid && request.resource.data.status in ["accepted", "declined"]) ||
+        (resource.data.fromUid == request.auth.uid && request.resource.data.status == "canceled")
+      ));
+
+      allow delete: if isAdmin();
+    }
+
+    match /battleRooms/{id} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.ownerUid == request.auth.uid;
+      allow update, delete: if isAdmin() || (isSignedIn() && resource.data.ownerUid == request.auth.uid);
+    }
   }
 }
+

@@ -1,33 +1,34 @@
 // src/components/users/types.ts
 import type { Timestamp } from 'firebase/firestore';
 
+export type PlayerAccountType = 'FREE' | 'VIP';
 export type PlayerStatus = 'active' | 'inactive';
-export type PlayerAccountType = 'vip' | 'common';
+
+export type CharacterSummary = {
+  id: string;
+  name: string;
+  region?: string | null;
+  classType?: string | null;
+  createdAt?: Timestamp | null;
+  updatedAt?: Timestamp | null;
+  kmWalked?: number;
+  pokeCoins?: number;
+  level?: number;
+};
 
 export interface PlayerSummary {
-  id: string;
-  displayName: string;
+  id: string; // uid do player
+  uid: string;
+  nomeJogador: string;
   email: string;
+  playerType: PlayerAccountType;
   status: PlayerStatus;
-  accountType: PlayerAccountType;
   createdAt?: Timestamp | null;
-  boxCurrent?: number;
-  boxTotalLimit?: number;
-  ecoinBalance?: number;
-  itemsCount?: number;
-  hasExpiringPokemon?: boolean;
-  boxIsFull?: boolean;
-  lastLoginAt?: Timestamp | null;
-  region?: string | null;
-  characterClass?: string | null;
-  starterSpeciesId?: string | null;
-  level?: number;
-  xp?: number;
-  kmWalked?: number;
-  pokedexSeen?: number;
-  pokedexCaught?: number;
-  missionsCompleted?: number;
-  badges?: number;
+  updatedAt?: Timestamp | null;
+
+  selectedCharacterId?: string | null;
+  characterCount: number;
+  primaryCharacter?: CharacterSummary | null;
 }
 
 export interface StatsBlock {
@@ -37,53 +38,60 @@ export interface StatsBlock {
   spAtk?: number;
   spDef?: number;
   speed?: number;
+  spa?: number;
+  spd?: number;
+  spe?: number;
 }
 
 export interface PokemonMove {
   name: string;
+  moveId?: string;
   type?: string;
   category?: string;
   power?: number | null;
   accuracy?: number | null;
   pp?: number | null;
   learnedAtLevel?: number | null;
-  method?: string; // levelUp, tm, egg, tutor...
+  method?: string;
 }
 
 export interface PokemonInstance {
   id: string;
-  ownerId: string;
+  ownerId?: string;
   speciesId: string;
+  speciesName?: string;
+  nickname?: string;
   level: number;
   shiny: boolean;
   types: string[];
   gender?: string;
   nature?: string;
   ability?: string;
+  abilityId?: string;
   heldItemId?: string | null;
   stats?: StatsBlock;
   ivs?: StatsBlock;
   evs?: StatsBlock;
-  moves?: PokemonMove[];
+  moves?: PokemonMove[] | string[];
+  hpCurrent?: number;
+  hpTotal?: number;
 }
 
 export interface TeamSlot {
   slot: number;
-  pokemonInstanceId: string;
+  pokemonDocId: string;
   pokemon?: PokemonInstance;
 }
 
 export interface BoxEntry {
   id: string;
-  pokemonInstanceId: string;
   createdAt?: Timestamp | null;
   pokemon?: PokemonInstance;
 }
 
 export interface FilterState {
   search: string;
-  status: 'all' | PlayerStatus;
   accountType: 'all' | PlayerAccountType;
-  onlyExpiring: boolean;
-  onlyBoxFull: boolean;
+  status: 'all' | PlayerStatus;
+  hasCharacters: 'all' | 'with' | 'without';
 }

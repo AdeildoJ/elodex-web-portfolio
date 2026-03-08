@@ -6,6 +6,7 @@ export type Direcionamento = "TREINADOR" | "LADRAO";
  * (mantém o que você já vinha usando: Pokemon / Item / Ecoin / Pokecoin)
  */
 export type MissionRewardTypes = "POKEMON" | "ITEM" | "ECOIN" | "POKECOIN";
+export type RewardKind = MissionRewardTypes;
 
 export type MissionRewards = {
   tipos: MissionRewardTypes[];
@@ -14,6 +15,7 @@ export type MissionRewards = {
   ecoin?: { quantidade: number };
   pokecoin?: { quantidade: number };
 };
+export type PhaseRewards = MissionRewards;
 
 /**
  * ✅ Objetivo de fase da MISSÃO

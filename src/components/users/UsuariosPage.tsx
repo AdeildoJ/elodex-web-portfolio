@@ -1,117 +1,184 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   collection,
+  DocumentData,
   getDocs,
+  limit,
   orderBy,
   query,
+  QueryDocumentSnapshot,
+  startAfter,
+  Timestamp,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import Sidebar from '@/components/Sidebar';
-import {
-  FilterState,
-  PlayerSummary,
-} from './types';
+import { CharacterSummary, FilterState, PlayerSummary } from './types';
 import UserFiltersBar from './UserFiltersBar';
 import UserTable from './UserTable';
-import UserDetailsDrawer from "./UserDetailsDrawer";
+import UserDetailsDrawer from './UserDetailsDrawer';
+
+const PAGE_SIZE = 20;
+
+function toNumber(value: unknown, fallback = 0) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+async function loadCharactersSummary(uid: string, selectedCharacterId?: string | null) {
+  const charsCol = collection(db, 'players', uid, 'characters');
+  const charsSnap = await getDocs(query(charsCol, orderBy('createdAt', 'asc')));
+
+  const chars: CharacterSummary[] = charsSnap.docs.map((d) => {
+    const data = d.data() as any;
+    return {
+      id: d.id,
+      name: String(data?.name || d.id),
+      region: data?.region ?? null,
+      classType: data?.classType ?? null,
+      createdAt: (data?.createdAt as Timestamp) ?? null,
+      updatedAt: (data?.updatedAt as Timestamp) ?? null,
+      kmWalked: toNumber(data?.kmWalked ?? data?.totalKm ?? data?.distanceKm ?? 0),
+      pokeCoins: toNumber(data?.pokeCoins ?? 0),
+      level: toNumber(data?.level ?? 1, 1),
+    };
+  });
+
+  const primary =
+    (selectedCharacterId ? chars.find((c) => c.id === selectedCharacterId) : null) ||
+    chars[0] ||
+    null;
+
+  return { chars, primary };
+}
 
 const UsuariosPageContent: React.FC = () => {
   const [players, setPlayers] = useState<PlayerSummary[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
+  const [cursor, setCursor] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);
+
   const [filters, setFilters] = useState<FilterState>({
     search: '',
     status: 'all',
     accountType: 'all',
-    onlyExpiring: false,
-    onlyBoxFull: false,
+    hasCharacters: 'all',
   });
-  const [selectedPlayer, setSelectedPlayer] =
-    useState<PlayerSummary | null>(null);
+  const [selectedPlayer, setSelectedPlayer] = useState<PlayerSummary | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
+  const mapSnapshotToRows = useCallback(async (docs: QueryDocumentSnapshot<DocumentData>[]) => {
+    const mapped = await Promise.all(
+      docs.map(async (docSnap) => {
+        const d = docSnap.data() as any;
+        const uid = docSnap.id;
+        const selectedCharacterId = (d?.selectedCharacterId ?? null) as string | null;
+        const { chars, primary } = await loadCharactersSummary(uid, selectedCharacterId);
 
-    const loadUsers = async () => {
-      try {
-        setLoading(true);
-        const qUsers = query(
-          collection(db, 'users'),
-          orderBy('createdAt', 'desc')
-        );
-        const snapshot = await getDocs(qUsers);
+        const playerTypeRaw = String(d?.playerType || 'FREE').toUpperCase();
+        const playerType = playerTypeRaw === 'VIP' ? 'VIP' : 'FREE';
 
-        if (cancelled) return;
+        const statusRaw = String(d?.status || 'active').toLowerCase();
+        const status = statusRaw === 'inactive' ? 'inactive' : 'active';
 
-        const data: PlayerSummary[] = snapshot.docs.map((doc) => {
-          const d = doc.data() as any;
-          return {
-            id: doc.id,
-            displayName: d.displayName ?? 'Sem nome',
-            email: d.email ?? '-',
-            status: (d.status ?? 'active') as any,
-            accountType: (d.accountType ?? 'common') as any,
-            createdAt: d.createdAt ?? null,
-            boxCurrent: d.boxCurrent ?? 0,
-            boxTotalLimit: d.boxTotalLimit ?? d.boxLimit ?? 0,
-            ecoinBalance: d.ecoinBalance ?? 0,
-            itemsCount: d.itemsCount ?? 0,
-            hasExpiringPokemon: d.hasExpiringPokemon ?? false,
-            boxIsFull: d.boxIsFull ?? false,
-            lastLoginAt: d.lastLoginAt ?? null,
-            region: d.region ?? null,
-            characterClass: d.characterClass ?? null,
-            starterSpeciesId: d.starterSpeciesId ?? null,
-            level: d.level ?? 1,
-            xp: d.xp ?? 0,
-            kmWalked: d.kmWalked ?? 0,
-            pokedexSeen: d.pokedexSeen ?? 0,
-            pokedexCaught: d.pokedexCaught ?? 0,
-            missionsCompleted: d.missionsCompleted ?? 0,
-            badges: d.badges ?? 0,
-          };
-        });
+        const row: PlayerSummary = {
+          id: uid,
+          uid,
+          nomeJogador: String(d?.nomeJogador || d?.displayName || 'Sem nome'),
+          email: String(d?.email || '-'),
+          playerType,
+          status,
+          createdAt: (d?.createdAt as Timestamp) ?? null,
+          updatedAt: (d?.updatedAt as Timestamp) ?? null,
+          selectedCharacterId,
+          characterCount: chars.length,
+          primaryCharacter: primary,
+        };
 
-        setPlayers(data);
-      } catch (err) {
-        console.error('[UsuariosPage] Erro ao carregar usuários:', err);
-        if (!cancelled) setPlayers([]);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
+        return row;
+      })
+    );
 
-    loadUsers();
-
-    return () => {
-      cancelled = true;
-    };
+    return mapped;
   }, []);
 
+  const loadFirstPage = useCallback(async () => {
+    setLoading(true);
+    try {
+      const qPlayers = query(collection(db, 'players'), orderBy('__name__', 'asc'), limit(PAGE_SIZE + 1));
+      const snapshot = await getDocs(qPlayers);
+
+      const docs = snapshot.docs;
+      const nextHasMore = docs.length > PAGE_SIZE;
+      const visibleDocs = nextHasMore ? docs.slice(0, PAGE_SIZE) : docs;
+      const mapped = await mapSnapshotToRows(visibleDocs);
+
+      setPlayers(mapped);
+      setHasMore(nextHasMore);
+      setCursor(visibleDocs.length ? visibleDocs[visibleDocs.length - 1] : null);
+    } catch (err) {
+      console.error('[UsuariosPage] Erro ao carregar jogadores:', err);
+      setPlayers([]);
+      setHasMore(false);
+      setCursor(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [mapSnapshotToRows]);
+
+  const loadMore = useCallback(async () => {
+    if (!cursor || loadingMore) return;
+    setLoadingMore(true);
+    try {
+      const qPlayers = query(
+        collection(db, 'players'),
+        orderBy('__name__', 'asc'),
+        startAfter(cursor),
+        limit(PAGE_SIZE + 1)
+      );
+      const snapshot = await getDocs(qPlayers);
+      const docs = snapshot.docs;
+      const nextHasMore = docs.length > PAGE_SIZE;
+      const visibleDocs = nextHasMore ? docs.slice(0, PAGE_SIZE) : docs;
+      const mapped = await mapSnapshotToRows(visibleDocs);
+
+      setPlayers((prev) => [...prev, ...mapped]);
+      setHasMore(nextHasMore);
+      setCursor(visibleDocs.length ? visibleDocs[visibleDocs.length - 1] : cursor);
+    } catch (err) {
+      console.error('[UsuariosPage] Erro ao carregar mais jogadores:', err);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [cursor, loadingMore, mapSnapshotToRows]);
+
+  useEffect(() => {
+    loadFirstPage();
+  }, [loadFirstPage]);
+
   const filteredPlayers = useMemo(() => {
-    return players.filter((p) => {
-      if (filters.status !== 'all' && p.status !== filters.status) {
-        return false;
-      }
-      if (
-        filters.accountType !== 'all' &&
-        p.accountType !== filters.accountType
-      ) {
-        return false;
-      }
-      if (filters.onlyExpiring && !p.hasExpiringPokemon) return false;
-      if (filters.onlyBoxFull && !p.boxIsFull) return false;
+    const list = players.filter((p) => {
+      if (filters.status !== 'all' && p.status !== filters.status) return false;
+      if (filters.accountType !== 'all' && p.playerType !== filters.accountType) return false;
+      if (filters.hasCharacters === 'with' && p.characterCount <= 0) return false;
+      if (filters.hasCharacters === 'without' && p.characterCount > 0) return false;
 
       if (filters.search.trim()) {
         const s = filters.search.toLowerCase();
-        const matchesName = p.displayName.toLowerCase().includes(s);
-        const matchesEmail = p.email.toLowerCase().includes(s);
-        const matchesId = p.id.toLowerCase().includes(s);
-        if (!matchesName && !matchesEmail && !matchesId) return false;
+        const inName = p.nomeJogador.toLowerCase().includes(s);
+        const inEmail = p.email.toLowerCase().includes(s);
+        const inUid = p.uid.toLowerCase().includes(s);
+        if (!inName && !inEmail && !inUid) return false;
       }
 
       return true;
+    });
+
+    return [...list].sort((a, b) => {
+      const ta = a.updatedAt?.toMillis?.() ?? a.createdAt?.toMillis?.() ?? 0;
+      const tb = b.updatedAt?.toMillis?.() ?? b.createdAt?.toMillis?.() ?? 0;
+      return tb - ta;
     });
   }, [players, filters]);
 
@@ -121,23 +188,20 @@ const UsuariosPageContent: React.FC = () => {
 
       <main className="flex-1 p-4 md:p-6 lg:p-8">
         <header className="mb-6">
-          <UserFiltersBar
-            filters={filters}
-            onChange={setFilters}
-          />
+          <UserFiltersBar filters={filters} onChange={setFilters} />
         </header>
 
         <UserTable
           players={filteredPlayers}
           loading={loading}
+          hasMore={hasMore}
+          loadingMore={loadingMore}
+          onLoadMore={loadMore}
           onSelectPlayer={(p) => setSelectedPlayer(p)}
         />
 
         {selectedPlayer && (
-          <UserDetailsDrawer
-            player={selectedPlayer}
-            onClose={() => setSelectedPlayer(null)}
-          />
+          <UserDetailsDrawer player={selectedPlayer} onClose={() => setSelectedPlayer(null)} />
         )}
       </main>
     </div>

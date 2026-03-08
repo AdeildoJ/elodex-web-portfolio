@@ -1,9 +1,10 @@
-// src/components/users/UserTeam.tsx
+﻿// src/components/users/UserTeam.tsx
 'use client';
 
 import PokemonSprite from './PokemonSprite';
 import PokemonTooltip from './PokemonTooltip';
 import { TeamSlot } from './types';
+import { getPokemonDisplayName } from './pokemonDisplay';
 
 interface Props {
   team: TeamSlot[];
@@ -13,16 +14,12 @@ interface Props {
 const UserTeam: React.FC<Props> = ({ team, loading }) => {
   return (
     <section className="space-y-3 rounded-xl border border-slate-800 bg-slate-900/60 p-4 text-xs text-slate-300">
-      <h3 className="text-sm font-semibold text-slate-200">
-        Time Principal
-      </h3>
+      <h3 className="text-sm font-semibold text-slate-200">Time do personagem</h3>
 
       {loading ? (
         <p className="text-slate-400">Carregando time...</p>
       ) : team.length === 0 ? (
-        <p className="text-slate-400">
-          Este jogador ainda não possui Pokémon no time.
-        </p>
+        <p className="text-slate-400">Este personagem ainda nao possui Pokemon no time.</p>
       ) : (
         <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
           {team.map((slot) => (
@@ -34,26 +31,18 @@ const UserTeam: React.FC<Props> = ({ team, loading }) => {
                 />
 
                 <div className="flex-1">
-                  <p className="text-[11px] text-slate-400">
-                    Slot {slot.slot}
-                  </p>
+                  <p className="text-[11px] text-slate-400">Slot {slot.slot}</p>
                   {slot.pokemon ? (
                     <>
                       <p className="text-sm font-semibold text-slate-50">
-                        #{slot.pokemon.speciesId} • Nível{' '}
-                        {slot.pokemon.level}
+                        {getPokemonDisplayName(slot.pokemon)} | Nv. {slot.pokemon.level}
                       </p>
                       <p className="text-[11px] text-slate-400">
-                        Tipos:{' '}
-                        {slot.pokemon.types?.length
-                          ? slot.pokemon.types.join(' / ')
-                          : 'Desconhecido'}
+                        Tipos: {slot.pokemon.types?.length ? slot.pokemon.types.join(' / ') : 'Desconhecido'}
                       </p>
                     </>
                   ) : (
-                    <p className="text-sm text-slate-400">
-                      Pokémon não encontrado ({slot.pokemonInstanceId})
-                    </p>
+                    <p className="text-sm text-slate-400">Pokemon nao encontrado</p>
                   )}
                 </div>
 

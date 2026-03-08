@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -9,11 +9,12 @@ import { auth } from "@/lib/firebase";
 
 const items = [
   { href: "/home", label: "Home", icon: "/icons/home.png" },
-  { href: "/pokedex", label: "Pokédex", icon: "/icons/testes.png" },
-  // 🔹 Novo item: Painéis
-  { href: "/paineis", label: "Painéis", icon: "/icons/auditoria.png" },
-  { href: "/usuarios", label: "Usuários", icon: "/icons/usuarios.png" },
-  { href: "/missoes", label: "Missões", icon: "/icons/eventos.png" },
+  { href: "/pokedex", label: "Pokedex", icon: "/icons/testes.png" },
+  { href: "/biomas", label: "Biomas", icon: "/icons/config.png" },
+  // Novo item: Biomas
+  { href: "/paineis", label: "Paineis", icon: "/icons/auditoria.png" },
+  { href: "/jogadores", label: "Jogadores", icon: "/icons/usuarios.png" },
+  { href: "/missoes", label: "Missoes", icon: "/icons/eventos.png" },
   { href: "/loja", label: "Loja", icon: "/icons/biblioteca.png" },
 ];
 
@@ -87,7 +88,7 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* Botão Sair */}
+      {/* Botao Sair */}
       <div className="px-2 pb-3">
         <button
           onClick={handleLogout}
@@ -126,3 +127,7 @@ export default function Sidebar() {
     </aside>
   );
 }
+
+
+
+

@@ -8,6 +8,7 @@ import {
   query,
   where,
 } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
 
 import { db, app, auth } from "@/lib/firebase";
 import RequireAuth from "@/components/RequireAuth";
@@ -50,6 +51,7 @@ interface ItemSaleConfig {
   sellMode: SellMode;
   gamePrice: number | null;
   ecoinPrice: number | null;
+  realPrice?: number | null;
   saleStartedAt?: Date | null;
   updatedAt?: Date | null;
 }
@@ -81,6 +83,15 @@ function parseBuyerUidFromPath(path: string) {
   return "desconhecido";
 }
 
+function parseTrainerUidFromPath(path: string) {
+  const parts = path.split("/");
+  const usersIdx = parts.indexOf("users");
+  if (usersIdx >= 0 && parts[usersIdx + 1]) return parts[usersIdx + 1];
+  const playersIdx = parts.indexOf("players");
+  if (playersIdx >= 0 && parts[playersIdx + 1]) return parts[playersIdx + 1];
+  return "desconhecido";
+}
+
 function toDateMaybe(ts: any): Date | undefined {
   if (!ts) return undefined;
   if (typeof ts.toDate === "function") return ts.toDate();
@@ -89,7 +100,17 @@ function toDateMaybe(ts: any): Date | undefined {
 
 function isPermissionError(e: any) {
   const msg = String(e?.message || "");
-  return msg.includes("Missing or insufficient permissions");
+  const code = String(e?.code || "");
+  return (
+    msg.includes("Missing or insufficient permissions") ||
+    code.includes("permission-denied")
+  );
+}
+
+function getSellModeLabel(mode: SellMode) {
+  if (mode === "game") return "Moedas do jogo";
+  if (mode === "ecoin") return "Dinheiro real";
+  return "Ambos";
 }
 
 /**
@@ -99,7 +120,7 @@ function isPermissionError(e: any) {
  */
 async function ensureFreshTokenWithClaims() {
   const user = auth.currentUser;
-  if (!user) throw new Error("Usuário não autenticado (auth.currentUser null).");
+  if (!user) return null;
 
   await user.getIdToken(true);
   const token = await user.getIdTokenResult(true);
@@ -113,6 +134,10 @@ async function ensureFreshTokenWithClaims() {
 
 export default function PaineisPage() {
   const [activePanel, setActivePanel] = useState<PanelKey>("capturas");
+  const [authUid, setAuthUid] = useState<string | null>(auth.currentUser?.uid ?? null);
+  const [authReady, setAuthReady] = useState(false);
+  const [authIsAdmin, setAuthIsAdmin] = useState(false);
+  const [speciesNameMap, setSpeciesNameMap] = useState<Record<string, string>>({});
 
   // capturas
   const [rows, setRows] = useState<PanelRow[]>([]);
@@ -148,11 +173,58 @@ export default function PaineisPage() {
     return "—";
   }, [debug.isAdmin]);
 
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, async (user) => {
+      setAuthUid(user?.uid ?? null);
+      if (!user) {
+        setAuthIsAdmin(false);
+        setAuthReady(true);
+        return;
+      }
+      try {
+        const token = await user.getIdTokenResult(true);
+        setAuthIsAdmin(token?.claims?.admin === true);
+      } catch {
+        setAuthIsAdmin(false);
+      } finally {
+        setAuthReady(true);
+      }
+    });
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const res = await fetch("/api/catalog/options", { cache: "no-store" });
+        if (!res.ok) return;
+        const data = (await res.json()) as {
+          species?: Array<{ id: number; label: string }>;
+        };
+        const map: Record<string, string> = {};
+        for (const row of data.species || []) {
+          const key = String(row.id);
+          const label = String(row.label || "").trim();
+          map[key] = label.replace(/^#\d+\s+/, "").trim() || `#${key}`;
+        }
+        if (alive) setSpeciesNameMap(map);
+      } catch {
+        if (alive) setSpeciesNameMap({});
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
+
   // ================================
   // Load Capturas
   // ================================
   useEffect(() => {
     if (activePanel !== "capturas") return;
+    if (!authReady || !authIsAdmin) return;
+    if (!authUid) return;
 
     let alive = true;
 
@@ -162,6 +234,11 @@ export default function PaineisPage() {
         setDebug((d) => ({ ...d, step: "token_capturas", lastError: "" }));
 
         const t = await ensureFreshTokenWithClaims();
+        if (!t) {
+          if (!alive) return;
+          setDebug((d) => ({ ...d, step: "aguardando_auth" }));
+          return;
+        }
         if (!alive) return;
 
         setDebug((d) => ({
@@ -209,37 +286,134 @@ export default function PaineisPage() {
         }
 
         // 2) Para cada config, buscar instâncias em pokemonInstances
-        setDebug((d) => ({ ...d, step: "lendo_pokemonInstances" }));
+        setDebug((d) => ({ ...d, step: "lendo_capturas_multifonte" }));
 
         const rowsFinal: PanelRow[] = [];
+        let canReadLegacy = true;
+        let canReadTimeGroup = true;
+        let canReadBoxGroup = true;
+        let warnedLegacy = false;
+        let warnedTime = false;
+        let warnedBox = false;
+
+        async function readDocsSafely(
+          source: "legacy" | "time" | "box",
+          fieldName: "speciesId" | "capturedSpeciesId",
+          speciesValue: number | string
+        ) {
+          try {
+            if (source === "legacy") {
+              if (!canReadLegacy) return [];
+              const snap = await getDocs(
+                query(
+                  collection(db, "pokemonInstances"),
+                  where(fieldName, "==", speciesValue)
+                )
+              );
+              return snap.docs;
+            }
+            if (source === "time") {
+              if (!canReadTimeGroup) return [];
+              const snap = await getDocs(
+                query(
+                  collectionGroup(db, "time"),
+                  where(fieldName, "==", speciesValue)
+                )
+              );
+              return snap.docs;
+            }
+            if (!canReadBoxGroup) return [];
+            const snap = await getDocs(
+              query(
+                collectionGroup(db, "box"),
+                where(fieldName, "==", speciesValue)
+              )
+            );
+            return snap.docs;
+          } catch (e: any) {
+            if (!isPermissionError(e)) throw e;
+            if (source === "legacy") {
+              canReadLegacy = false;
+              if (!warnedLegacy) {
+                warnedLegacy = true;
+                console.warn("[Painéis] Sem permissão para ler pokemonInstances. Continuando sem essa fonte.");
+              }
+            } else if (source === "time") {
+              canReadTimeGroup = false;
+              if (!warnedTime) {
+                warnedTime = true;
+                console.warn("[Painéis] Sem permissão para collectionGroup(time). Continuando sem essa fonte.");
+              }
+            } else {
+              canReadBoxGroup = false;
+              if (!warnedBox) {
+                warnedBox = true;
+                console.warn("[Painéis] Sem permissão para collectionGroup(box). Continuando sem essa fonte.");
+              }
+            }
+            return [];
+          }
+        }
 
         for (const cfg of configs) {
           try {
             const speciesNum = Number(cfg.speciesId);
-            const qi = !Number.isNaN(speciesNum)
-              ? query(
-                  collection(db, "pokemonInstances"),
-                  where("speciesId", "==", speciesNum)
-                )
-              : query(
-                  collection(db, "pokemonInstances"),
-                  where("speciesId", "==", cfg.speciesId)
-                );
+            const queryValues: Array<number | string> = [];
+            if (!Number.isNaN(speciesNum)) queryValues.push(speciesNum);
+            queryValues.push(String(cfg.speciesId));
 
-            const snap = await getDocs(qi);
-            const captures: CaptureInstance[] = [];
+            const capturesByPath = new Map<string, CaptureInstance>();
+            for (const speciesValue of queryValues) {
+              const [
+                legacyBySpecies,
+                legacyByCapturedSpecies,
+                timeBySpecies,
+                timeByCapturedSpecies,
+                boxBySpecies,
+                boxByCapturedSpecies,
+              ] = await Promise.all([
+                readDocsSafely("legacy", "speciesId", speciesValue),
+                readDocsSafely("legacy", "capturedSpeciesId", speciesValue),
+                readDocsSafely("time", "speciesId", speciesValue),
+                readDocsSafely("time", "capturedSpeciesId", speciesValue),
+                readDocsSafely("box", "speciesId", speciesValue),
+                readDocsSafely("box", "capturedSpeciesId", speciesValue),
+              ]);
 
-            snap.forEach((docSnap) => {
-              const data = docSnap.data() as any;
-              const capturedAt = toDateMaybe(data.capturedAt);
+              const allDocs = [
+                ...legacyBySpecies,
+                ...legacyByCapturedSpecies,
+                ...timeBySpecies,
+                ...timeByCapturedSpecies,
+                ...boxBySpecies,
+                ...boxByCapturedSpecies,
+              ];
+              for (const docSnap of allDocs) {
+                const pathId = docSnap.ref.path;
+                if (capturesByPath.has(pathId)) continue;
 
-              captures.push({
-                id: docSnap.id,
-                speciesId: cfg.speciesId,
-                trainerId: data.ownerId ?? "desconhecido",
-                capturedAt,
-                isSpecialCapture: Boolean(data.isSpecialCapture),
-              });
+                const data = docSnap.data() as any;
+                if (data?.isStarter === true) continue;
+                capturesByPath.set(pathId, {
+                  id: pathId,
+                  speciesId: cfg.speciesId,
+                  trainerId:
+                    data.ownerId ??
+                    data.uid ??
+                    parseTrainerUidFromPath(pathId),
+                  capturedAt:
+                    toDateMaybe(data.capturedAt) ??
+                    toDateMaybe(data.createdAt) ??
+                    toDateMaybe(data.updatedAt),
+                  isSpecialCapture: Boolean(data.isSpecialCapture),
+                });
+              }
+            }
+
+            const captures = Array.from(capturesByPath.values()).sort((a, b) => {
+              const ta = a.capturedAt?.getTime() ?? 0;
+              const tb = b.capturedAt?.getTime() ?? 0;
+              return tb - ta;
             });
 
             rowsFinal.push({ config: cfg, captures });
@@ -276,13 +450,15 @@ export default function PaineisPage() {
     return () => {
       alive = false;
     };
-  }, [activePanel]);
+  }, [activePanel, authUid, authIsAdmin, authReady]);
 
   // ================================
   // Load Compras
   // ================================
   useEffect(() => {
     if (activePanel !== "compras") return;
+    if (!authReady || !authIsAdmin) return;
+    if (!authUid) return;
 
     let alive = true;
 
@@ -293,6 +469,11 @@ export default function PaineisPage() {
         setDebug((d) => ({ ...d, step: "token_compras", lastError: "" }));
 
         const t = await ensureFreshTokenWithClaims();
+        if (!t) {
+          if (!alive) return;
+          setDebug((d) => ({ ...d, step: "aguardando_auth" }));
+          return;
+        }
         if (!alive) return;
 
         setDebug((d) => ({
@@ -329,7 +510,10 @@ export default function PaineisPage() {
           configs.push({
             id: docSnap.id,
             saleEnabled: Boolean(data.saleEnabled),
-            sellMode: (data.sellMode as SellMode) ?? "game",
+            sellMode:
+              data.sellMode === "real"
+                ? "ecoin"
+                : ((data.sellMode as SellMode) ?? "game"),
             gamePrice:
               typeof data.gamePrice === "number"
                 ? data.gamePrice
@@ -339,8 +523,16 @@ export default function PaineisPage() {
             ecoinPrice:
               typeof data.ecoinPrice === "number"
                 ? data.ecoinPrice
+                : typeof data.realPrice === "number"
+                ? data.realPrice
                 : data.ecoinPrice != null
                 ? Number(data.ecoinPrice)
+                : null,
+            realPrice:
+              typeof data.realPrice === "number"
+                ? data.realPrice
+                : data.realPrice != null
+                ? Number(data.realPrice)
                 : null,
             saleStartedAt: toDateMaybe(data.saleStartedAt) ?? null,
             updatedAt: toDateMaybe(data.updatedAt) ?? null,
@@ -448,7 +640,7 @@ export default function PaineisPage() {
     return () => {
       alive = false;
     };
-  }, [activePanel]);
+  }, [activePanel, authUid, authIsAdmin, authReady]);
 
   return (
     <RequireAuth>
@@ -577,8 +769,12 @@ export default function PaineisPage() {
 
                             const isExpanded =
                               expandedConfigId === row.config.id;
-                            const nameLabel = row.config.speciesName
-                              ? ` ${row.config.speciesName}`
+                            const resolvedSpeciesName =
+                              row.config.speciesName ||
+                              speciesNameMap[String(row.config.speciesId)] ||
+                              null;
+                            const nameLabel = resolvedSpeciesName
+                              ? ` ${resolvedSpeciesName}`
                               : "";
 
                             return (
@@ -666,8 +862,12 @@ export default function PaineisPage() {
                                   (c) => c.isSpecialCapture
                                 ).length;
 
-                                const nameLabel = row.config.speciesName
-                                  ? ` ${row.config.speciesName}`
+                                const resolvedSpeciesName =
+                                  row.config.speciesName ||
+                                  speciesNameMap[String(row.config.speciesId)] ||
+                                  null;
+                                const nameLabel = resolvedSpeciesName
+                                  ? ` ${resolvedSpeciesName}`
                                   : "";
 
                                 return (
@@ -872,7 +1072,7 @@ export default function PaineisPage() {
                                       Venda
                                     </span>
                                     <span className="font-semibold">
-                                      {s.config.sellMode}
+                                      {getSellModeLabel(s.config.sellMode)}
                                     </span>
                                   </div>
                                 </div>
@@ -880,17 +1080,17 @@ export default function PaineisPage() {
                                 <div className="mt-2 text-[10px] text-slate-300">
                                   {s.config.sellMode === "game" && (
                                     <>
-                                      Preço jogo: <b>{s.config.gamePrice ?? "—"}</b>
+                                      Preco moedas: <b>{s.config.gamePrice ?? "—"}</b>
                                     </>
                                   )}
                                   {s.config.sellMode === "ecoin" && (
                                     <>
-                                      Preço ECoin: <b>{s.config.ecoinPrice ?? "—"}</b>
+                                      Preco dinheiro real: <b>{s.config.ecoinPrice ?? "—"}</b>
                                     </>
                                   )}
                                   {s.config.sellMode === "both" && (
                                     <>
-                                      Jogo: <b>{s.config.gamePrice ?? "—"}</b> · ECoin:{" "}
+                                      Moedas: <b>{s.config.gamePrice ?? "—"}</b> · Dinheiro real:{" "}
                                       <b>{s.config.ecoinPrice ?? "—"}</b>
                                     </>
                                   )}
@@ -1006,3 +1206,4 @@ export default function PaineisPage() {
     </RequireAuth>
   );
 }
+

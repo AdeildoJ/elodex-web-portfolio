@@ -1,6 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 import itemsData from "@/data/items.json";
 import movesData from "@/data/moves.json";
@@ -34,7 +36,7 @@ export type ItemSubCategory =
   | "experiencia";
 
 export type PokemonItem = {
-  id: string; // ✅ id padrão PokeAPI (ex: "potion", "poke-ball", "tm01", "tr12")
+  id: string;
   name: string;
 
   descriptionPtBr?: string | null;
@@ -44,21 +46,30 @@ export type PokemonItem = {
   subCategory?: ItemSubCategory | string | null;
 
   price?: number | null;
-
-  // pode vir do JSON, mas vamos resolver a imagem dinamicamente nos componentes
   sprite?: string | null;
 
   consumable?: boolean | null;
   battleUsable?: boolean | null;
   overworldUsable?: boolean | null;
 
-  // quando for TM/HM/TR
   moveId?: string | null;
   moveNameCache?: string | null;
 };
 
 type MoveFromJson = {
   machineItem?: PokemonItem | null;
+};
+
+export type SellMode = "game" | "ecoin" | "both";
+
+export type ShopItemConfig = {
+  saleEnabled: boolean;
+  sellMode: SellMode;
+  gamePrice: number | null;
+  ecoinPrice: number | null;
+  grantType?: "inventory" | "biome_access";
+  biomeAccessBiomeId?: string | null;
+  biomeAccessDurationHours?: number | null;
 };
 
 const CATEGORIES: ItemCategory[] = [
@@ -88,6 +99,33 @@ const SUBCATEGORIES: ItemSubCategory[] = [
   "experiencia",
 ];
 
+const VIRTUAL_SHOP_ITEMS: PokemonItem[] = [
+  {
+    id: "egg-incubator",
+    name: "Egg Incubator",
+    descriptionPtBr: "Ativa a incubacao de ovos por passos fora do daycare.",
+    effectPtBr: "Consumivel: 1 unidade por ovo.",
+    category: "outros",
+    subCategory: "experiencia",
+    price: 0,
+    consumable: true,
+    battleUsable: false,
+    overworldUsable: true,
+  },
+  {
+    id: "biome-access-pass",
+    name: "Biome Access Pass",
+    descriptionPtBr: "Concede acesso temporario a um bioma.",
+    effectPtBr: "Configuravel por bioma e duracao no painel da loja.",
+    category: "outros",
+    subCategory: "experiencia",
+    price: 0,
+    consumable: true,
+    battleUsable: false,
+    overworldUsable: true,
+  },
+];
+
 export default function ItensPage() {
   const PAGE_SIZE = 27;
 
@@ -97,27 +135,77 @@ export default function ItensPage() {
   const [page, setPage] = useState(1);
 
   const [selected, setSelected] = useState<PokemonItem | null>(null);
+  const [shopConfigs, setShopConfigs] = useState<Record<string, ShopItemConfig>>({});
+  const [shopLoading, setShopLoading] = useState(true);
+  const [showOnlyShopItems, setShowOnlyShopItems] = useState(false);
 
   const itemsArray: PokemonItem[] = useMemo(() => {
     const baseItems = Object.values(itemsData as Record<string, PokemonItem>);
 
-    // ✅ puxa TM/HM/TR do moves.json (machineItem)
     const tmHmTrFromMoves = Object.values(movesData as Record<string, MoveFromJson>)
       .map((mv) => mv.machineItem)
       .filter((x): x is PokemonItem => !!x && !!x.id);
 
-    // evita duplicar ids
     const baseIds = new Set(baseItems.map((it) => it.id));
     const uniqueMachines = tmHmTrFromMoves.filter((it) => !baseIds.has(it.id));
+    const uniqueVirtual = VIRTUAL_SHOP_ITEMS.filter((it) => !baseIds.has(it.id));
 
-    // ✅ BUG FIX: espalhar arrays
-    return [...baseItems, ...uniqueMachines];
+    return [...baseItems, ...uniqueMachines, ...uniqueVirtual];
+  }, []);
+
+  useEffect(() => {
+    let alive = true;
+
+    async function loadShopConfigs() {
+      setShopLoading(true);
+      try {
+        const snap = await getDocs(collection(db, "itemsConfig"));
+        if (!alive) return;
+
+        const next: Record<string, ShopItemConfig> = {};
+
+        snap.forEach((docSnap) => {
+          const data = docSnap.data() as Record<string, unknown>;
+          const sellModeRaw = String(data.sellMode ?? "game");
+          const normalizedSellMode: SellMode =
+            sellModeRaw === "real"
+              ? "ecoin"
+              : sellModeRaw === "game" || sellModeRaw === "ecoin" || sellModeRaw === "both"
+              ? (sellModeRaw as SellMode)
+              : "game";
+
+          const gameRaw = data.gamePrice;
+          const gamePriceNumber =
+            typeof gameRaw === "number" ? gameRaw : gameRaw != null ? Number(gameRaw) : null;
+
+          const realRaw = data.ecoinPrice ?? data.realPrice ?? null;
+          const realPriceNumber =
+            typeof realRaw === "number" ? realRaw : realRaw != null ? Number(realRaw) : null;
+
+          next[docSnap.id] = {
+            saleEnabled: Boolean(data.saleEnabled),
+            sellMode: normalizedSellMode,
+            gamePrice: Number.isFinite(gamePriceNumber as number) ? gamePriceNumber : null,
+            ecoinPrice: Number.isFinite(realPriceNumber as number) ? realPriceNumber : null,
+          };
+        });
+
+        setShopConfigs(next);
+      } finally {
+        if (alive) setShopLoading(false);
+      }
+    }
+
+    loadShopConfigs();
+    return () => {
+      alive = false;
+    };
   }, []);
 
   const filtered = useMemo(() => {
     const s = search.trim().toLowerCase();
 
-    const list = itemsArray.filter((it) => {
+    return itemsArray.filter((it) => {
       const matchSearch =
         !s ||
         (it.name || "").toLowerCase().includes(s) ||
@@ -126,18 +214,20 @@ export default function ItensPage() {
 
       const matchCategory = category === "todas" || it.category === category;
       const matchSub = subCategory === "todas" || it.subCategory === subCategory;
+      const matchShop = !showOnlyShopItems || Boolean(shopConfigs[it.id]?.saleEnabled);
 
-      return matchSearch && matchCategory && matchSub;
+      return matchSearch && matchCategory && matchSub && matchShop;
     });
+  }, [itemsArray, search, category, subCategory, showOnlyShopItems, shopConfigs]);
 
-    return list;
-  }, [itemsArray, search, category, subCategory]);
-
-  // quando filtros mudarem, volta pra página 1
-  useMemo(() => {
+  useEffect(() => {
     setPage(1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, category, subCategory]);
+  }, [search, category, subCategory, showOnlyShopItems]);
+
+  const shopEnabledCount = useMemo(
+    () => itemsArray.filter((it) => shopConfigs[it.id]?.saleEnabled).length,
+    [itemsArray, shopConfigs]
+  );
 
   const total = filtered.length;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -151,7 +241,6 @@ export default function ItensPage() {
 
   return (
     <div className="flex gap-4">
-      {/* Menu lateral */}
       <aside className="w-72 shrink-0 bg-slate-900/40 border border-slate-800 rounded-lg p-3">
         <div className="text-sm font-semibold mb-2">Itens</div>
 
@@ -163,9 +252,7 @@ export default function ItensPage() {
         />
 
         <div className="mb-3">
-          <div className="text-xs uppercase tracking-wider text-slate-400 mb-2">
-            Categorias
-          </div>
+          <div className="text-xs uppercase tracking-wider text-slate-400 mb-2">Categorias</div>
 
           <button
             className={`w-full text-left px-3 py-2 rounded-md text-sm ${
@@ -192,9 +279,7 @@ export default function ItensPage() {
         </div>
 
         <div>
-          <div className="text-xs uppercase tracking-wider text-slate-400 mb-2">
-            Subcategorias
-          </div>
+          <div className="text-xs uppercase tracking-wider text-slate-400 mb-2">Subcategorias</div>
 
           <button
             className={`w-full text-left px-3 py-2 rounded-md text-sm ${
@@ -221,8 +306,37 @@ export default function ItensPage() {
         </div>
       </aside>
 
-      {/* Grid + paginação */}
       <section className="flex-1">
+        <div className="mb-3 rounded-lg border border-emerald-700/50 bg-emerald-950/20 p-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <div className="text-sm font-semibold text-emerald-300">Modo de criacao de loja</div>
+              <div className="text-xs text-slate-300">
+                Escolha os itens no modal e defina preco em moeda do jogo ou dinheiro real.
+              </div>
+            </div>
+
+            <label className="inline-flex items-center gap-2 text-sm text-slate-200">
+              <input
+                type="checkbox"
+                checked={showOnlyShopItems}
+                onChange={(e) => setShowOnlyShopItems(e.target.checked)}
+              />
+              Mostrar somente itens da loja
+            </label>
+          </div>
+
+          <div className="mt-2 text-xs text-slate-300">
+            {shopLoading ? (
+              "Carregando configuracoes da loja..."
+            ) : (
+              <>
+                Itens ativos na loja: <b>{shopEnabledCount}</b>
+              </>
+            )}
+          </div>
+        </div>
+
         <div className="flex items-center justify-between mb-3">
           <div className="text-sm text-slate-300">
             Mostrando <b>{paginated.length}</b> de <b>{total}</b> itens
@@ -238,7 +352,7 @@ export default function ItensPage() {
             </button>
 
             <div className="text-sm text-slate-300">
-              Página <b>{safePage}</b> / <b>{totalPages}</b>
+              Pagina <b>{safePage}</b> / <b>{totalPages}</b>
             </div>
 
             <button
@@ -246,18 +360,34 @@ export default function ItensPage() {
               disabled={safePage >= totalPages}
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             >
-              Próximo
+              Proximo
             </button>
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {paginated.map((it) => (
-            <ItemCard key={it.id} item={it} onClick={() => setSelected(it)} />
+            <ItemCard
+              key={it.id}
+              item={it}
+              shopConfig={shopConfigs[it.id]}
+              onClick={() => setSelected(it)}
+            />
           ))}
         </div>
 
-        {selected && <ItemModal item={selected} onClose={() => setSelected(null)} />}
+        {selected && (
+          <ItemModal
+            item={selected}
+            onClose={() => setSelected(null)}
+            onConfigSaved={(config) =>
+              setShopConfigs((prev) => ({
+                ...prev,
+                [selected.id]: config,
+              }))
+            }
+          />
+        )}
       </section>
     </div>
   );

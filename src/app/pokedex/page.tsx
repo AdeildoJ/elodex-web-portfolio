@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMemo, useState } from "react";
 
@@ -11,9 +11,7 @@ import PokemonDetailModal from "@/components/pokedex/PokemonDetailModal";
 import CaptureConfigModal from "@/components/pokedex/CaptureConfigModal";
 import { PokemonSpecies, PokemonType } from "@/components/pokedex/pokedexTypes";
 
-import ItensPage from "@/components/itens/ItensPage";
-
-// ✅ JSON LOCAL (catálogo fixo)
+// JSON LOCAL (catalogo fixo)
 import pokemonSpeciesJson from "@/data/pokemon/pokemonSpecies.json";
 import pokemonFormsJson from "@/data/pokemon/pokemonForms.json";
 
@@ -23,9 +21,7 @@ const VERSIONS = [
   { id: "johto-edition", label: "Johto Edition" },
 ];
 
-type ViewMode = "pokemon" | "itens";
-
-// Tipagem mínima pra ler pokemonForms.json
+// Tipagem minima pra ler pokemonForms.json
 type PokemonFormJsonEntry = {
   formId: string;
   baseSpeciesId: string;
@@ -53,7 +49,7 @@ type PokemonFormsJsonMap = Record<string, PokemonFormJsonEntry>;
 function normalizeBaseStats(raw: any) {
   if (!raw) return undefined;
 
-  // Formato já "novo" (hp/attack/defense/specialAttack/specialDefense/speed)
+  // Formato ja "novo" (hp/attack/defense/specialAttack/specialDefense/speed)
   if (
     raw.hp !== undefined &&
     (raw.attack !== undefined ||
@@ -72,7 +68,7 @@ function normalizeBaseStats(raw: any) {
     };
   }
 
-  // Formato do catálogo (hp/atk/def/spa/spd/spe)
+  // Formato do catalogo (hp/atk/def/spa/spd/spe)
   if (
     raw.hp !== undefined &&
     (raw.atk !== undefined ||
@@ -96,7 +92,7 @@ function normalizeBaseStats(raw: any) {
 
 function normalizeSpecies(p: any): PokemonSpecies {
   return {
-    // básicos
+    // basicos
     id: String(p.id),
     dexNumber: Number(p.dexNumber ?? p.id ?? 0),
     name: String(p.name ?? ""),
@@ -109,13 +105,13 @@ function normalizeSpecies(p: any): PokemonSpecies {
     height: (p.height ?? p.heightM) ?? undefined,
     weight: (p.weight ?? p.weightKg) ?? undefined,
 
-    // campos obrigatórios novos (do seu tipo atual)
+    // campos obrigatorios novos (do seu tipo atual)
     generation: Number(p.generation ?? 0),
     legendary: Boolean(p.legendary ?? p.flags?.legendary ?? false),
     mythical: Boolean(p.mythical ?? p.flags?.mythical ?? false),
     captureRate: Number(p.captureRate ?? 0),
 
-    // extras (somente se existirem no teu tipo — se não existirem, o TS ignora via cast)
+    // extras (somente se existirem no teu tipo - se nao existirem, o TS ignora via cast)
     abilities: p.abilities ?? { normal: [], hidden: [] },
     eggGroups: p.eggGroups ?? [],
     typeEffectiveness: p.typeEffectiveness ?? null,
@@ -135,7 +131,7 @@ function normalizeFormToSpecies(f: PokemonFormJsonEntry, base: PokemonSpecies | 
     f.formType === "mega" ? "Mega" : f.formType === "gigantamax" ? "Gigantamax" : "Forma";
 
   return {
-    // básicos
+    // basicos
     id: String(f.formId),
     dexNumber: baseDexNumber,
     name: String(f.displayName || f.formId),
@@ -148,7 +144,7 @@ function normalizeFormToSpecies(f: PokemonFormJsonEntry, base: PokemonSpecies | 
     height: typeof f.height === "number" ? f.height : base?.height ?? undefined,
     weight: typeof f.weight === "number" ? f.weight : base?.weight ?? undefined,
 
-    // obrigatórios
+    // obrigatorios
     generation: base?.generation ?? 0,
     legendary: base?.legendary ?? false,
     mythical: base?.mythical ?? false,
@@ -168,8 +164,6 @@ function normalizeFormToSpecies(f: PokemonFormJsonEntry, base: PokemonSpecies | 
 }
 
 export default function PokedexPage() {
-  const [viewMode, setViewMode] = useState<ViewMode>("pokemon");
-
   const allPokemon = useMemo<PokemonSpecies[]>(() => {
     // --- 1) Species ---
     const rawSpecies = pokemonSpeciesJson as unknown;
@@ -225,11 +219,11 @@ export default function PokedexPage() {
 
   const [selectedPokemon, setSelectedPokemon] = useState<PokemonSpecies | null>(null);
 
-  // Marcações (APENAS EM MEMÓRIA)
+  // Marcacoes (APENAS EM MEMORIA)
   const [markedSpeciesIds, setMarkedSpeciesIds] = useState<Set<string>>(() => new Set());
   const [showOnlyMarked, setShowOnlyMarked] = useState(false);
 
-  // Modal de configuração de capturas
+  // Modal de configuracao de capturas
   const [captureConfigOpen, setCaptureConfigOpen] = useState(false);
 
   function handleToggleMark(poke: PokemonSpecies) {
@@ -327,64 +321,34 @@ export default function PokedexPage() {
         <Sidebar />
 
         <main className="flex-1 bg-slate-950 px-4 py-6">
-          <div className="flex gap-2 mb-4">
-            <button
-              className={`px-4 py-2 rounded-md text-sm font-semibold transition ${
-                viewMode === "pokemon"
-                  ? "bg-emerald-600 text-white"
-                  : "bg-slate-800 text-slate-200 hover:bg-slate-700"
-              }`}
-              onClick={() => setViewMode("pokemon")}
-            >
-              POKEMON
-            </button>
+          <PokedexHeader
+            search={search}
+            onSearchChange={setSearch}
+            typeFilter={typeFilter}
+            onTypeFilterChange={setTypeFilter}
+            selectedVersion={selectedVersion}
+            onVersionChange={setSelectedVersion}
+            versions={VERSIONS}
+            markedCount={markedCount}
+            showOnlyMarked={showOnlyMarked}
+            onShowOnlyMarkedChange={setShowOnlyMarked}
+            onBulkMarkAll={handleBulkMarkAll}
+            onBulkUnmarkAll={handleBulkUnmarkAll}
+            onBulkMarkAllOfType={handleBulkMarkAllOfType}
+            onBulkMarkRandom={handleBulkMarkRandom}
+            onBulkMarkRandomOfType={handleBulkMarkRandomOfType}
+            onConfigureCapturesClick={() => setCaptureConfigOpen(true)}
+          />
 
-            <button
-              className={`px-4 py-2 rounded-md text-sm font-semibold transition ${
-                viewMode === "itens"
-                  ? "bg-emerald-600 text-white"
-                  : "bg-slate-800 text-slate-200 hover:bg-slate-700"
-              }`}
-              onClick={() => setViewMode("itens")}
-            >
-              ITENS
-            </button>
-          </div>
+          <PokemonGrid
+            pokemon={filteredPokemon}
+            loading={loading}
+            onSelectPokemon={(pk) => setSelectedPokemon(pk)}
+            markedIds={markedSpeciesIds}
+            onToggleMark={handleToggleMark}
+          />
 
-          {viewMode === "pokemon" ? (
-            <>
-              <PokedexHeader
-                search={search}
-                onSearchChange={setSearch}
-                typeFilter={typeFilter}
-                onTypeFilterChange={setTypeFilter}
-                selectedVersion={selectedVersion}
-                onVersionChange={setSelectedVersion}
-                versions={VERSIONS}
-                markedCount={markedCount}
-                showOnlyMarked={showOnlyMarked}
-                onShowOnlyMarkedChange={setShowOnlyMarked}
-                onBulkMarkAll={handleBulkMarkAll}
-                onBulkUnmarkAll={handleBulkUnmarkAll}
-                onBulkMarkAllOfType={handleBulkMarkAllOfType}
-                onBulkMarkRandom={handleBulkMarkRandom}
-                onBulkMarkRandomOfType={handleBulkMarkRandomOfType}
-                onConfigureCapturesClick={() => setCaptureConfigOpen(true)}
-              />
-
-              <PokemonGrid
-                pokemon={filteredPokemon}
-                loading={loading}
-                onSelectPokemon={(pk) => setSelectedPokemon(pk)}
-                markedIds={markedSpeciesIds}
-                onToggleMark={handleToggleMark}
-              />
-            </>
-          ) : (
-            <ItensPage />
-          )}
-
-          {viewMode === "pokemon" && selectedPokemon && (
+          {selectedPokemon && (
             <PokemonDetailModal
               pokemon={selectedPokemon}
               versionId={selectedVersion}
@@ -392,7 +356,7 @@ export default function PokedexPage() {
             />
           )}
 
-          {viewMode === "pokemon" && captureConfigOpen && (
+          {captureConfigOpen && (
             <CaptureConfigModal
               open={captureConfigOpen}
               onClose={() => setCaptureConfigOpen(false)}
@@ -405,3 +369,5 @@ export default function PokedexPage() {
     </RequireAuth>
   );
 }
+
+

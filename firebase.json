@@ -1,4 +1,32 @@
 {
+  "functions": [
+    {
+      "source": "functions",
+      "runtime": "nodejs20"
+    }
+  ],
+  "hosting": {
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/api/payments/create-checkout",
+        "function": "paymentsCreateCheckout"
+      },
+      {
+        "source": "/api/payments/webhook/mercadopago",
+        "function": "paymentsWebhookMercadoPago"
+      },
+      {
+        "source": "/api/payments/result",
+        "function": "paymentsResult"
+      }
+    ]
+  },
   "firestore": {
     "database": "(default)",
     "location": "nam5",

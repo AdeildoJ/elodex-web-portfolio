@@ -1,11 +1,12 @@
-// src/components/users/PokemonTooltip.tsx
+﻿// src/components/users/PokemonTooltip.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
 import { PokemonInstance, StatsBlock } from './types';
+import { getPokemonDisplayName } from './pokemonDisplay';
 import { fetchSpeciesData } from './PokemonSprite';
 
-// JSONs estáticos de golpes e learnsets
+// JSONs estaticos de golpes e learnsets
 import movesJson from '@/data/moves.json';
 import pokemonMovesJson from '@/data/pokemonMoves.json';
 
@@ -20,7 +21,7 @@ interface PokemonTooltipProps {
 type PokemonMoveLearn = {
   moveId: string;
   method: string; // "level-up" | "egg" | "machine" | "tutor" ...
-  level?: number | null; // nível quando for level-up
+  level?: number | null; // nivel quando for level-up
 };
 
 type PokemonMovesDoc = {
@@ -28,7 +29,7 @@ type PokemonMovesDoc = {
 };
 
 /**
- * Estrutura mínima de um movimento salvo na instância
+ * Estrutura minima de um movimento salvo na instancia
  */
 type NormalizedInstanceMove = {
   moveId: string;
@@ -52,7 +53,7 @@ type MoveData = {
 };
 
 /**
- * Dados já prontos para exibição
+ * Dados ja prontos para exibicao
  */
 type DisplayMove = MoveData & {
   method?: string;
@@ -105,7 +106,7 @@ function getNatureModifier(nature: string | undefined, stat: StatKey) {
 }
 
 /**
- * Fórmula oficial de stats
+ * Formula oficial de stats
  */
 function calcStat(
   base: number,
@@ -139,7 +140,7 @@ function formatMoveName(name: string) {
 }
 
 /**
- * Normaliza pokemon.moves (string[] ou objeto[]) para um formato único
+ * Normaliza pokemon.moves (string[] ou objeto[]) para um formato unico
  */
 function normalizeInstanceMoves(
   pokemon: PokemonInstance
@@ -175,7 +176,7 @@ function normalizeInstanceMoves(
 }
 
 /**
- * Busca o learnset no JSON estático pokemonMoves.json
+ * Busca o learnset no JSON estatico pokemonMoves.json
  */
 async function fetchLearnset(
   speciesId: string | number
@@ -189,7 +190,7 @@ async function fetchLearnset(
 }
 
 /**
- * Busca dados de cada golpe em memória usando moves.json
+ * Busca dados de cada golpe em memoria usando moves.json
  */
 async function fetchMovesDetails(
   moveIds: string[]
@@ -221,11 +222,11 @@ async function fetchMovesDetails(
 }
 
 /**
- * Lógica de escolha de golpes para exibição:
- * - Se a instância tiver moves → usa eles (máx. 4).
- * - Senão:
- *    • tenta pegar até 4 últimos level-up <= nível atual
- *    • se não tiver level-up, pega até 2 egg moves (para caso de ovo)
+ * Logica de escolha de golpes para exibicao:
+ * - Se a instancia tiver moves, usa eles (max. 4).
+ * - Senao:
+ *    - tenta pegar ate 4 ultimos level-up <= nivel atual
+ *    - se nao tiver level-up, pega ate 2 egg moves (para caso de ovo)
  */
 function chooseMovesFromLearnset(
   pokemon: PokemonInstance,
@@ -243,17 +244,17 @@ function chooseMovesFromLearnset(
 
   if (levelUp.length > 0) {
     const start = Math.max(levelUp.length - 4, 0);
-    return levelUp.slice(start); // últimos até 4
+    return levelUp.slice(start); // ultimos ate 4
   }
 
-  // fallback: egg moves (caso ovo / espécie sem level-up)
+  // fallback: egg moves (caso ovo / especie sem level-up)
   const eggMoves = learnset.filter((m) => m.method === 'egg');
 
   if (eggMoves.length === 0) {
     return [];
   }
 
-  // regra de visualização: mostra até 2 egg moves (ou o que tiver)
+  // regra de visualizacao: mostra ate 2 egg moves (ou o que tiver)
   return eggMoves.slice(0, Math.min(2, eggMoves.length));
 }
 
@@ -267,7 +268,7 @@ function buildDisplayMoves(
 ): DisplayMove[] {
   const instanceMoves = normalizeInstanceMoves(pokemon);
 
-  // 1) Se a instância tem golpes escolhidos → são a verdade oficial
+  // 1) Se a instancia tem golpes escolhidos, sao a verdade oficial
   if (instanceMoves.length > 0) {
     const chosen =
       instanceMoves.length > 4
@@ -288,7 +289,7 @@ function buildDisplayMoves(
     });
   }
 
-  // 2) Nenhum golpe salvo na instância → calcula a partir do learnset
+  // 2) Nenhum golpe salvo na instancia, calcula a partir do learnset
   const fromLearnset = chooseMovesFromLearnset(pokemon, learnset);
 
   return fromLearnset.map((entry) => {
@@ -313,14 +314,14 @@ const PokemonTooltip: React.FC<PokemonTooltipProps> = ({
   const [movesToShow, setMovesToShow] = useState<DisplayMove[]>([]);
 
   useEffect(() => {
-    // ⚠️ ECONOMIA: só busca dados quando o mouse estiver em cima
+    // Economia: so busca dados quando o mouse estiver em cima
     if (!pokemon || !hovered) return;
 
     let cancelled = false;
 
     (async () => {
       try {
-        // 1) Espécie + base stats
+        // 1) Especie + base stats
         const species = await fetchSpeciesData(pokemon.speciesId);
         if (cancelled) return;
 
@@ -412,7 +413,7 @@ const PokemonTooltip: React.FC<PokemonTooltipProps> = ({
         if (cancelled) return;
         setFinalStats(computed);
 
-        // 3) Movimentos: instância + learnset como fallback
+        // 3) Movimentos: instancia + learnset como fallback
         const learnset = await fetchLearnset(pokemon.speciesId);
         if (cancelled) return;
 
@@ -432,7 +433,7 @@ const PokemonTooltip: React.FC<PokemonTooltipProps> = ({
         const list = buildDisplayMoves(pokemon, learnset, detailsById);
         setMovesToShow(list);
       } catch (err) {
-        console.error('Erro ao montar tooltip de Pokémon:', err);
+        console.error('Erro ao montar tooltip de Pokemon:', err);
       }
     })();
 
@@ -446,7 +447,7 @@ const PokemonTooltip: React.FC<PokemonTooltipProps> = ({
       <div className="relative inline-flex group">
         {children}
         <div className="pointer-events-none absolute left-1/2 top-0 z-40 hidden -translate-x-1/2 -translate-y-full transform rounded-md bg-slate-900 px-3 py-2 text-[10px] text-slate-300 shadow-lg group-hover:block">
-          Pokémon não encontrado.
+          Pokemon nao encontrado.
         </div>
       </div>
     );
@@ -476,6 +477,8 @@ const PokemonTooltip: React.FC<PokemonTooltipProps> = ({
     (pokemon as any).maldade ??
     '-';
 
+  const displayName = getPokemonDisplayName(pokemon);
+
   return (
     <div
       className="relative inline-flex group"
@@ -489,7 +492,7 @@ const PokemonTooltip: React.FC<PokemonTooltipProps> = ({
         <div className="mb-2 flex items-start justify-between gap-2">
           <div className="space-y-0.5">
             <div className="font-semibold text-[11px]">
-              {speciesName || `#${pokemon.speciesId}`}{' '}
+              {displayName || speciesName || `#${pokemon.speciesId}`}{' '}
               [Nv. {pokemon.level ?? 1} - EXP {expValue}]
             </div>
             <div className="text-[9px] text-slate-300">
@@ -570,31 +573,31 @@ const PokemonTooltip: React.FC<PokemonTooltipProps> = ({
                   {m.type && (
                     <span className="text-slate-400">
                       {' '}
-                      • {m.type.toUpperCase()}
+                      | {m.type.toUpperCase()}
                     </span>
                   )}
                   {m.damageClass && (
                     <span className="text-slate-400">
                       {' '}
-                      • {m.damageClass.toUpperCase()}
+                      | {m.damageClass.toUpperCase()}
                     </span>
                   )}
                   {typeof m.power === 'number' && (
                     <span className="text-slate-400">
                       {' '}
-                      • Poder {m.power}
+                      | Poder {m.power}
                     </span>
                   )}
                   {typeof m.accuracy === 'number' && (
                     <span className="text-slate-400">
                       {' '}
-                      • {m.accuracy}% precisão
+                      | {m.accuracy}% precisao
                     </span>
                   )}
                   {m.statusAilment && (
                     <span className="text-amber-300">
                       {' '}
-                      • {m.statusAilment}
+                      | {m.statusAilment}
                       {m.statusChance != null
                         ? ` (${m.statusChance}%)`
                         : ''}
@@ -625,3 +628,4 @@ const PokemonTooltip: React.FC<PokemonTooltipProps> = ({
 };
 
 export default PokemonTooltip;
+

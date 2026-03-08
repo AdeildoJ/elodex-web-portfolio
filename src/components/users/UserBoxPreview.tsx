@@ -1,9 +1,10 @@
-// src/components/users/UserBoxPreview.tsx
+﻿// src/components/users/UserBoxPreview.tsx
 'use client';
 
 import PokemonSprite from './PokemonSprite';
 import PokemonTooltip from './PokemonTooltip';
 import { BoxEntry } from './types';
+import { getPokemonDisplayName } from './pokemonDisplay';
 
 interface Props {
   box: BoxEntry[];
@@ -13,20 +14,14 @@ interface Props {
 
 const PREVIEW_COUNT = 6;
 
-const UserBoxPreview: React.FC<Props> = ({
-  box,
-  loading,
-  onOpenFullBox,
-}) => {
+const UserBoxPreview: React.FC<Props> = ({ box, loading, onOpenFullBox }) => {
   const preview = box.slice(0, PREVIEW_COUNT);
   const hasMore = box.length > PREVIEW_COUNT;
 
   return (
     <section className="space-y-3 rounded-xl border border-slate-800 bg-slate-900/60 p-4 text-xs text-slate-300">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-slate-200">
-          Box (Armazenamento)
-        </h3>
+        <h3 className="text-sm font-semibold text-slate-200">Box (Armazenamento)</h3>
         {box.length > 0 && (
           <button
             onClick={onOpenFullBox}
@@ -40,9 +35,7 @@ const UserBoxPreview: React.FC<Props> = ({
       {loading ? (
         <p className="text-slate-400">Carregando box...</p>
       ) : box.length === 0 ? (
-        <p className="text-slate-400">
-          Este jogador ainda não possui Pokémon na box.
-        </p>
+        <p className="text-slate-400">Este personagem ainda nao possui Pokemon na box.</p>
       ) : (
         <>
           <div className="grid grid-cols-3 gap-2 md:grid-cols-4">
@@ -54,20 +47,14 @@ const UserBoxPreview: React.FC<Props> = ({
                     shiny={entry.pokemon?.shiny}
                     className="mb-1"
                   />
-                  <p className="text-[10px] text-slate-100">
-                    #{entry.pokemon?.speciesId ?? '?'}
-                  </p>
-                  <p className="text-[9px] text-slate-400">
-                    Nv. {entry.pokemon?.level ?? '?'}
-                  </p>
+                  <p className="text-[10px] text-slate-100">{getPokemonDisplayName(entry.pokemon)}</p>
+                  <p className="text-[9px] text-slate-400">Nv. {entry.pokemon?.level ?? '?'}</p>
                 </div>
               </PokemonTooltip>
             ))}
           </div>
           {hasMore && (
-            <p className="mt-1 text-[10px] text-slate-500">
-              +{box.length - PREVIEW_COUNT} Pokémon na box.
-            </p>
+            <p className="mt-1 text-[10px] text-slate-500">+{box.length - PREVIEW_COUNT} Pokemon na box.</p>
           )}
         </>
       )}
