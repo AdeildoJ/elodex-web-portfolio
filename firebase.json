@@ -22,6 +22,10 @@
         "function": "paymentsWebhookMercadoPago"
       },
       {
+        "source": "/api/payments/sync-order",
+        "function": "paymentsSyncOrderStatus"
+      },
+      {
         "source": "/api/payments/result",
         "function": "paymentsResult"
       }
@@ -32,5 +36,8 @@
     "location": "nam5",
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
+  },
+  "storage": {
+    "rules": "storage.rules"
   }
 }

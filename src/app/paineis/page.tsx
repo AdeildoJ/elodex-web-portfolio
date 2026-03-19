@@ -13,8 +13,9 @@ import { onAuthStateChanged } from "firebase/auth";
 import { db, app, auth } from "@/lib/firebase";
 import RequireAuth from "@/components/RequireAuth";
 import Sidebar from "@/components/Sidebar";
+import GymAdmin from "@/components/gym/GymAdmin";
 
-type PanelKey = "capturas" | "compras";
+type PanelKey = "capturas" | "compras" | "gym";
 
 // ================================
 // CAPTURAS
@@ -166,6 +167,15 @@ export default function PaineisPage() {
     activePanel === "capturas"
       ? "Visão geral das configurações de captura e das instâncias de Pokémon já capturadas."
       : "Visão geral dos itens à venda e do histórico de compras.";
+
+  const effectiveHeaderTitle =
+    activePanel === "capturas" ? "Painel de Capturas" : activePanel === "compras" ? "Painel de Compras" : "Painel de GYM";
+  const effectiveHeaderSubtitle =
+    activePanel === "capturas"
+      ? "Visão geral das configurações de captura e das instâncias já registradas."
+      : activePanel === "compras"
+      ? "Visão geral dos itens à venda e do histórico de compras."
+      : "Listagem e ajustes simples dos GYMs cadastrados.";
 
   const adminLabel = useMemo(() => {
     if (debug.isAdmin === true) return "SIM";
@@ -652,10 +662,10 @@ export default function PaineisPage() {
           <div className="w-full">
             <header className="flex flex-col gap-1 mb-4">
               <h1 className="text-xl md:text-2xl font-bold tracking-tight">
-                {headerTitle}
+                {effectiveHeaderTitle}
               </h1>
               <p className="text-xs md:text-sm text-slate-300">
-                {headerSubtitle}
+                {effectiveHeaderSubtitle}
               </p>
             </header>
 
@@ -720,6 +730,20 @@ export default function PaineisPage() {
                     Painel de Compras
                     <div className="text-[11px] text-slate-400 mt-0.5">
                       Itens à venda, total vendido e compradores.
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActivePanel("gym")}
+                    className={`w-full rounded-lg px-3 py-2 text-left text-sm border transition ${
+                      activePanel === "gym"
+                        ? "bg-emerald-600/20 border-emerald-500/50 text-emerald-200"
+                        : "bg-slate-900/40 border-slate-800 hover:bg-slate-900"
+                    }`}
+                  >
+                    Painel de GYM
+                    <div className="text-[11px] text-slate-400 mt-0.5">
+                      Dono, tipo, limites, badges, NPCs e upgrades.
                     </div>
                   </button>
                 </div>
@@ -983,6 +1007,11 @@ export default function PaineisPage() {
                     )}
                   </>
                 )}
+
+                {/* ================================
+                    GYM
+                ================================ */}
+                {activePanel === "gym" && <GymAdmin />}
 
                 {/* ================================
                     COMPRAS

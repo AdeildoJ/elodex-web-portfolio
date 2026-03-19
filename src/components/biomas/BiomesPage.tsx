@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -11,6 +11,13 @@ import {
 } from "firebase/firestore";
 
 import { db } from "@/lib/firebase";
+import { imageFileToStorableDataUrl } from "@/lib/imageProcessing";
+import {
+  LEGACY_SCENARIOS,
+  createLegacyScenarioSeed,
+  getScenarioDisplayName,
+  normalizeScenarioRecord,
+} from "@/lib/scenarioCatalog";
 import {
   DEFAULT_ADMIN_BIOMES,
   type AdminBiome,
@@ -23,6 +30,9 @@ type BiomeDoc = AdminBiome & {
   unlockRules?: unknown;
   battleAssets?: unknown;
   battleScenarios?: string[];
+  acceptsGym?: boolean;
+  requiresTrainerLicense?: boolean;
+  trainerLicenseProductCode?: string | null;
   updatedAt?: unknown;
   createdAt?: unknown;
 };
@@ -34,6 +44,11 @@ type BiomeForm = {
   name: string;
   description: string;
   imageUrl: string;
+  acceptsGym: boolean;
+  requiresTicket: boolean;
+  ticketProductCode: string;
+  requiresTrainerLicense: boolean;
+  trainerLicenseProductCode: string;
   npcs: BiomeNpcConfig[];
   unlockType: UnlockType;
   kmRequired: string;
@@ -67,13 +82,6 @@ type BiomeBattleAssetKey =
 
 type BiomeBattleAssets = Record<BiomeBattleAssetKey, string>;
 
-type NpcDraft = {
-  role: BiomeNpcRole;
-  name: string;
-  imageUrl: string;
-  specialistType: string;
-};
-
 type MissionOption = {
   id: string;
   title: string;
@@ -87,6 +95,20 @@ type SpeciesOption = {
 type MoveOption = {
   id: string;
   label: string;
+};
+
+type ScenarioOption = {
+  id: string;
+  name: string;
+  processedImageUrl: string;
+  isActive: boolean;
+  isSpecial: boolean;
+  specialType: string | null;
+};
+
+type LicenseProductOption = {
+  code: string;
+  name: string;
 };
 
 function slugify(value: string) {
@@ -104,6 +126,11 @@ const emptyForm: BiomeForm = {
   name: "",
   description: "",
   imageUrl: "",
+  acceptsGym: false,
+  requiresTicket: false,
+  ticketProductCode: "biome-ticket",
+  requiresTrainerLicense: false,
+  trainerLicenseProductCode: "",
   npcs: [],
   unlockType: "km",
   kmRequired: "0",
@@ -160,56 +187,23 @@ const BATTLE_ASSET_FIELDS: Array<{
     { key: "platformEnemy", label: "Plataforma inimigo", helper: "Base/chao do lado inimigo." },
   ];
 
-const POKEMON_TYPES = [
-  "normal",
-  "fire",
-  "water",
-  "electric",
-  "grass",
-  "ice",
-  "fighting",
-  "poison",
-  "ground",
-  "flying",
-  "psychic",
-  "bug",
-  "rock",
-  "ghost",
-  "dragon",
-  "dark",
-  "steel",
-  "fairy",
-] as const;
-
-const AVAILABLE_SCENARIOS = [
-  "beach",
-  "cave",
-  "city",
-  "desert",
-  "dojo",
-  "forest",
-  "grassland",
-  "lake",
-  "mountain",
-  "river",
-  "ruins",
-  "snow",
-  "swamp",
-  "vocanion",
-];
+type NpcOption = {
+  id: string;
+  name: string;
+  role: BiomeNpcRole;
+  imageUrl: string;
+  specialistType?: string | null;
+};
 
 const NPC_ROLE_LABEL: Record<BiomeNpcRole, string> = {
   nurse: "Enfermeira",
   breeder: "Criador",
   specialist: "Especialista",
   remember: "Remember",
-};
-
-const emptyNpcDraft: NpcDraft = {
-  role: "nurse",
-  name: "",
-  imageUrl: "",
-  specialistType: "normal",
+  policial: "Policial",
+  ladrao: "Ladrao",
+  enfermeiro: "Enfermeiro",
+  criador: "Criador",
 };
 
 function toInt(value: string, fallback = 0) {
@@ -316,60 +310,6 @@ function buildUnlockRules(form: BiomeForm): unknown {
   };
 }
 
-function fileToDataUrl(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = typeof reader.result === "string" ? reader.result : "";
-      if (!dataUrl) {
-        reject(new Error("data-url-empty"));
-        return;
-      }
-      resolve(dataUrl);
-    };
-    reader.onerror = () => reject(new Error("data-url-read-error"));
-    reader.readAsDataURL(file);
-  });
-}
-
-async function compressImageToDataUrl(
-  file: File,
-  maxSide: number,
-  quality = 0.72
-): Promise<string> {
-  const src = await fileToDataUrl(file);
-  const img = await new Promise<HTMLImageElement>((resolve, reject) => {
-    const el = new window.Image();
-    el.onload = () => resolve(el);
-    el.onerror = () => reject(new Error("image-load-error"));
-    el.src = src;
-  });
-
-  const w = img.width || maxSide;
-  const h = img.height || maxSide;
-  const scale = Math.min(1, maxSide / Math.max(w, h));
-  const tw = Math.max(1, Math.round(w * scale));
-  const th = Math.max(1, Math.round(h * scale));
-
-  const canvas = document.createElement("canvas");
-  canvas.width = tw;
-  canvas.height = th;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return src;
-  ctx.drawImage(img, 0, 0, tw, th);
-  return canvas.toDataURL("image/jpeg", quality);
-}
-
-async function imageFileToStorableDataUrl(
-  file: File,
-  maxSide: number,
-  quality = 0.72
-): Promise<string> {
-  const mime = String(file.type || "").toLowerCase();
-  if (mime.includes("gif")) return fileToDataUrl(file);
-  return compressImageToDataUrl(file, maxSide, quality);
-}
-
 function parseBattleAssets(raw: unknown): BiomeBattleAssets {
   const base: BiomeBattleAssets = { ...emptyForm.battleAssets };
   if (!raw || typeof raw !== "object") return base;
@@ -409,10 +349,19 @@ function normalizeNpcList(raw: unknown): BiomeNpcConfig[] {
     if (!row || typeof row !== "object") return;
     const data = row as Record<string, unknown>;
     const roleRaw = String(data.role || "").trim().toLowerCase();
-    const role: BiomeNpcRole =
-      roleRaw === "nurse" || roleRaw === "breeder" || roleRaw === "specialist" || roleRaw === "remember"
-        ? (roleRaw as BiomeNpcRole)
-        : "remember";
+    const allowedRoles: BiomeNpcRole[] = [
+      "nurse",
+      "breeder",
+      "specialist",
+      "remember",
+      "policial",
+      "ladrao",
+      "enfermeiro",
+      "criador",
+    ];
+    const role: BiomeNpcRole = allowedRoles.includes(roleRaw as BiomeNpcRole)
+      ? (roleRaw as BiomeNpcRole)
+      : "remember";
     const name = String(data.name || "").trim();
     if (!name) return;
     const imageUrl = String(data.imageUrl || "").trim();
@@ -436,15 +385,16 @@ export default function BiomesPage() {
   const [saving, setSaving] = useState(false);
   const [items, setItems] = useState<BiomeDoc[]>([]);
   const [missions, setMissions] = useState<MissionOption[]>([]);
+  const [availableNpcs, setAvailableNpcs] = useState<NpcOption[]>([]);
+  const [availableScenarios, setAvailableScenarios] = useState<ScenarioOption[]>([]);
+  const [licenseProducts, setLicenseProducts] = useState<LicenseProductOption[]>([]);
   const [speciesOptions, setSpeciesOptions] = useState<SpeciesOption[]>([]);
   const [moveOptions, setMoveOptions] = useState<MoveOption[]>([]);
   const [form, setForm] = useState<BiomeForm>(emptyForm);
-  const [npcDraft, setNpcDraft] = useState<NpcDraft>(emptyNpcDraft);
   const [partySearch, setPartySearch] = useState("");
   const [moveSearch, setMoveSearch] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
-  const npcImageInputRef = useRef<HTMLInputElement | null>(null);
 
   const filteredSpeciesOptions = useMemo(() => {
     const q = partySearch.trim().toLowerCase();
@@ -473,6 +423,12 @@ export default function BiomesPage() {
           name: String(data.name || d.id),
           description: String(data.description || ""),
           imageUrl: String(data.imageUrl || ""),
+          acceptsGym: Boolean(data.acceptsGym),
+          requiresTicket: Boolean(data.requiresTicket),
+          ticketProductCode: typeof data.ticketProductCode === "string" ? data.ticketProductCode : null,
+          requiresTrainerLicense: Boolean(data.requiresTrainerLicense),
+          trainerLicenseProductCode:
+            typeof data.trainerLicenseProductCode === "string" ? data.trainerLicenseProductCode : null,
           npcs: normalizeNpcList(data.npcs),
           unlockRules: data.unlockRules ?? null,
           battleAssets: parseBattleAssets(data.battleAssets),
@@ -491,6 +447,11 @@ export default function BiomesPage() {
           ...biome,
           description: biome.description || "",
           imageUrl: biome.imageUrl || "",
+          acceptsGym: Boolean((biome as Record<string, unknown>).acceptsGym),
+          requiresTicket: Boolean(biome.requiresTicket),
+          ticketProductCode: biome.ticketProductCode || "biome-ticket",
+          requiresTrainerLicense: false,
+          trainerLicenseProductCode: null,
           npcs: [],
           unlockRules: null,
           battleAssets: { ...emptyForm.battleAssets },
@@ -524,6 +485,23 @@ export default function BiomesPage() {
     setMissions(rows);
   }
 
+  async function loadNpcs() {
+    const snap = await getDocs(collection(db, "npcs"));
+    const rows: NpcOption[] = snap.docs.map((d) => {
+      const data = d.data() as Record<string, unknown>;
+      const roleRaw = String(data.role || "remember").trim().toLowerCase() as BiomeNpcRole;
+      return {
+        id: String(data.id || d.id),
+        name: String(data.nome || data.name || d.id),
+        role: roleRaw,
+        imageUrl: String(data.imageUrl || ""),
+        specialistType: typeof data.specialistType === "string" ? data.specialistType : null,
+      };
+    });
+    rows.sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
+    setAvailableNpcs(rows);
+  }
+
   async function loadCatalogOptions() {
     const response = await fetch("/api/catalog/options", { cache: "no-store" });
     if (!response.ok) {
@@ -537,9 +515,69 @@ export default function BiomesPage() {
     setMoveOptions(Array.isArray(data.moves) ? data.moves : []);
   }
 
+  async function loadScenarios() {
+    const snap = await getDocs(collection(db, "scenarios"));
+    const merged = new Map<string, ScenarioOption>();
+
+    LEGACY_SCENARIOS.forEach((scenarioId) => {
+      const seed = createLegacyScenarioSeed(scenarioId);
+      merged.set(seed.id, {
+        id: seed.id,
+        name: seed.name,
+        processedImageUrl: seed.processedImageUrl,
+        isActive: seed.isActive,
+        isSpecial: seed.isSpecial,
+        specialType: seed.specialType,
+      });
+    });
+
+    snap.forEach((row) => {
+      const item = normalizeScenarioRecord(row.id, row.data());
+      merged.set(item.id, {
+        id: item.id,
+        name: item.name || getScenarioDisplayName(item.id),
+        processedImageUrl: item.processedImageUrl || item.imageUrl || "",
+        isActive: item.isActive,
+        isSpecial: item.isSpecial,
+        specialType: item.specialType,
+      });
+    });
+
+    setAvailableScenarios(
+      Array.from(merged.values()).sort((a, b) => a.name.localeCompare(b.name, "pt-BR"))
+    );
+  }
+
+  async function loadLicenseProducts() {
+    const snap = await getDocs(collection(db, "monetizationProducts"));
+    const rows = snap.docs
+      .map((docSnap) => {
+        const data = docSnap.data() as Record<string, unknown>;
+        const type = String(data.type || "").trim().toLowerCase();
+        const configuration =
+          data.configuration && typeof data.configuration === "object"
+            ? (data.configuration as Record<string, unknown>)
+            : {};
+        if (type !== "trainer_license" && String(configuration.kind || "") !== "trainer_license") {
+          return null;
+        }
+        return {
+          code: String(data.code || docSnap.id).trim().toLowerCase(),
+          name: String(data.name || data.nome || docSnap.id),
+        };
+      })
+      .filter((row): row is LicenseProductOption => Boolean(row?.code))
+      .sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
+
+    setLicenseProducts(rows);
+  }
+
   useEffect(() => {
     loadBiomes();
     loadMissions();
+    loadNpcs();
+    loadScenarios();
+    loadLicenseProducts();
     loadCatalogOptions().catch(() => {
       setSpeciesOptions([]);
       setMoveOptions([]);
@@ -549,7 +587,6 @@ export default function BiomesPage() {
   function startCreate() {
     setEditingId(null);
     setForm(emptyForm);
-    setNpcDraft(emptyNpcDraft);
   }
 
   function startEdit(item: BiomeDoc) {
@@ -560,6 +597,11 @@ export default function BiomesPage() {
       name: item.name,
       description: item.description || "",
       imageUrl: item.imageUrl || "",
+      acceptsGym: Boolean((item as Record<string, unknown>).acceptsGym),
+      requiresTicket: Boolean(item.requiresTicket),
+      ticketProductCode: item.ticketProductCode || "biome-ticket",
+      requiresTrainerLicense: Boolean(item.requiresTrainerLicense),
+      trainerLicenseProductCode: item.trainerLicenseProductCode || "",
       npcs: item.npcs || [],
       unlockType: parsedUnlock.unlockType,
       kmRequired: parsedUnlock.kmRequired,
@@ -569,50 +611,32 @@ export default function BiomesPage() {
       battleAssets: parseBattleAssets(item.battleAssets),
       battleScenarios: item.battleScenarios || [],
     });
-    setNpcDraft(emptyNpcDraft);
-  }
-
-  function addNpc() {
-    const name = npcDraft.name.trim();
-    if (!name) {
-      alert("Informe o nome do NPC.");
-      return;
-    }
-    if (!npcDraft.imageUrl.trim()) {
-      alert("Adicione a foto do NPC.");
-      return;
-    }
-    if (npcDraft.role === "specialist" && !npcDraft.specialistType.trim()) {
-      alert("Selecione o tipo do Especialista.");
-      return;
-    }
-
-    const idBase = slugify(`${npcDraft.role}-${name}`) || `npc-${Date.now()}`;
-    const payload: BiomeNpcConfig = {
-      id: `${idBase}-${Date.now()}`,
-      role: npcDraft.role,
-      name,
-      imageUrl: npcDraft.imageUrl.trim(),
-      specialistType:
-        npcDraft.role === "specialist"
-          ? npcDraft.specialistType.trim().toLowerCase()
-          : null,
-    };
-
-    setForm((prev) => {
-      const duplicate = prev.npcs.some(
-        (npc) =>
-          npc.role === payload.role &&
-          npc.name.trim().toLowerCase() === payload.name.trim().toLowerCase()
-      );
-      if (duplicate) return prev;
-      return { ...prev, npcs: [...prev.npcs, payload] };
-    });
-    setNpcDraft(emptyNpcDraft);
   }
 
   function removeNpc(id: string) {
     setForm((prev) => ({ ...prev, npcs: prev.npcs.filter((npc) => npc.id !== id) }));
+  }
+
+  function toggleNpcSelection(option: NpcOption) {
+    setForm((prev) => {
+      const exists = prev.npcs.some((npc) => npc.id === option.id);
+      if (exists) {
+        return { ...prev, npcs: prev.npcs.filter((npc) => npc.id !== option.id) };
+      }
+      return {
+        ...prev,
+        npcs: [
+          ...prev.npcs,
+          {
+            id: option.id,
+            role: option.role,
+            name: option.name,
+            imageUrl: option.imageUrl,
+            specialistType: option.specialistType || null,
+          },
+        ],
+      };
+    });
   }
 
   function togglePartyPokemon(speciesId: number) {
@@ -665,16 +689,6 @@ export default function BiomesPage() {
     }
   }
 
-  async function onPickNpcImage(file: File | null) {
-    if (!file) return;
-    try {
-      const dataUrl = await imageFileToStorableDataUrl(file, 160, 0.72);
-      setNpcDraft((prev) => ({ ...prev, imageUrl: dataUrl }));
-    } catch {
-      alert("Nao foi possivel processar a imagem do NPC.");
-    }
-  }
-
   async function onPickBattleAsset(key: BiomeBattleAssetKey, file: File | null) {
     if (!file) return;
     try {
@@ -718,6 +732,10 @@ export default function BiomesPage() {
       alert("Selecione ao menos um movimento para desbloqueio.");
       return;
     }
+    if (form.requiresTrainerLicense && !form.trainerLicenseProductCode) {
+      alert("Selecione qual licenca libera este bioma.");
+      return;
+    }
 
     setSaving(true);
     try {
@@ -727,6 +745,14 @@ export default function BiomesPage() {
         name,
         description: String(form.description || ""),
         imageUrl: String(form.imageUrl || ""),
+        acceptsGym: !!form.acceptsGym,
+        gymEnabled: !!form.acceptsGym,
+        requiresTicket: !!form.requiresTicket,
+        ticketProductCode: form.requiresTicket ? String(form.ticketProductCode || "biome-ticket").trim().toLowerCase() : null,
+        requiresTrainerLicense: !!form.requiresTrainerLicense,
+        trainerLicenseProductCode: form.requiresTrainerLicense
+          ? String(form.trainerLicenseProductCode || "").trim().toLowerCase()
+          : null,
         npcs: form.npcs.map((npc) => ({
           id: npc.id,
           role: npc.role,
@@ -744,7 +770,6 @@ export default function BiomesPage() {
       await loadBiomes();
       setEditingId(null);
       setForm(emptyForm);
-      setNpcDraft(emptyNpcDraft);
       alert("Bioma salvo com sucesso.");
     } catch (e) {
       console.error("[BiomesPage] save error", e);
@@ -843,75 +868,104 @@ export default function BiomesPage() {
                   </div>
                 ) : null}
 
-                <div className="rounded border border-slate-700 bg-slate-950/60 p-2 space-y-2">
-                  <select
-                    className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-2 text-xs"
-                    value={npcDraft.role}
+                <label className="flex items-center gap-2 text-xs text-slate-200">
+                  <input
+                    type="checkbox"
+                    checked={form.acceptsGym}
                     onChange={(e) =>
-                      setNpcDraft((prev) => ({
-                        ...prev,
-                        role: (e.target.value as BiomeNpcRole) || "nurse",
-                      }))
+                      setForm((prev) => ({ ...prev, acceptsGym: e.target.checked }))
                     }
-                  >
-                    <option value="nurse">Enfermeira</option>
-                    <option value="breeder">Criador</option>
-                    <option value="specialist">Especialista</option>
-                    <option value="remember">Remember</option>
-                  </select>
+                  />
+                  Este bioma aceita GYM
+                </label>
 
-                  {npcDraft.role === "specialist" && (
-                    <select
-                      className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-2 text-xs"
-                      value={npcDraft.specialistType}
-                      onChange={(e) =>
-                        setNpcDraft((prev) => ({ ...prev, specialistType: e.target.value }))
-                      }
-                    >
-                      {POKEMON_TYPES.map((tp) => (
-                        <option key={tp} value={tp}>
-                          {tp}
-                        </option>
-                      ))}
-                    </select>
-                  )}
-
+                <label className="flex items-center gap-2 text-xs text-slate-200">
+                  <input
+                    type="checkbox"
+                    checked={form.requiresTicket}
+                    onChange={(e) =>
+                      setForm((prev) => ({ ...prev, requiresTicket: e.target.checked }))
+                    }
+                  />
+                  Este bioma exige ticket
+                </label>
+                {form.requiresTicket ? (
                   <input
                     className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
-                    placeholder="Nome do NPC"
-                    value={npcDraft.name}
-                    onChange={(e) => setNpcDraft((prev) => ({ ...prev, name: e.target.value }))}
+                    placeholder="Codigo do produto de ticket"
+                    value={form.ticketProductCode}
+                    onChange={(e) =>
+                      setForm((prev) => ({ ...prev, ticketProductCode: e.target.value }))
+                    }
                   />
+                ) : null}
 
+                <label className="flex items-center gap-2 text-xs text-slate-200">
                   <input
-                    ref={npcImageInputRef}
-                    type="file"
-                    accept="image/*,.gif"
-                    className="hidden"
-                    onChange={(e) => onPickNpcImage(e.target.files?.[0] || null)}
+                    type="checkbox"
+                    checked={form.requiresTrainerLicense}
+                    onChange={(e) =>
+                      setForm((prev) => ({
+                        ...prev,
+                        requiresTrainerLicense: e.target.checked,
+                        trainerLicenseProductCode: e.target.checked ? prev.trainerLicenseProductCode : "",
+                      }))
+                    }
                   />
-                  <button
-                    type="button"
-                    onClick={() => npcImageInputRef.current?.click()}
-                    className="rounded-md border border-slate-600 px-3 py-2 text-xs text-slate-100 hover:bg-slate-800"
+                  Este bioma e exclusivo por licenca
+                </label>
+                {form.requiresTrainerLicense ? (
+                  <select
+                    className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+                    value={form.trainerLicenseProductCode}
+                    onChange={(e) =>
+                      setForm((prev) => ({ ...prev, trainerLicenseProductCode: e.target.value }))
+                    }
                   >
-                    Adicionar Foto do NPC
-                  </button>
-                  {npcDraft.imageUrl ? (
-                    <img
-                      src={npcDraft.imageUrl}
-                      alt={npcDraft.name || "NPC"}
-                      className="h-12 w-12 rounded object-cover border border-slate-700"
-                    />
-                  ) : null}
+                    <option value="">Selecione a licenca</option>
+                    {licenseProducts.map((license) => (
+                      <option key={license.code} value={license.code}>
+                        {license.name} ({license.code})
+                      </option>
+                    ))}
+                  </select>
+                ) : null}
 
-                  <button
-                    type="button"
-                    onClick={addNpc}
-                    className="rounded-md border border-slate-600 px-3 py-2 text-xs text-slate-100 hover:bg-slate-800"
-                  >
-                    Adicionar NPC
-                  </button>
+                <div className="rounded border border-slate-700 bg-slate-950/60 p-2 space-y-2">
+                  <p className="text-[11px] text-slate-300">
+                    Selecione os NPCs ja cadastrados no menu de NPCs.
+                  </p>
+                  <div className="max-h-44 overflow-y-auto rounded border border-slate-700 p-2">
+                    <div className="grid grid-cols-1 gap-2">
+                      {availableNpcs.map((npc) => {
+                        const checked = form.npcs.some((item) => item.id === npc.id);
+                        return (
+                          <label
+                            key={npc.id}
+                            className="flex items-center gap-2 rounded border border-slate-800 bg-slate-900/60 p-2 text-xs text-slate-200"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              onChange={() => toggleNpcSelection(npc)}
+                            />
+                            {npc.imageUrl ? (
+                              <img src={npc.imageUrl} alt={npc.name} className="h-8 w-8 rounded object-cover" />
+                            ) : (
+                              <div className="h-8 w-8 rounded bg-slate-800" />
+                            )}
+                            <div className="flex-1">
+                              <p className="font-semibold text-slate-100">{npc.name}</p>
+                              <p className="text-[11px] text-slate-400">
+                                {NPC_ROLE_LABEL[npc.role] || npc.role}
+                                {npc.role === "specialist" && npc.specialistType ? ` | ${npc.specialistType}` : ""}
+                              </p>
+                            </div>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
                 {form.npcs.length ? (
                   <div className="grid gap-2">
@@ -1064,17 +1118,44 @@ export default function BiomesPage() {
                 Selecione os cenarios que podem ser sorteados ao iniciar uma batalha neste bioma.
                 Se definidos, um deles vai sobrescrever os assets padrao.
               </p>
-              <div className="mt-2 grid grid-cols-2 md:grid-cols-3 gap-2">
-                {AVAILABLE_SCENARIOS.map((scenario) => (
-                  <label key={scenario} className="flex items-center gap-2 text-xs text-slate-200">
-                    <input
-                      type="checkbox"
-                      checked={form.battleScenarios.includes(scenario)}
-                      onChange={() => toggleScenario(scenario)}
-                    />
-                    {scenario}
-                  </label>
-                ))}
+              <div className="mt-2 grid grid-cols-1 gap-2 md:grid-cols-2">
+                {availableScenarios.map((scenario) => {
+                  const checked = form.battleScenarios.includes(scenario.id);
+                  return (
+                    <label
+                      key={scenario.id}
+                      className={`flex items-center gap-3 rounded border p-2 text-xs transition ${
+                        checked
+                          ? "border-cyan-400/40 bg-cyan-500/10 text-cyan-100"
+                          : "border-slate-700 bg-slate-950/60 text-slate-200"
+                      } ${scenario.isActive ? "" : "opacity-60"}`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => toggleScenario(scenario.id)}
+                      />
+                      {scenario.processedImageUrl ? (
+                        <img
+                          src={scenario.processedImageUrl}
+                          alt={scenario.name}
+                          className="h-10 w-16 rounded border border-slate-700 object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-10 w-16 items-center justify-center rounded border border-dashed border-slate-700 bg-slate-900 text-[10px] uppercase tracking-[0.2em] text-slate-500">
+                          Legacy
+                        </div>
+                      )}
+                      <div className="flex-1">
+                        <p className="font-semibold text-slate-100">{scenario.name}</p>
+                        <p className="text-[11px] text-slate-400">
+                          {scenario.isSpecial ? `Especial: ${scenario.specialType}` : "Visual comum"}
+                          {!scenario.isActive ? " | Inativo" : ""}
+                        </p>
+                      </div>
+                    </label>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -1123,8 +1204,25 @@ export default function BiomesPage() {
                     NPCs: {item.npcs?.length || 0}
                   </p>
                   <p className="mt-1 text-[11px] text-slate-400">
-                    Cenários de Batalha: {item.battleScenarios?.length || 0}
+                    Aceita GYM: {(item as Record<string, unknown>).acceptsGym ? "Sim" : "Nao"}
                   </p>
+                  <p className="mt-1 text-[11px] text-slate-400">
+                    Licenca: {item.requiresTrainerLicense ? item.trainerLicenseProductCode || "Obrigatoria" : "Nao"}
+                  </p>
+                  <p className="mt-1 text-[11px] text-slate-400">
+                    CenÃ¡rios de Batalha: {item.battleScenarios?.length || 0}
+                  </p>
+                  {item.battleScenarios?.length ? (
+                    <p className="mt-1 line-clamp-2 text-[11px] text-slate-400">
+                      {item.battleScenarios
+                        .map(
+                          (scenarioId) =>
+                            availableScenarios.find((entry) => entry.id === scenarioId)?.name ||
+                            getScenarioDisplayName(scenarioId)
+                        )
+                        .join(", ")}
+                    </p>
+                  ) : null}
                   {item.unlockRules ? (
                     <p className="mt-1 line-clamp-2 text-[11px] text-slate-400">
                       {getUnlockSummary(item.unlockRules)}
@@ -1155,3 +1253,4 @@ export default function BiomesPage() {
     </div>
   );
 }
+

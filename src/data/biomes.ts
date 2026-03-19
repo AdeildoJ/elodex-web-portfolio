@@ -5,9 +5,19 @@ export type AdminBiome = {
   imageUrl?: string;
   hasDaycare?: boolean;
   hasPokemart?: boolean;
+  requiresTicket?: boolean;
+  ticketProductCode?: string | null;
 };
 
-export type BiomeNpcRole = "nurse" | "breeder" | "specialist" | "remember";
+export type BiomeNpcRole =
+  | "nurse"
+  | "breeder"
+  | "specialist"
+  | "remember"
+  | "policial"
+  | "ladrao"
+  | "enfermeiro"
+  | "criador";
 
 export type BiomeNpcConfig = {
   id: string;

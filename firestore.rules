@@ -57,6 +57,24 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Cadastro de NPCs (admin/web)
+    match /npcs/{id} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Cadastro de cenarios (admin/web)
+    match /scenarios/{id} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Cadastro de insignias (admin/web)
+    match /badges/{id} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
     // Pool global de Pokemon liberados/abandonados para re-encontro em biomas
     match /releasedPokemonPool/{id} {
       allow read: if isSignedIn();
@@ -99,6 +117,48 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    match /vipPlans/{id} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /monetizationProducts/{id} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /ecoinPackages/{id} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /gyms/{gymId} {
+      allow read: if isAdmin() || isSignedIn();
+      allow create: if isSignedIn() && gymId == request.auth.uid && request.resource.data.ownerUid == request.auth.uid;
+      allow update, delete: if isAdmin() || (isSignedIn() && gymId == request.auth.uid);
+
+      match /storage/{entryId} {
+        allow read: if isAdmin() || isSignedIn();
+        allow write: if isAdmin() || (isSignedIn() && gymId == request.auth.uid);
+      }
+
+      match /mainTeam/{entryId} {
+        allow read: if isAdmin() || isSignedIn();
+        allow write: if isAdmin() || (isSignedIn() && gymId == request.auth.uid);
+      }
+
+      match /{document=**} {
+        allow read: if isAdmin() || (isSignedIn() && gymId == request.auth.uid);
+        allow write: if isAdmin() || (isSignedIn() && gymId == request.auth.uid);
+      }
+    }
+
+    match /gymNames/{nameId} {
+      allow read: if isAdmin() || isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.ownerUid == request.auth.uid;
+      allow update, delete: if isAdmin() || (isSignedIn() && resource.data.ownerUid == request.auth.uid);
+    }
+
     // ================================
     // ðŸ”¥ ELODEX â€” USUÃRIOS
     // ================================
@@ -113,6 +173,16 @@ service cloud.firestore {
         allow read:  if isSelf(uid) || isAdmin();
         allow write: if isSelf(uid) || isAdmin();
       }
+    }
+
+    match /players/{uid}/monetizationHistory/{entryId} {
+      allow read: if isSelf(uid) || isAdmin();
+      allow write: if isSelf(uid) || isAdmin();
+    }
+
+    match /players/{uid}/productEntitlements/{entryId} {
+      allow read: if isSelf(uid) || isAdmin();
+      allow write: if isSelf(uid) || isAdmin();
     }
 
     match /users/{uid} {
@@ -249,8 +319,12 @@ service cloud.firestore {
     match /battleRooms/{id} {
       allow read: if isSignedIn();
       allow create: if isSignedIn() && request.resource.data.ownerUid == request.auth.uid;
-      allow update, delete: if isAdmin() || (isSignedIn() && resource.data.ownerUid == request.auth.uid);
+      allow update: if isAdmin() || (isSignedIn() && (
+        resource.data.ownerUid == request.auth.uid ||
+        resource.data.challengerUid == request.auth.uid ||
+        (resource.data.status == "waiting_opponent" && request.resource.data.challengerUid == request.auth.uid)
+      ));
+      allow delete: if isAdmin() || (isSignedIn() && resource.data.ownerUid == request.auth.uid);
     }
   }
 }
-

@@ -1,27 +1,193 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import type { ComponentType } from "react";
 import { signOut } from "firebase/auth";
+
 import { auth } from "@/lib/firebase";
 
-const items = [
-  { href: "/home", label: "Home", icon: "/icons/home.png" },
-  { href: "/pokedex", label: "Pokedex", icon: "/icons/testes.png" },
-  { href: "/biomas", label: "Biomas", icon: "/icons/config.png" },
-  // Novo item: Biomas
-  { href: "/paineis", label: "Paineis", icon: "/icons/auditoria.png" },
-  { href: "/jogadores", label: "Jogadores", icon: "/icons/usuarios.png" },
-  { href: "/missoes", label: "Missoes", icon: "/icons/eventos.png" },
-  { href: "/loja", label: "Loja", icon: "/icons/biblioteca.png" },
+type Item = {
+  href: string;
+  label: string;
+  icon: ComponentType<{ className?: string }>;
+};
+
+function HomeIcon({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className={className}>
+      <path d="M3 11.5 12 4l9 7.5" />
+      <path d="M5 10.5V20h14v-9.5" />
+    </svg>
+  );
+}
+
+function BookOpenIcon({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className={className}>
+      <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4H20v15.5a.5.5 0 0 1-.5.5H7a3 3 0 0 0-3 3z" />
+      <path d="M8 4v16" />
+    </svg>
+  );
+}
+
+function PanelsIcon({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className={className}>
+      <rect x="3" y="4" width="18" height="6" rx="2" />
+      <rect x="3" y="14" width="8" height="6" rx="2" />
+      <rect x="13" y="14" width="8" height="6" rx="2" />
+    </svg>
+  );
+}
+
+function StoreIcon({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className={className}>
+      <path d="M4 9h16" />
+      <path d="M5 9.5 6.5 4h11L19 9.5V20H5z" />
+      <path d="M9 20v-5h6v5" />
+    </svg>
+  );
+}
+
+function FolderIcon({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className={className}>
+      <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3z" />
+    </svg>
+  );
+}
+
+function UsersIcon({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className={className}>
+      <path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" />
+      <circle cx="9.5" cy="7.5" r="3.5" />
+      <path d="M20 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16.5 4.6a3.5 3.5 0 0 1 0 5.8" />
+    </svg>
+  );
+}
+
+function MapIcon({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className={className}>
+      <path d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20z" />
+      <path d="M9 4v13.5" />
+      <path d="M15 6.5V20" />
+    </svg>
+  );
+}
+
+function ScrollIcon({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className={className}>
+      <path d="M7 4h9a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H8a3 3 0 0 1 0-6h8" />
+      <path d="M8 14h8" />
+      <path d="M8 10h8" />
+    </svg>
+  );
+}
+
+function NpcIcon({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className={className}>
+      <circle cx="12" cy="7.5" r="3.5" />
+      <path d="M5 20a7 7 0 0 1 14 0" />
+      <path d="M18.5 9.5 21 12l-2.5 2.5" />
+    </svg>
+  );
+}
+
+function ScenarioIcon({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className={className}>
+      <path d="M3 19V5" />
+      <path d="M21 19V5" />
+      <path d="M3 19h18" />
+      <path d="m7 15 3-3 2 2 5-5 2 2" />
+    </svg>
+  );
+}
+
+function BadgeIcon({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className={className}>
+      <circle cx="12" cy="8" r="4" />
+      <path d="m8.5 12.5-1 7 4.5-2.5 4.5 2.5-1-7" />
+    </svg>
+  );
+}
+
+function LogoutIcon({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className={className}>
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <path d="M16 17l5-5-5-5" />
+      <path d="M21 12H9" />
+    </svg>
+  );
+}
+
+const mainItems: Item[] = [
+  { href: "/home", label: "Home", icon: HomeIcon },
+  { href: "/pokedex", label: "Pokedex", icon: BookOpenIcon },
+  { href: "/paineis", label: "Paineis", icon: PanelsIcon },
+  { href: "/loja", label: "Loja", icon: StoreIcon },
 ];
+
+const cadastroItems: Item[] = [
+  { href: "/jogadores", label: "Jogadores", icon: UsersIcon },
+  { href: "/biomas", label: "Biomas", icon: MapIcon },
+  { href: "/missoes", label: "Missoes", icon: ScrollIcon },
+  { href: "/npc", label: "NPC", icon: NpcIcon },
+  { href: "/cenario", label: "Cenario", icon: ScenarioIcon },
+  { href: "/insignias", label: "Insignias", icon: BadgeIcon },
+];
+
+function SidebarLink({
+  item,
+  expanded,
+  active,
+}: {
+  item: Item;
+  expanded: boolean;
+  active: boolean;
+}) {
+  const Icon = item.icon;
+
+  return (
+    <Link
+      href={item.href}
+      title={item.label}
+      className={`flex ${expanded ? "justify-start" : "justify-center"} items-center gap-3 rounded-md p-2 transition ${
+        active ? "bg-white/14" : "hover:bg-white/10"
+      }`}
+    >
+      <span className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md ${
+        active ? "text-cyan-200" : "text-white"
+      }`}>
+        <Icon className="h-5 w-5" />
+      </span>
+
+      <span
+        className={`${expanded ? "inline" : "hidden"} whitespace-nowrap text-sm font-semibold text-white drop-shadow`}
+      >
+        {item.label}
+      </span>
+    </Link>
+  );
+}
 
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [expanded, setExpanded] = useState(false);
+  const cadastrosActive =
+    pathname.startsWith("/cadastros") || cadastroItems.some((item) => pathname.startsWith(item.href));
 
   async function handleLogout() {
     await signOut(auth);
@@ -32,102 +198,54 @@ export default function Sidebar() {
     <aside
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
-      className={`h-screen sticky top-0 border-r border-black/10 
-              transition-[width] duration-300
-              ${expanded ? "w-56" : "w-16"} 
-              overflow-hidden flex flex-col`}
+      className={`sticky top-0 flex h-screen flex-col overflow-hidden border-r border-black/10 transition-[width] duration-300 ${
+        expanded ? "w-60" : "w-16"
+      }`}
       style={{
         background: "linear-gradient(180deg, #A78BFA 0%, #7C3AED 100%)",
       }}
     >
-      {/* Logo */}
       <div className="flex items-center justify-center py-4">
-        <Image
-          src="/images/EloDexLogo.png"
-          alt="EloDex"
-          width={expanded ? 80 : 28}
-          height={32}
-          priority
-        />
+        <Image src="/images/EloDexLogo.png" alt="EloDex" width={expanded ? 80 : 28} height={32} priority />
       </div>
 
-      {/* Menu */}
-      <nav className="px-2 space-y-1 mt-2 flex-1">
-        {items.map((it) => {
-          const active = pathname.startsWith(it.href);
+      <nav className="mt-2 flex-1 space-y-1 px-2">
+        {mainItems.map((item) => (
+          <SidebarLink key={item.href} item={item} expanded={expanded} active={pathname.startsWith(item.href)} />
+        ))}
 
-          return (
-            <Link
-              key={it.href}
-              href={it.href}
-              title={it.label}
-              className={`flex ${
-                expanded ? "justify-start" : "justify-center"
-              } 
-                          items-center gap-3 p-2 rounded-md transition 
-                          ${active ? "bg-white/20" : "hover:bg-white/10"}`}
-            >
-              <span className="inline-flex items-center justify-center w-9 h-9 rounded-md bg-white">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={it.icon}
-                  alt=""
-                  className="w-5 h-5 object-contain"
-                />
-              </span>
-
-              <span
-                className={`${
-                  expanded ? "inline" : "hidden"
-                } text-sm font-semibold text-white drop-shadow whitespace-nowrap`}
-              >
-                {it.label}
-              </span>
-            </Link>
-          );
-        })}
+        <Link
+          href="/cadastros"
+          title="Cadastros"
+          className={`flex ${expanded ? "justify-start" : "justify-center"} items-center gap-3 rounded-md p-2 transition ${
+            cadastrosActive ? "bg-white/14" : "hover:bg-white/10"
+          }`}
+        >
+          <span className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md ${
+            cadastrosActive ? "text-cyan-200" : "text-white"
+          }`}>
+            <FolderIcon className="h-5 w-5" />
+          </span>
+          <span className={`${expanded ? "inline" : "hidden"} whitespace-nowrap text-sm font-semibold text-white drop-shadow`}>
+            Cadastros
+          </span>
+        </Link>
       </nav>
 
-      {/* Botao Sair */}
       <div className="px-2 pb-3">
         <button
           onClick={handleLogout}
           title="Sair"
-          className={`w-full flex ${
-            expanded ? "justify-start gap-3" : "justify-center"
-          } 
-                      items-center p-2 rounded-md 
-                      bg-black/30 hover:bg-black/40 
-                      text-white transition`}
+          className={`w-full rounded-md bg-black/30 p-2 text-white transition hover:bg-black/40 ${
+            expanded ? "flex items-center justify-start gap-3" : "flex items-center justify-center"
+          }`}
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M12 2v10"
-              stroke="white"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-            <path
-              d="M6.35 6.35a8 8 0 1 0 11.3 0"
-              stroke="white"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          </svg>
-
-          <span
-            className={`${
-              expanded ? "inline" : "hidden"
-            } text-sm font-semibold`}
-          >
-            Sair
+          <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-white">
+            <LogoutIcon className="h-5 w-5" />
           </span>
+          <span className={`${expanded ? "inline" : "hidden"} text-sm font-semibold`}>Sair</span>
         </button>
       </div>
     </aside>
   );
 }
-
-
-
-
