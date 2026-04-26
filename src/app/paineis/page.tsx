@@ -160,14 +160,6 @@ export default function PaineisPage() {
     lastError?: string;
   }>({ projectId: app?.options?.projectId });
 
-  const headerTitle =
-    activePanel === "capturas" ? "Painéis de Captura" : "Painel de Compras";
-
-  const headerSubtitle =
-    activePanel === "capturas"
-      ? "Visão geral das configurações de captura e das instâncias de Pokémon já capturadas."
-      : "Visão geral dos itens à venda e do histórico de compras.";
-
   const effectiveHeaderTitle =
     activePanel === "capturas" ? "Painel de Capturas" : activePanel === "compras" ? "Painel de Compras" : "Painel de GYM";
   const effectiveHeaderSubtitle =
@@ -207,7 +199,7 @@ export default function PaineisPage() {
     let alive = true;
     (async () => {
       try {
-        const res = await fetch("/api/catalog/options", { cache: "no-store" });
+        const res = await fetch("/api/catalog/options.json", { cache: "no-store" });
         if (!res.ok) return;
         const data = (await res.json()) as {
           species?: Array<{ id: number; label: string }>;
@@ -1235,4 +1227,3 @@ export default function PaineisPage() {
     </RequireAuth>
   );
 }
-

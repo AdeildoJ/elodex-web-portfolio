@@ -1,0 +1,149 @@
+{
+  "ok": true,
+  "dryRun": false,
+  "execute": true,
+  "mode": "clamp",
+  "options": {
+    "resetLevel": null,
+    "capLevel": null,
+    "clampMin": 20,
+    "clampMax": 30,
+    "uidFilter": null,
+    "characterIdFilter": null
+  },
+  "firestorePaths": "players/{uid}/characters/{characterId}/time/slot_* | .../box/*",
+  "docsScanned": 55,
+  "docsToUpdate": 5,
+  "details": [
+    {
+      "path": "players/kUfs0C5zHuZhp8hfWu4tDUxG43r1/characters/1jmR8dCnLU82qaPJVumJ/box/9cCiIPDkfMy1ifSr9s2t",
+      "uid": "kUfs0C5zHuZhp8hfWu4tDUxG43r1",
+      "characterId": "1jmR8dCnLU82qaPJVumJ",
+      "speciesId": 102,
+      "speciesName": "Exeggcute",
+      "isShiny": false,
+      "isStarter": false,
+      "oldLevel": 11,
+      "newLevel": 20,
+      "levelChanged": true,
+      "reasons": [
+        "mode_clamp",
+        "clamped_from_11_to_20",
+        "band_20_30"
+      ],
+      "patchKeys": [
+        "level",
+        "exp",
+        "expCurrent",
+        "expToNext",
+        "hp",
+        "stats",
+        "pendingEvolution"
+      ]
+    },
+    {
+      "path": "players/kUfs0C5zHuZhp8hfWu4tDUxG43r1/characters/1jmR8dCnLU82qaPJVumJ/box/GZFtXPiADiNjg3lB7Eh8",
+      "uid": "kUfs0C5zHuZhp8hfWu4tDUxG43r1",
+      "characterId": "1jmR8dCnLU82qaPJVumJ",
+      "speciesId": 17,
+      "speciesName": "Pidgeotto",
+      "isShiny": false,
+      "isStarter": false,
+      "oldLevel": 15,
+      "newLevel": 20,
+      "levelChanged": true,
+      "reasons": [
+        "mode_clamp",
+        "clamped_from_15_to_20",
+        "band_20_30"
+      ],
+      "patchKeys": [
+        "level",
+        "exp",
+        "expCurrent",
+        "expToNext",
+        "hp",
+        "stats",
+        "pendingEvolution"
+      ]
+    },
+    {
+      "path": "players/DBbQEp4paOWbwyII4ZBmPQQIhCB3/characters/bBkmqTW3X9oeU1Ek5XRc/time/slot_1",
+      "uid": "DBbQEp4paOWbwyII4ZBmPQQIhCB3",
+      "characterId": "bBkmqTW3X9oeU1Ek5XRc",
+      "speciesId": 762,
+      "speciesName": "Steenee",
+      "isShiny": false,
+      "isStarter": false,
+      "oldLevel": 38,
+      "newLevel": 30,
+      "levelChanged": true,
+      "reasons": [
+        "mode_clamp",
+        "clamped_from_38_to_30",
+        "band_20_30"
+      ],
+      "patchKeys": [
+        "level",
+        "exp",
+        "expCurrent",
+        "expToNext",
+        "hp",
+        "stats",
+        "pendingEvolution"
+      ]
+    },
+    {
+      "path": "players/DBbQEp4paOWbwyII4ZBmPQQIhCB3/characters/bBkmqTW3X9oeU1Ek5XRc/time/slot_3",
+      "uid": "DBbQEp4paOWbwyII4ZBmPQQIhCB3",
+      "characterId": "bBkmqTW3X9oeU1Ek5XRc",
+      "speciesId": 908,
+      "speciesName": "Meowscarada",
+      "isShiny": true,
+      "isStarter": true,
+      "oldLevel": 47,
+      "newLevel": 30,
+      "levelChanged": true,
+      "reasons": [
+        "mode_clamp",
+        "clamped_from_47_to_30",
+        "band_20_30"
+      ],
+      "patchKeys": [
+        "level",
+        "exp",
+        "expCurrent",
+        "expToNext",
+        "hp",
+        "stats",
+        "pendingEvolution"
+      ]
+    },
+    {
+      "path": "players/S2ahNFS3WEWMqpkum5CdV5EHSK52/characters/zYYekXo8xcozsCF6I7oJ/time/slot_1",
+      "uid": "S2ahNFS3WEWMqpkum5CdV5EHSK52",
+      "characterId": "zYYekXo8xcozsCF6I7oJ",
+      "speciesId": 350,
+      "speciesName": "Milotic",
+      "isShiny": true,
+      "isStarter": true,
+      "oldLevel": 36,
+      "newLevel": 30,
+      "levelChanged": true,
+      "reasons": [
+        "mode_clamp",
+        "clamped_from_36_to_30",
+        "band_20_30"
+      ],
+      "patchKeys": [
+        "level",
+        "exp",
+        "expCurrent",
+        "expToNext",
+        "hp",
+        "stats",
+        "pendingEvolution"
+      ]
+    }
+  ]
+}

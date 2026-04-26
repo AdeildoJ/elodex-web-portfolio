@@ -1,0 +1,82 @@
+[
+  {
+    "path": "players/S2ahNFS3WEWMqpkum5CdV5EHSK52/characters/PnR8WOlPtd6OF5c88wbB/time/slot_2",
+    "speciesId": 267,
+    "beforeMoves": [
+      "pound"
+    ],
+    "afterMoves": [
+      "bug-bite"
+    ],
+    "invalidMoves": [
+      "pound"
+    ],
+    "replacements": [
+      {
+        "from": "pound",
+        "to": "bug-bite",
+        "index": 0
+      }
+    ]
+  },
+  {
+    "path": "players/UWgyoJGya1T5w8741lMG0NmSVje2/characters/awW8MLqLFJhvYSKvlMto/time/slot_1",
+    "speciesId": 653,
+    "beforeMoves": [
+      "tackle",
+      "quick-attack",
+      "pound",
+      "scratch"
+    ],
+    "afterMoves": [
+      "tail-whip",
+      "ember",
+      "howl",
+      "scratch"
+    ],
+    "invalidMoves": [
+      "tackle",
+      "quick-attack",
+      "pound"
+    ],
+    "replacements": [
+      {
+        "from": "tackle",
+        "to": "tail-whip",
+        "index": 0
+      },
+      {
+        "from": "quick-attack",
+        "to": "ember",
+        "index": 1
+      },
+      {
+        "from": "pound",
+        "to": "howl",
+        "index": 2
+      }
+    ]
+  },
+  {
+    "path": "players/UWgyoJGya1T5w8741lMG0NmSVje2/characters/awW8MLqLFJhvYSKvlMto/time/slot_3",
+    "speciesId": 664,
+    "beforeMoves": [
+      "tackle",
+      "quick-attack"
+    ],
+    "afterMoves": [
+      "tackle",
+      "string-shot"
+    ],
+    "invalidMoves": [
+      "quick-attack"
+    ],
+    "replacements": [
+      {
+        "from": "quick-attack",
+        "to": "string-shot",
+        "index": 1
+      }
+    ]
+  }
+]

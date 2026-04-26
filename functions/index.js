@@ -1,4 +1,5 @@
 const { onRequest } = require("firebase-functions/v2/https");
+const { onDocumentCreated, onDocumentDeleted } = require("firebase-functions/v2/firestore");
 const { defineSecret } = require("firebase-functions/params");
 const logger = require("firebase-functions/logger");
 const { initializeApp, applicationDefault } = require("firebase-admin/app");
@@ -9,6 +10,7 @@ initializeApp({ credential: applicationDefault() });
 
 const auth = getAuth();
 const db = getFirestore();
+const { ensureStableInstanceId } = require("./pokemonDocIdentity");
 const mpAccessToken = defineSecret("MP_ACCESS_TOKEN");
 
 function json(res, code, payload) {
@@ -20,6 +22,32 @@ function readBearer(req) {
   const [kind, token] = h.split(" ");
   if (String(kind || "").toLowerCase() !== "bearer" || !token) return null;
   return String(token).trim();
+}
+
+/** Corpo JSON em Cloud Functions as vezes chega como string ou Buffer. */
+function parseHttpJsonBody(req) {
+  const b = req.body;
+  if (b == null || b === "") return {};
+  if (typeof b === "string") {
+    const t = b.trim();
+    if (!t) return {};
+    try {
+      const o = JSON.parse(t);
+      return o && typeof o === "object" && !Array.isArray(o) ? o : {};
+    } catch {
+      return {};
+    }
+  }
+  if (Buffer.isBuffer(b)) {
+    try {
+      const o = JSON.parse(b.toString("utf8"));
+      return o && typeof o === "object" && !Array.isArray(o) ? o : {};
+    } catch {
+      return {};
+    }
+  }
+  if (typeof b === "object" && !Array.isArray(b)) return b;
+  return {};
 }
 
 function parseOrderPathCandidate(value) {
@@ -50,6 +78,103 @@ function resolvePaymentsBaseUrl(req) {
 function n(v, fallback = 0) {
   const x = Number(v);
   return Number.isFinite(x) ? x : fallback;
+}
+
+function normalizeBalanceAmounts(pkg) {
+  const items = pkg && typeof pkg.items === "object" && pkg.items ? pkg.items : {};
+  const ecoin = Math.max(0, n(items.ecoin, 0) || n(pkg.ecoinAmount, 0) || n(pkg.amount, 0));
+  const km = Math.max(0, n(items.km, 0) || n(pkg.kmAmount, 0));
+  return { ecoin, km };
+}
+
+function normalizePackageBoost(pkg) {
+  const items = pkg && typeof pkg.items === "object" && pkg.items ? pkg.items : {};
+  const boost = items.boost && typeof items.boost === "object" ? items.boost : {};
+  let bonusPercent = Math.max(0, n(boost.bonusPercent, n(boost.kmBonusPercent, 0)));
+  let durationHours = Math.max(0, n(boost.durationHours, 0));
+  if (durationHours <= 0) durationHours = Math.max(0, Math.floor(n(boost.duration, 0)));
+  if (bonusPercent <= 0) {
+    bonusPercent = Math.max(0, n(pkg.boostBonusPercent, n(pkg.kmBoostBonusPercent, 0)));
+  }
+  if (durationHours <= 0) {
+    durationHours = Math.max(0, n(pkg.boostDurationHours, n(pkg.kmBoostDurationHours, 0)));
+  }
+  if (durationHours <= 0) {
+    const legacyDays = Math.max(0, Math.floor(n(boost.durationDays, 0)));
+    if (legacyDays > 0) durationHours = legacyDays * 24;
+  }
+  if (durationHours <= 0) {
+    const legacyDaysPkg = Math.max(0, Math.floor(n(pkg.boostDurationDays, 0)));
+    if (legacyDaysPkg > 0) durationHours = legacyDaysPkg * 24;
+  }
+  return { bonusPercent, durationHours };
+}
+
+function hasBalancePackageContent(amounts, boost) {
+  if (amounts.ecoin > 0 || amounts.km > 0) return true;
+  return boost.bonusPercent > 0 && boost.durationHours > 0;
+}
+
+/** Hours the player paid for (new field + legacy days on old orders). */
+function orderBoostDurationHoursFromOrder(order) {
+  let h = Math.max(0, n(order.boostDurationHours, 0));
+  if (h <= 0) {
+    const legacyDays = Math.max(0, Math.floor(n(order.boostDurationDays, 0)));
+    if (legacyDays > 0) h = legacyDays * 24;
+  }
+  return h;
+}
+
+function isStorePackagePath(path) {
+  return String(path || "").startsWith("storePackages/");
+}
+
+function stockRemainingForPackage(pkg, pkgPath) {
+  if (!isStorePackagePath(pkgPath)) return Number.POSITIVE_INFINITY;
+  const total = Math.floor(n(pkg.stockTotal, 0));
+  if (total <= 0) return Number.POSITIVE_INFINITY;
+  const sold = Math.max(0, n(pkg.stockSold, 0));
+  return Math.max(0, total - sold);
+}
+
+function purchaseLimitForPackage(pkg, pkgPath) {
+  if (!isStorePackagePath(pkgPath)) return Number.POSITIVE_INFINITY;
+  const lim = Math.floor(n(pkg.purchaseLimitPerPlayer, 0));
+  if (lim <= 0) return Number.POSITIVE_INFINITY;
+  return lim;
+}
+
+function packageIsActive(pkg) {
+  if (pkg && pkg.isActive === false) return false;
+  if (pkg && pkg.isActive === true) return true;
+  return String(pkg?.status || "inactive") === "active";
+}
+
+function buildBalanceItemName(ecoinUnit, kmUnit, qty, boostUnit) {
+  const q = Math.max(1, Math.floor(n(qty, 1)));
+  const parts = [];
+  if (ecoinUnit > 0) parts.push(`${ecoinUnit * q} Ecoin`);
+  if (kmUnit > 0) parts.push(`${kmUnit * q} KM`);
+  if (boostUnit && boostUnit.bonusPercent > 0 && boostUnit.durationHours > 0) {
+    parts.push(`+${boostUnit.bonusPercent}% (${boostUnit.durationHours}h)`);
+  }
+  return parts.join(" + ") || "Pacote de saldo";
+}
+
+async function sumApprovedPurchasesForPackage(uid, packageId) {
+  const id = String(packageId || "").trim();
+  if (!id || !uid) return 0;
+  const snap = await db
+    .collection("packagePurchases")
+    .where("playerUid", "==", uid)
+    .where("packageId", "==", id)
+    .where("paymentStatus", "==", "approved")
+    .get();
+  let sum = 0;
+  snap.forEach((doc) => {
+    sum += Math.max(1, Math.floor(n(doc.data()?.qty, 1)));
+  });
+  return sum;
 }
 
 function mapStatus(mpStatus) {
@@ -422,7 +547,7 @@ function resolveProductDeliveryScope(productType, explicitScope) {
   if (explicit === "account") return "account";
   if (explicit === "character_backpack" || explicit === "character") return "character_backpack";
   const normalized = String(productType || "").trim().toLowerCase();
-  if (["incubator", "iv_reset", "biome_ticket", "mystery_egg", "egg"].includes(normalized)) {
+  if (["incubator", "iv_reset", "biome_ticket", "mystery_egg", "egg", "fishing_bait"].includes(normalized)) {
     return "character_backpack";
   }
   return "account";
@@ -462,7 +587,7 @@ function isCharacterDeliveredMonetizedProduct(product) {
   )
     .trim()
     .toLowerCase();
-  return ["incubator", "iv_reset", "biome_ticket", "mystery_egg", "egg"].includes(productType) ||
+  return ["incubator", "iv_reset", "biome_ticket", "mystery_egg", "egg", "fishing_bait"].includes(productType) ||
     (productType === "ticket" && ticketSubtype === "biome");
 }
 
@@ -474,19 +599,52 @@ function deterministicGrantId(parts) {
     .slice(0, 180);
 }
 
+/** Um único documento por jogador para boost de KM comprado na loja (não acumula %; recompra reinicia a janela). */
+const STORE_KM_BOOST_SLOT_ID = "store_km_boost_slot";
+const STORE_KM_BOOST_PRODUCT_CODE = "store-package-km-boost";
+
 async function grantVipIncludedRewards({ tx, uid, playerRef, includedItems, orderId, planId, planCode }) {
   const rows = Array.isArray(includedItems) ? includedItems : [];
   if (!rows.length) return;
   const playerSnap = await tx.get(playerRef);
   let nextEcoinBalance = Math.max(0, Number(playerSnap.data()?.ecoinBalance || 0));
+  let nextKmBalance = Math.max(0, Number(playerSnap.data()?.kmsDisponiveis || 0));
 
   for (const item of rows) {
     const source = String(item?.source || "").trim().toLowerCase();
     const qty = Math.max(1, Math.floor(n(item?.quantity, 1)));
-    if (source === "ecoin_package") {
-      const pkg = await resolveEcoinPackage(String(item?.refId || item?.refCode || ""));
-      if (!pkg) continue;
-      nextEcoinBalance += Math.max(0, Number(pkg.amount || 0)) * qty;
+    if (source === "ecoin_package" || source === "store_package") {
+      const resolved = await resolveBalancePackage(String(item?.refId || item?.refCode || ""));
+      if (!resolved?.pkg) continue;
+      const { ecoin, km } = normalizeBalanceAmounts(resolved.pkg);
+      nextEcoinBalance += ecoin * qty;
+      nextKmBalance += km * qty;
+      const pkgBoost = normalizePackageBoost(resolved.pkg);
+      if (pkgBoost.bonusPercent > 0 && pkgBoost.durationHours > 0) {
+        const mult = 1 + pkgBoost.bonusPercent / 100;
+        const validUntilMs = Date.now() + pkgBoost.durationHours * qty * 60 * 60 * 1000;
+        const entId = deterministicGrantId(["vip_pkg_boost", orderId, String(resolved.pkg.id || ""), String(qty)]);
+        tx.set(db.doc(`players/${uid}/productEntitlements/${entId}`), {
+          entitlementId: entId,
+          productId: String(resolved.pkg.id || ""),
+          productCode: "vip-included-boost",
+          productType: "km_boost",
+          productName: String(resolved.pkg.name || "Boost KM"),
+          benefits: {
+            kmGainMultiplier: mult,
+            kmBonusPercent: pkgBoost.bonusPercent,
+            metadata: { source: "vip_subscription", packageId: String(resolved.pkg.id || "") },
+          },
+          quantity: qty,
+          status: "active",
+          source: "vip_subscription",
+          orderId,
+          validUntil: new Date(validUntilMs),
+          validUntilMs,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+      }
       continue;
     }
     if (source === "item_config") {
@@ -570,24 +728,46 @@ async function grantVipIncludedRewards({ tx, uid, playerRef, includedItems, orde
     );
   }
 
-  tx.set(playerRef, { ecoinBalance: nextEcoinBalance, updatedAt: new Date() }, { merge: true });
+  tx.set(playerRef, { ecoinBalance: nextEcoinBalance, kmsDisponiveis: nextKmBalance, updatedAt: new Date() }, { merge: true });
 }
 
-function grantProductReward({ tx, uid, playerRef, source, orderId, product, qty, validUntilMs, characterId }) {
+async function grantProductReward({ tx, uid, playerRef, source, orderId, product, qty, validUntilMs, characterId }) {
   const quantity = Math.max(1, Math.floor(n(qty, 1)));
-  const deliveryScope = isGymCharacterSlotProduct(product)
-    ? "character_backpack"
-    : isCharacterDeliveredMonetizedProduct(product)
+  /** Escopo gravado no pedido (create-checkout): "account" = compra global; "character_backpack" = checkout no contexto do personagem. */
+  const orderCheckoutScope = String(product?.deliveryScope || "").trim().toLowerCase();
+  const isCharacterContextCheckout =
+    orderCheckoutScope === "character_backpack" || orderCheckoutScope === "character";
+
+  const bagItemProduct =
+    isGymCharacterSlotProduct(product) ||
+    isCharacterDeliveredMonetizedProduct(product) ||
+    resolveProductDeliveryScope(product?.type, "") === "character_backpack";
+
+  const entitlementDeliveryScope = bagItemProduct
     ? "character_backpack"
     : resolveProductDeliveryScope(product?.type, product?.deliveryScope);
-  if (deliveryScope === "character_backpack" && !characterId) {
+
+  if (bagItemProduct) {
+    if (isCharacterContextCheckout && characterId) {
+      const phase2Mutations = require("./phase2Mutations");
+      const itemCapacityLimit = 20;
+      await phase2Mutations.applyMonetizedCharacterItemGrantTx(tx, db, {
+        uid,
+        characterId,
+        productType: product?.type,
+        benefits: product?.benefits || null,
+        quantity,
+        itemCapacityLimit,
+      });
+      return;
+    }
     const rewardId = deterministicGrantId([source, orderId, String(product?.id || "product"), String(quantity)]);
     tx.set(
       db.doc(`players/${uid}/accountBackpack/${rewardId}`),
       {
         name: String(product?.name || "Produto"),
         rewardType: "monetization_product",
-        deliveryScope,
+        deliveryScope: "character_backpack",
         source,
         status: "pending",
         quantity,
@@ -620,7 +800,7 @@ function grantProductReward({ tx, uid, playerRef, source, orderId, product, qty,
       status: "active",
       source,
       orderId,
-      deliveryScope,
+      deliveryScope: entitlementDeliveryScope,
       consumedByCharacterId: characterId || null,
       validUntil: validUntilMs ? new Date(validUntilMs) : null,
       validUntilMs: validUntilMs || null,
@@ -631,20 +811,42 @@ function grantProductReward({ tx, uid, playerRef, source, orderId, product, qty,
   );
 }
 
-// packages of ecoin can be defined in firestore under `ecoinPackages`
-// each document should contain { price, currency, amount, status }
-// this resolver mirrors the monetization/product resolver with a simple fallback list
-async function resolveEcoinPackage(packageIdOrCode) {
+// Pacotes de saldo: `storePackages` (modelo unificado) e legado `ecoinPackages` / `kmPackages`
+async function resolveBalancePackage(packageIdOrCode) {
   const normalized = String(packageIdOrCode || "").trim().toLowerCase();
   if (!normalized) return null;
 
-  const directSnap = await db.doc(`ecoinPackages/${normalized}`).get();
-  if (directSnap.exists) return { id: directSnap.id, ...directSnap.data() };
+  const storeDirect = await db.doc(`storePackages/${normalized}`).get();
+  if (storeDirect.exists) {
+    return { ref: storeDirect.ref, pkg: { id: storeDirect.id, ...storeDirect.data() }, path: storeDirect.ref.path };
+  }
+
+  const storeByCode = await db.collection("storePackages").where("code", "==", normalized).limit(1).get();
+  if (!storeByCode.empty) {
+    const d = storeByCode.docs[0];
+    return { ref: d.ref, pkg: { id: d.id, ...d.data() }, path: d.ref.path };
+  }
+
+  const directEcoin = await db.doc(`ecoinPackages/${normalized}`).get();
+  if (directEcoin.exists) {
+    return { ref: directEcoin.ref, pkg: { id: directEcoin.id, ...directEcoin.data() }, path: directEcoin.ref.path };
+  }
+  const directKm = await db.doc(`kmPackages/${normalized}`).get();
+  if (directKm.exists) {
+    return { ref: directKm.ref, pkg: { id: directKm.id, ...directKm.data() }, path: directKm.ref.path };
+  }
 
   const byCode = await db.collection("ecoinPackages").where("code", "==", normalized).limit(1).get();
-  if (!byCode.empty) return { id: byCode.docs[0].id, ...byCode.docs[0].data() };
+  if (!byCode.empty) {
+    const d = byCode.docs[0];
+    return { ref: d.ref, pkg: { id: d.id, ...d.data() }, path: d.ref.path };
+  }
+  const byCodeKm = await db.collection("kmPackages").where("code", "==", normalized).limit(1).get();
+  if (!byCodeKm.empty) {
+    const d = byCodeKm.docs[0];
+    return { ref: d.ref, pkg: { id: d.id, ...d.data() }, path: d.ref.path };
+  }
 
-  // no default list defined for ecoin packages – return null if not found
   return null;
 }
 
@@ -711,39 +913,366 @@ async function resolveOrderRef({ orderId, orderPath }) {
   return findOrderRefById(orderId);
 }
 
+/**
+ * Pedidos em `players/{uid}/characters/{cid}/paymentOrders/*` (loja do personagem, itemsConfig).
+ * Entrega no inventario do personagem via Admin + transacao (regras do cliente bloqueiam `itens/`).
+ */
+async function applyCharacterShopOrderDelivery(orderRef, playerUid, characterId, orderData) {
+  const phase2Mutations = require("./phase2Mutations");
+  try {
+    await db.runTransaction(async (tx) => {
+      const freshSnap = await tx.get(orderRef);
+      if (!freshSnap.exists) return;
+      const d = freshSnap.data() || {};
+      if (d.deliveredAt) return;
+      const status = String(d.status || "").trim().toLowerCase();
+      if (status !== "approved") return;
+      const itemId = String(d.itemId || "").trim();
+      if (!itemId) throw new Error("Pedido sem itemId.");
+      const qty = Math.max(1, Math.floor(n(d.qty, 1)));
+      const itemKind = String(d.itemKind || "ITEM");
+      await phase2Mutations.deliverItemsConfigShopPurchaseTx(tx, db, {
+        uid: playerUid,
+        characterId,
+        itemId,
+        qty,
+        itemKind,
+        itemCapacityLimit: 20,
+      });
+      tx.set(
+        orderRef,
+        {
+          deliveredAt: new Date(),
+          deliveryFulfillment: "server_itemsConfig_shop",
+          deliveryError: null,
+          updatedAt: new Date(),
+        },
+        { merge: true }
+      );
+    });
+  } catch (e) {
+    logger.error("applyCharacterShopOrderDelivery_failed", {
+      message: String(e?.message || e),
+      path: orderRef.path,
+    });
+    await orderRef.set(
+      {
+        deliveryError: String(e?.message || e).slice(0, 500),
+        updatedAt: new Date(),
+      },
+      { merge: true }
+    );
+  }
+}
+
 async function applyApprovedOrderSideEffects(orderRef) {
   const orderSnap = await orderRef.get();
   if (!orderSnap.exists) return;
   const orderData = orderSnap.data() || {};
   if (orderData.deliveredAt) return;
+
+  const path = orderRef.path;
+  const characterShopMatch = /^players\/([^/]+)\/characters\/([^/]+)\/paymentOrders\/([^/]+)$/.exec(path);
+  if (characterShopMatch) {
+    const shopUid = characterShopMatch[1];
+    const shopCharId = characterShopMatch[2];
+    const earlyGrant = String(orderData.grantType || "");
+    const shopItemId = String(orderData.itemId || "").trim();
+    if (
+      shopItemId &&
+      !["vip_subscription", "product_entitlement", "balance_package_purchase", "ecoin_purchase"].includes(earlyGrant)
+    ) {
+      await applyCharacterShopOrderDelivery(orderRef, shopUid, shopCharId, orderData);
+      return;
+    }
+  }
+
   const grantType = String(orderData.grantType || "");
 
-  // ecoin purchase needs to credit player balance and record history
-  if (grantType === "ecoin_purchase") {
+  // balance package purchase (ecoin and/or KM) credits player wallet(s)
+  if (grantType === "ecoin_purchase" || grantType === "balance_package_purchase") {
     const playerUid = String(orderData.uid || "");
-    const amount = Math.max(0, Number(orderData.ecoinAmount || 0));
+    if (!playerUid) {
+      await orderRef.set({ deliveryError: "missing_player_uid", updatedAt: new Date() }, { merge: true });
+      return;
+    }
     const playerRef = db.doc(`players/${playerUid}`);
-    const historyRef = db.collection(`players/${playerUid}/monetizationHistory`).doc();
-    await db.runTransaction(async (tx) => {
-      const playerSnap = await tx.get(playerRef);
-      const prev = playerSnap.exists ? Math.max(0, Number(playerSnap.data()?.ecoinBalance || 0)) : 0;
-      tx.set(playerRef, { ecoinBalance: prev + amount, updatedAt: new Date() }, { merge: true });
-      tx.set(historyRef, {
-        type: "ecoin_purchase",
-        source: "mercadopago",
-        status: "active",
-        itemId: String(orderData.ecoinPackageId || ""),
-        itemType: "ecoin",
-        itemName: String(orderData.itemName || ""),
-        amountPaid: Math.max(0, Number(orderData.totalPaid || orderData.total || 0)),
-        currency: String(orderData.currency || "BRL"),
-        orderId: String(orderData.orderId || orderRef.id),
-        ecoinAmount: amount,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+    const orderIdStable = String(orderData.orderId || orderRef.id);
+    const purchaseRef = db.doc(`packagePurchases/${orderIdStable}`);
+
+    try {
+      await db.runTransaction(async (tx) => {
+        const freshOrderSnap = await tx.get(orderRef);
+        const freshOrder = freshOrderSnap.data() || {};
+        if (freshOrder.deliveredAt) return;
+
+        const qty = Math.max(1, Math.floor(n(freshOrder.qty, 1)));
+        let packagePath = String(freshOrder.packageFirestorePath || "").trim();
+        let pkgRef = packagePath ? db.doc(packagePath) : null;
+        if (!pkgRef) {
+          const rawKey = String(
+            freshOrder.storePackageId || freshOrder.balancePackageId || freshOrder.ecoinPackageId || freshOrder.kmPackageId || ""
+          ).trim();
+          if (!rawKey) {
+            tx.set(
+              orderRef,
+              { deliveryError: "missing_package_path", updatedAt: new Date() },
+              { merge: true }
+            );
+            return;
+          }
+          const idCandidates = [...new Set([rawKey, rawKey.toLowerCase()])].filter(Boolean);
+          let hit = null;
+          for (const id of idCandidates) {
+            const tryRefs = [
+              db.doc(`storePackages/${id}`),
+              db.doc(`ecoinPackages/${id}`),
+              db.doc(`kmPackages/${id}`),
+            ];
+            const trySnaps = await Promise.all(tryRefs.map((r) => tx.get(r)));
+            hit = trySnaps.find((s) => s.exists);
+            if (hit) break;
+          }
+          if (!hit) {
+            tx.set(orderRef, { deliveryError: "package_missing", updatedAt: new Date() }, { merge: true });
+            return;
+          }
+          pkgRef = hit.ref;
+          packagePath = hit.ref.path;
+        }
+
+        const pkgSnap = await tx.get(pkgRef);
+        if (!pkgSnap.exists) {
+          tx.set(orderRef, { deliveryError: "package_missing", updatedAt: new Date() }, { merge: true });
+          return;
+        }
+        const pkg = pkgSnap.data() || {};
+        const pkgId = pkgSnap.id;
+        const amounts = normalizeBalanceAmounts(pkg);
+        const boost = normalizePackageBoost(pkg);
+        const expectEcoin = amounts.ecoin * qty;
+        const expectKm = amounts.km * qty;
+        const orderEcoin = Math.max(0, n(freshOrder.ecoinAmount, 0));
+        const orderKm = Math.max(0, n(freshOrder.kmAmount, 0));
+        const orderBoostPct = Math.max(0, n(freshOrder.boostBonusPercent, 0));
+        const orderBoostHours = orderBoostDurationHoursFromOrder(freshOrder);
+        const ri = (x) => Math.round(n(x, 0));
+        if (ri(orderEcoin) !== ri(expectEcoin) || ri(orderKm) !== ri(expectKm)) {
+          tx.set(
+            orderRef,
+            {
+              deliveryError: "amount_mismatch",
+              deliveryDetail: {
+                orderEcoin,
+                orderKm,
+                expectEcoin,
+                expectKm,
+                orderBoostPct,
+                orderBoostHours,
+                expectBoostPct: boost.bonusPercent,
+                expectBoostHours: boost.durationHours,
+                phase: "balance",
+              },
+              updatedAt: new Date(),
+            },
+            { merge: true }
+          );
+          return;
+        }
+        let deliverBoostPct = boost.bonusPercent;
+        let deliverBoostHours = boost.durationHours;
+        const boostMatch =
+          ri(orderBoostPct) === ri(boost.bonusPercent) && ri(orderBoostHours) === ri(boost.durationHours);
+        if (!boostMatch) {
+          if (ri(orderBoostPct) > 0 && ri(orderBoostHours) > 0) {
+            deliverBoostPct = n(orderBoostPct, 0);
+            deliverBoostHours = n(orderBoostHours, 0);
+          } else if (ri(boost.bonusPercent) > 0 || ri(boost.durationHours) > 0) {
+            tx.set(
+              orderRef,
+              {
+                deliveryError: "amount_mismatch",
+                deliveryDetail: {
+                  orderEcoin,
+                  orderKm,
+                  expectEcoin,
+                  expectKm,
+                  orderBoostPct,
+                  orderBoostHours,
+                  expectBoostPct: boost.bonusPercent,
+                  expectBoostHours: boost.durationHours,
+                  phase: "boost",
+                },
+                updatedAt: new Date(),
+              },
+              { merge: true }
+            );
+            return;
+          }
+        }
+
+        let totalsRef = null;
+        let prevApprovedQty = 0;
+        if (isStorePackagePath(packagePath)) {
+          const remaining = stockRemainingForPackage(pkg, packagePath);
+          if (remaining < qty) {
+            tx.set(
+              orderRef,
+              { deliveryError: "out_of_stock", deliveryDetail: { remaining, requested: qty }, updatedAt: new Date() },
+              { merge: true }
+            );
+            return;
+          }
+          totalsRef = db.doc(`players/${playerUid}/packagePurchaseTotals/${pkgId}`);
+          const totalsSnap = await tx.get(totalsRef);
+          prevApprovedQty = totalsSnap.exists ? Math.max(0, Math.floor(n(totalsSnap.data()?.approvedQty, 0))) : 0;
+          const limit = purchaseLimitForPackage(pkg, packagePath);
+          if (prevApprovedQty + qty > limit) {
+            tx.set(
+              orderRef,
+              {
+                deliveryError: "purchase_limit_exceeded",
+                deliveryDetail: { prevCount: prevApprovedQty, qty, limit },
+                updatedAt: new Date(),
+              },
+              { merge: true }
+            );
+            return;
+          }
+        }
+
+        const playerSnap = await tx.get(playerRef);
+        const prev = playerSnap.exists ? Math.max(0, n(playerSnap.data()?.ecoinBalance, 0)) : 0;
+        const prevKm = playerSnap.exists ? Math.max(0, n(playerSnap.data()?.kmsDisponiveis, 0)) : 0;
+
+        const entitlementsCol = db.collection(`players/${playerUid}/productEntitlements`);
+        let existingBoostSnap = null;
+        if (deliverBoostPct > 0 && deliverBoostHours > 0) {
+          existingBoostSnap = await tx.get(
+            entitlementsCol.where("productCode", "==", STORE_KM_BOOST_PRODUCT_CODE)
+          );
+        }
+
+        if (isStorePackagePath(packagePath)) {
+          const sold = Math.max(0, n(pkg.stockSold, 0));
+          const totalStock = Math.floor(n(pkg.stockTotal, 0));
+          if (totalStock > 0) {
+            tx.set(pkgRef, { stockSold: sold + qty, updatedAt: new Date() }, { merge: true });
+          }
+          tx.set(
+            totalsRef,
+            { approvedQty: prevApprovedQty + qty, packageId: pkgId, updatedAt: new Date() },
+            { merge: true }
+          );
+        }
+
+        let boostValidUntilMs = 0;
+        let boostMult = 1;
+        if (deliverBoostPct > 0 && deliverBoostHours > 0) {
+          boostMult = 1 + deliverBoostPct / 100;
+          const totalHours = Math.max(1, deliverBoostHours * qty);
+          boostValidUntilMs = Date.now() + totalHours * 60 * 60 * 1000;
+        }
+
+        const playerPayload = {
+          ecoinBalance: prev + orderEcoin,
+          kmsDisponiveis: prevKm + orderKm,
+          updatedAt: new Date(),
+        };
+        if (boostValidUntilMs > 0) {
+          playerPayload.activeStoreKmBoost = {
+            validUntilMs: boostValidUntilMs,
+            kmBonusPercent: deliverBoostPct,
+            kmGainMultiplier: boostMult,
+            packageId: pkgId,
+            orderId: orderIdStable,
+            updatedAt: new Date(),
+          };
+        }
+        tx.set(playerRef, playerPayload, { merge: true });
+
+        const historyRef = db.collection(`players/${playerUid}/monetizationHistory`).doc();
+        tx.set(historyRef, {
+          type: "balance_package_purchase",
+          source: "mercadopago",
+          status: "active",
+          itemId: String(freshOrder.storePackageId || freshOrder.balancePackageId || freshOrder.ecoinPackageId || ""),
+          itemType: "balance_package",
+          itemName: String(freshOrder.itemName || ""),
+          amountPaid: Math.max(0, n(freshOrder.totalPaid || freshOrder.total, 0)),
+          currency: String(freshOrder.currency || "BRL"),
+          orderId: orderIdStable,
+          ecoinAmount: orderEcoin,
+          kmAmount: orderKm,
+          boostBonusPercent: orderBoostPct,
+          boostDurationHours: orderBoostHours,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+
+        if (deliverBoostPct > 0 && deliverBoostHours > 0) {
+          const validUntilMs = boostValidUntilMs;
+          const mult = boostMult;
+          if (existingBoostSnap) {
+            existingBoostSnap.forEach((d) => {
+              tx.set(d.ref, { status: "expired", updatedAt: new Date() }, { merge: true });
+            });
+          }
+          tx.set(entitlementsCol.doc(STORE_KM_BOOST_SLOT_ID), {
+            entitlementId: STORE_KM_BOOST_SLOT_ID,
+            productId: pkgId,
+            productCode: STORE_KM_BOOST_PRODUCT_CODE,
+            productType: "km_boost",
+            productName: String(pkg.name || "Boost KM"),
+            benefits: {
+              kmGainMultiplier: mult,
+              kmBonusPercent: deliverBoostPct,
+              metadata: { source: "store_package", packageId: pkgId },
+            },
+            quantity: qty,
+            status: "active",
+            source: "balance_package_purchase",
+            orderId: orderIdStable,
+            validUntil: new Date(validUntilMs),
+            validUntilMs,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+        }
+
+        tx.set(purchaseRef, {
+          packageId: pkgId,
+          playerUid,
+          items: {
+            ecoin: amounts.ecoin,
+            km: amounts.km,
+            boost:
+              deliverBoostPct > 0 && deliverBoostHours > 0
+                ? { bonusPercent: deliverBoostPct, durationHours: deliverBoostHours }
+                : null,
+          },
+          qty,
+          pricePaid: Math.max(0, n(freshOrder.totalPaid || freshOrder.total, 0)),
+          currency: String(freshOrder.currency || "BRL"),
+          paymentStatus: "approved",
+          checkoutReference: orderIdStable,
+          orderPath: orderRef.path,
+          createdAt: new Date(),
+          approvedAt: new Date(),
+        });
+        tx.set(orderRef, { deliveredAt: new Date(), deliveryError: null, updatedAt: new Date() }, { merge: true });
       });
-      tx.set(orderRef, { deliveredAt: new Date(), updatedAt: new Date() }, { merge: true });
-    });
+    } catch (e) {
+      logger.error("balance_package_delivery_tx", e);
+      await orderRef.set(
+        {
+          deliveryError: "transaction_failed",
+          deliveryExceptionMessage: String(e?.message || e).slice(0, 900),
+          updatedAt: new Date(),
+        },
+        { merge: true }
+      );
+    }
     return;
   }
 
@@ -812,15 +1341,6 @@ async function applyApprovedOrderSideEffects(orderRef) {
         createdAt: new Date(),
         updatedAt: new Date(),
       });
-      await grantVipIncludedRewards({
-        tx,
-        uid: playerUid,
-        playerRef,
-        includedItems: vipIncludedItems,
-        orderId: String(freshOrder.orderId || orderRef.id),
-        planId: vipPlanId,
-        planCode: vipPlanCode,
-      });
       tx.set(
         orderRef,
         {
@@ -830,6 +1350,42 @@ async function applyApprovedOrderSideEffects(orderRef) {
         { merge: true }
       );
     });
+
+    try {
+      await db.runTransaction(async (tx) => {
+        const ordSnap = await tx.get(orderRef);
+        const o = ordSnap.data() || {};
+        if (!o.deliveredAt) return;
+        if (o.vipIncludedRewardsApplied) return;
+        const items = Array.isArray(o.vipIncludedItems) ? o.vipIncludedItems : [];
+        const orderIdPost = String(o.orderId || orderRef.id);
+        const vipPlanIdPost = String(o.vipPlanId || o.offerId || o.itemId || "");
+        const vipPlanCodePost = String(o.vipPlanCode || o.offerId || vipPlanIdPost || "");
+        if (!items.length) {
+          tx.set(orderRef, { vipIncludedRewardsApplied: true, updatedAt: new Date() }, { merge: true });
+          return;
+        }
+        await grantVipIncludedRewards({
+          tx,
+          uid: playerUid,
+          playerRef,
+          includedItems: items,
+          orderId: orderIdPost,
+          planId: vipPlanIdPost,
+          planCode: vipPlanCodePost,
+        });
+        tx.set(orderRef, { vipIncludedRewardsApplied: true, updatedAt: new Date() }, { merge: true });
+      });
+    } catch (e) {
+      logger.error("grantVipIncludedRewards_failed", e);
+      await orderRef.set(
+        {
+          vipIncludedRewardsError: String(e?.message || e).slice(0, 500),
+          updatedAt: new Date(),
+        },
+        { merge: true }
+      );
+    }
     return;
   }
 
@@ -849,7 +1405,7 @@ async function applyApprovedOrderSideEffects(orderRef) {
     if (freshOrder.deliveredAt) return;
 
     tx.set(playerRef, { updatedAt: new Date() }, { merge: true });
-    grantProductReward({
+    await grantProductReward({
       tx,
       uid: playerUid,
       playerRef,
@@ -964,7 +1520,18 @@ async function syncOrderStatusById(orderId, orderPath) {
     await applyApprovedOrderSideEffects(orderRef);
   }
 
-  return { ok: true, status, providerPaymentId: paymentId || null };
+  const postSnap = await orderRef.get();
+  const post = postSnap.data() || {};
+  return {
+    ok: true,
+    status,
+    providerPaymentId: paymentId || null,
+    delivered: Boolean(post.deliveredAt),
+    deliveryError: post.deliveryError ? String(post.deliveryError) : null,
+    deliveryExceptionMessage: post.deliveryExceptionMessage
+      ? String(post.deliveryExceptionMessage).slice(0, 500)
+      : null,
+  };
 }
 
 exports.paymentsCreateCheckout = onRequest(
@@ -980,24 +1547,44 @@ exports.paymentsCreateCheckout = onRequest(
     if (!uid) return json(res, 401, { error: "Token invalido." });
     const payerEmail = fallbackPayerEmail(uid, decoded.email);
 
-    const body = req.body || {};
+    const body = parseHttpJsonBody(req);
     const itemId = String(body.itemId || "").trim();
     const offerId = String(body.offerId || "").trim().toLowerCase();
     const offerCode = String(body.offerCode || "").trim().toLowerCase();
     const offerName = String(body.offerName || "").trim();
     const productId = String(body.productId || "").trim().toLowerCase();
     const characterId = String(body.characterId || "").trim();
+    const rawPackageId = String(body.packageId || "").trim().toLowerCase();
+    const rawStorePackageId = String(body.storePackageId || "").trim().toLowerCase();
+    const rawBalancePackageId = String(body.balancePackageId || "").trim().toLowerCase();
     const rawEcoinPackageId = String(body.ecoinPackageId || "").trim().toLowerCase();
-    const inferredEcoinPackageId =
-      !rawEcoinPackageId && !offerId && !productId && !characterId
+    const rawKmPackageId = String(body.kmPackageId || "").trim().toLowerCase();
+    const inferredBalancePackageId =
+      !rawPackageId &&
+      !rawStorePackageId &&
+      !rawBalancePackageId &&
+      !rawEcoinPackageId &&
+      !rawKmPackageId &&
+      !offerId &&
+      !productId &&
+      !characterId
         ? String(body.itemId || "").trim().toLowerCase()
         : "";
-    const ecoinPackageId = rawEcoinPackageId || inferredEcoinPackageId;
+    const balancePackageKey =
+      rawPackageId ||
+      rawStorePackageId ||
+      rawBalancePackageId ||
+      rawEcoinPackageId ||
+      rawKmPackageId ||
+      inferredBalancePackageId;
     const qty = Math.max(1, Math.floor(n(body.qty, 1)));
     const method = String(body.method || "").toUpperCase();
 
-    if (!itemId && !offerId && !productId && !ecoinPackageId) {
-      return json(res, 400, { error: "itemId, offerId, productId ou ecoinPackageId sao obrigatorios." });
+    if (!itemId && !offerId && !productId && !balancePackageKey) {
+      return json(res, 400, {
+        error:
+          "Informe packageId, storePackageId, ecoinPackageId, balancePackageId, itemId (pacote de saldo), offerId, productId ou itemId+characterId (loja do jogo).",
+      });
     }
     if (!["PIX", "CREDIT", "DEBIT"].includes(method)) return json(res, 400, { error: "Metodo invalido." });
 
@@ -1009,27 +1596,56 @@ exports.paymentsCreateCheckout = onRequest(
     let itemName = "";
     let orderPayload = null;
 
-    if (ecoinPackageId) {
-      const pkg = await resolveEcoinPackage(ecoinPackageId);
-      if (!pkg) return json(res, 404, { error: "Pacote de Ecoin nao configurado." });
-      if (String(pkg.status || "inactive") !== "active") {
-        return json(res, 400, { error: "Pacote de Ecoin indisponivel." });
+    if (balancePackageKey) {
+      const resolved = await resolveBalancePackage(balancePackageKey);
+      if (!resolved) return json(res, 404, { error: "Pacote de saldo nao configurado." });
+      const pkg = resolved.pkg;
+      if (!packageIsActive(pkg)) {
+        return json(res, 400, { error: "Pacote de saldo indisponivel." });
+      }
+      const pkgPath = resolved.path;
+      const amounts = normalizeBalanceAmounts(pkg);
+      const boost = normalizePackageBoost(pkg);
+      if (!hasBalancePackageContent(amounts, boost)) {
+        return json(res, 400, { error: "Pacote sem conteudo (Ecoin, KM ou Boost)." });
+      }
+      if (isStorePackagePath(pkgPath)) {
+        const remaining = stockRemainingForPackage(pkg, pkgPath);
+        if (remaining < qty) {
+          return json(res, 400, { error: "Estoque insuficiente para este pacote." });
+        }
+        const purchased = await sumApprovedPurchasesForPackage(uid, pkg.id);
+        const limit = purchaseLimitForPackage(pkg, pkgPath);
+        if (purchased + qty > limit) {
+          return json(res, 400, { error: "Limite de compras por jogador atingido para este pacote." });
+        }
       }
       orderRef = db.collection(`players/${uid}/paymentOrders`).doc();
       total = Number((Number(pkg.price || 0) * qty).toFixed(2));
-      itemName = `${pkg.amount} Ecoins`;
+      const ecoinAmount = amounts.ecoin * qty;
+      const kmAmount = amounts.km * qty;
+      itemName = buildBalanceItemName(amounts.ecoin, amounts.km, qty, boost);
       orderPayload = {
         orderId: orderRef.id,
         uid,
+        packageFirestorePath: pkgPath,
+        storePackageId: pkg.id,
+        balancePackageId: pkg.id,
+        packageId: pkg.id,
         ecoinPackageId: pkg.id,
+        kmPackageId: pkg.id,
         itemId: pkg.id,
         itemName,
-        itemKind: "ECOIN_PACKAGE",
+        itemKind: "BALANCE_PACKAGE",
         qty,
         method,
         scope: "player",
-        grantType: "ecoin_purchase",
-        ecoinAmount: Math.max(0, Number(pkg.amount || 0)) * qty,
+        grantType: "balance_package_purchase",
+        ecoinAmount,
+        kmAmount,
+        boostBonusPercent: boost.bonusPercent,
+        boostDurationHours: boost.durationHours,
+        imageUrl: String(pkg.imageUrl || ""),
         status: "pending",
         unitPrice: Number(pkg.price || 0),
         currency: pkg.currency || "BRL",
@@ -1078,14 +1694,17 @@ exports.paymentsCreateCheckout = onRequest(
       if (String(product.status || "inactive") !== "active") {
         return json(res, 400, { error: "Produto monetizavel indisponivel." });
       }
+      const productTypeLower = String(product.type || "").trim().toLowerCase();
       const productDurationDays =
-        product.type === "trainer_license"
+        productTypeLower === "trainer_license"
           ? Math.min(7, Math.max(1, Number(product.durationDays ?? product.benefits?.trainerLicenseDays ?? 1)))
+          : productTypeLower === "km_boost"
+          ? Math.min(30, Math.max(1, Math.floor(Number(product.durationDays ?? product.benefits?.metadata?.durationDays ?? 1))))
           : product.durationDays ?? null;
       const directCharacterDelivery =
         !!characterId &&
-        (["incubator", "iv_reset", "biome_ticket", "mystery_egg", "egg", "gym_main_team_slot"].includes(
-          String(product.type || "").trim().toLowerCase()
+        (["incubator", "iv_reset", "biome_ticket", "mystery_egg", "egg", "gym_main_team_slot", "fishing_bait"].includes(
+          productTypeLower
         ) ||
           isGymCharacterSlotProduct(product));
       orderRef = db.collection(`players/${uid}/paymentOrders`).doc();
@@ -1189,6 +1808,9 @@ exports.paymentsCreateCheckout = onRequest(
             itemId,
             offerId,
             productId,
+            packageId: orderPayload?.packageId || orderPayload?.storePackageId || rawPackageId || "",
+            ecoinPackageId: orderPayload?.ecoinPackageId || rawEcoinPackageId || "",
+            kmPackageId: orderPayload?.kmPackageId || rawKmPackageId || "",
             qty,
             method,
             proto,
@@ -1242,7 +1864,7 @@ exports.paymentsCreateCheckout = onRequest(
     const payload = {
       items: [
         {
-          id: offerId || productId || itemId,
+          id: offerId || productId || balancePackageKey || itemId,
           title: itemName,
           quantity: qty,
           currency_id: "BRL",
@@ -1265,6 +1887,9 @@ exports.paymentsCreateCheckout = onRequest(
         itemId,
         offerId,
         productId,
+        packageId: orderPayload?.packageId || orderPayload?.storePackageId || rawPackageId || "",
+        ecoinPackageId: orderPayload?.ecoinPackageId || rawEcoinPackageId || "",
+        kmPackageId: orderPayload?.kmPackageId || rawKmPackageId || "",
         qty,
         method,
         proto,
@@ -1628,7 +2253,12 @@ exports.thiefResolvePvpLoot = onRequest({ region: "southamerica-east1", cors: tr
       const mon = vSnap.data() || {};
       tx.delete(victimRef);
       if (!intercept) {
-        tx.set(thiefBoxRef, { ...mon, updatedAt: new Date(), stolenFromUid: victimUid, stolenFromCharacterId: victimCharacterId });
+        tx.set(thiefBoxRef, {
+          ...ensureStableInstanceId(mon),
+          updatedAt: new Date(),
+          stolenFromUid: victimUid,
+          stolenFromCharacterId: victimCharacterId,
+        });
       }
       tx.set(caseRef, {
         status: intercept ? "pending_police_battle" : "stolen_direct",
@@ -1698,8 +2328,38 @@ exports.thiefResolvePoliceOutcome = onRequest({ region: "southamerica-east1", co
     if (String(row.thiefUid || "") !== uid) return json(res, 403, { error: "Somente o ladrao do caso pode resolver." });
     if (String(row.status || "") !== "pending_police_battle") return json(res, 400, { error: "Caso ja resolvido." });
 
-    const targetCollection = thiefWon ? "thiefHQStorage" : "policeStationStorage";
+    let policeBiomeId = null;
+    if (!thiefWon) {
+      try {
+        const bSnap = await db.collection("biomes").limit(200).get();
+        const candidates = bSnap.docs
+          .map((d) => ({ id: d.id, data: d.data() || {} }))
+          .filter((x) => x.data.hasPoliceStation === true)
+          .map((x) => String(x.id || "").trim().toLowerCase())
+          .filter(Boolean);
+        if (candidates.length) {
+          policeBiomeId = candidates[Math.floor(Math.random() * candidates.length)];
+        }
+      } catch (e) {
+        logger.warn("thiefResolvePoliceOutcome_biomes", e);
+      }
+    }
+
+    let thiefNpcId = null;
+    if (thiefWon) {
+      try {
+        const nSnap = await db.collection("npcs").limit(400).get();
+        const thieves = nSnap.docs.filter((d) => String((d.data() || {}).role || "").trim().toLowerCase() === "ladrao");
+        if (thieves.length) thiefNpcId = String(thieves[Math.floor(Math.random() * thieves.length)].id || "").trim();
+      } catch (e) {
+        logger.warn("thiefResolvePoliceOutcome_thiefNpcs", e);
+      }
+    }
+
+    const useNpcStorage = thiefWon && thiefNpcId;
+    const targetCollection = thiefWon ? (useNpcStorage ? "thiefNpcStorage" : "thiefHQStorage") : "policeStationStorage";
     const targetRef = db.collection(targetCollection).doc();
+
     await db.runTransaction(async (tx) => {
       tx.set(targetRef, {
         caseId,
@@ -1708,12 +2368,24 @@ exports.thiefResolvePoliceOutcome = onRequest({ region: "southamerica-east1", co
         thiefUid: row.thiefUid,
         thiefCharacterId: row.thiefCharacterId,
         pokemonData: row.pokemonData || {},
-        status: thiefWon ? "at_hq" : "at_police",
+        status: thiefWon ? (useNpcStorage ? "held_at_npc" : "at_hq") : "at_police",
+        policeBiomeId: policeBiomeId || null,
+        thiefNpcId: thiefNpcId || null,
         createdAt: new Date(),
       });
-      tx.set(caseRef, { status: thiefWon ? "at_hq" : "at_police", resolvedAt: new Date() }, { merge: true });
+      tx.set(caseRef, { status: thiefWon ? (useNpcStorage ? "at_thief_npc" : "at_hq") : "at_police", resolvedAt: new Date() }, { merge: true });
     });
-    return json(res, 200, { ok: true, destination: thiefWon ? "hq" : "police", message: thiefWon ? "Pokemon enviado para sede dos ladroes." : "Pokemon apreendido na delegacia." });
+    return json(res, 200, {
+      ok: true,
+      destination: thiefWon ? (useNpcStorage ? "thief_npc" : "hq") : "police",
+      thiefNpcStorageId: useNpcStorage ? targetRef.id : null,
+      thiefNpcId: thiefNpcId || null,
+      message: thiefWon
+        ? useNpcStorage
+          ? "Pokemon enviado para um NPC ladrao (nao fica com o jogador)."
+          : "Pokemon enviado para sede dos ladroes."
+        : "Pokemon apreendido na delegacia.",
+    });
   } catch (e) {
     logger.error("thiefResolvePoliceOutcome", e);
     return json(res, 500, { error: e?.message || "Erro ao resolver desfecho policial." });
@@ -1745,7 +2417,7 @@ exports.thiefRecoverFromPolice = onRequest({ region: "southamerica-east1", cors:
     snap.forEach((d) => {
       const row = d.data() || {};
       const boxRef = db.collection(`players/${uid}/characters/${characterId}/box`).doc();
-      batch.set(boxRef, { ...(row.pokemonData || {}), recoveredFromPolice: true, updatedAt: new Date() }, { merge: true });
+      batch.set(boxRef, { ...ensureStableInstanceId(row.pokemonData || {}), recoveredFromPolice: true, updatedAt: new Date() });
       batch.set(d.ref, { status: "recovered", recoveredAt: new Date() }, { merge: true });
       count += 1;
     });
@@ -1754,6 +2426,60 @@ exports.thiefRecoverFromPolice = onRequest({ region: "southamerica-east1", cors:
   } catch (e) {
     logger.error("thiefRecoverFromPolice", e);
     return json(res, 500, { error: e?.message || "Erro ao recuperar Pokemon da delegacia." });
+  }
+});
+
+/** Vitória sobre o NPC ladrao: devolve o Pokémon ao dono original (caixa). */
+exports.thiefReportThiefNpcDefeat = onRequest({ region: "southamerica-east1", cors: true }, async (req, res) => {
+  try {
+    if (req.method !== "POST") return json(res, 405, { error: "Method not allowed" });
+    const token = readBearer(req);
+    if (!token) return json(res, 401, { error: "Token ausente." });
+    const decoded = await auth.verifyIdToken(token);
+    const uid = String(decoded?.uid || "");
+    if (!uid) return json(res, 401, { error: "Token invalido." });
+
+    const storageId = String(req.body?.storageId || "").trim();
+    if (!storageId) return json(res, 400, { error: "storageId obrigatorio." });
+
+    const docRef = db.doc(`thiefNpcStorage/${storageId}`);
+    const snap = await docRef.get();
+    if (!snap.exists) return json(res, 404, { error: "Registro nao encontrado." });
+    const row = snap.data() || {};
+    if (String(row.status || "") !== "held_at_npc") return json(res, 400, { error: "Pokemon nao esta retido neste NPC." });
+
+    const victimUid = String(row.ownerUid || "").trim();
+    const victimCharacterId = String(row.ownerCharacterId || "").trim();
+    if (!victimUid || !victimCharacterId) return json(res, 400, { error: "Dono invalido no registro." });
+
+    const boxRef = db.collection(`players/${victimUid}/characters/${victimCharacterId}/box`).doc();
+
+    await db.runTransaction(async (tx) => {
+      const fresh = await tx.get(docRef);
+      if (!fresh.exists) throw new Error("storage-gone");
+      const r = fresh.data() || {};
+      if (String(r.status || "") !== "held_at_npc") throw new Error("status-changed");
+      tx.set(boxRef, {
+        ...ensureStableInstanceId(r.pokemonData || {}),
+        recoveredFromThiefNpc: true,
+        thiefNpcDefeatedByUid: uid,
+        updatedAt: new Date(),
+      });
+      tx.set(
+        docRef,
+        {
+          status: "recovered_via_npc_defeat",
+          defeatedByUid: uid,
+          recoveredAt: new Date(),
+        },
+        { merge: true }
+      );
+    });
+
+    return json(res, 200, { ok: true, message: "Pokemon devolvido ao treinador original." });
+  } catch (e) {
+    logger.error("thiefReportThiefNpcDefeat", e);
+    return json(res, 500, { error: e?.message || "Erro ao concluir recuperacao via NPC ladrao." });
   }
 });
 
@@ -1799,39 +2525,68 @@ exports.registerBiomeCapture = onRequest({ region: "southamerica-east1", cors: t
 
     const biomeId = String(req.body?.biomeId || "").trim().toLowerCase();
     const speciesId = Math.max(1, Math.trunc(n(req.body?.speciesId, 0)));
+    const groupId = String(req.body?.groupId || "").trim();
     if (!biomeId) return json(res, 400, { error: "biomeId obrigatorio." });
     if (!speciesId) return json(res, 400, { error: "speciesId obrigatorio." });
 
     const configDocId = `elodex-base_${biomeId}`;
-    const ref = db.doc(`biomeEncounterConfig/${configDocId}/individual/${speciesId}`);
     let exhausted = false;
     let remaining = null;
 
-    await db.runTransaction(async (tx) => {
-      const snap = await tx.get(ref);
-      if (!snap.exists) return;
-      const row = snap.data() || {};
-      const captureLimitRaw = row.captureLimit;
-      const captureLimit = captureLimitRaw == null ? null : Math.max(0, Math.trunc(n(captureLimitRaw, 0)));
-      const currentCaptured = Math.max(0, Math.trunc(n(row.capturedCount, 0)));
-      if (captureLimit != null && currentCaptured >= captureLimit) {
-        exhausted = true;
-        remaining = 0;
-        return;
-      }
-      const nextCaptured = currentCaptured + 1;
-      remaining = captureLimit == null ? null : Math.max(0, captureLimit - nextCaptured);
-      exhausted = remaining === 0;
-      tx.set(
-        ref,
-        {
-          capturedCount: nextCaptured,
-          remainingCaptures: remaining,
-          updatedAt: new Date(),
-        },
-        { merge: true }
-      );
-    });
+    if (groupId) {
+      const ref = db.doc(`biomeEncounterConfig/${configDocId}/groups/${groupId}`);
+      await db.runTransaction(async (tx) => {
+        const snap = await tx.get(ref);
+        if (!snap.exists) return;
+        const data = snap.data() || {};
+        const slots = Array.isArray(data.speciesSlots) ? data.speciesSlots : [];
+        const idx = slots.findIndex((s) => Math.trunc(n(s?.speciesId, 0)) === speciesId);
+        if (idx < 0) return;
+        const slot = { ...(slots[idx] || {}) };
+        const maxRaw = slot.max;
+        const maxCap = maxRaw == null ? null : Math.max(0, Math.trunc(n(maxRaw, 0)));
+        const currentCaptured = Math.max(0, Math.trunc(n(slot.capturedCount, 0)));
+        if (maxCap != null && currentCaptured >= maxCap) {
+          exhausted = true;
+          remaining = 0;
+          return;
+        }
+        const nextCaptured = currentCaptured + 1;
+        remaining = maxCap == null ? null : Math.max(0, maxCap - nextCaptured);
+        exhausted = remaining === 0;
+        slot.capturedCount = nextCaptured;
+        const nextSlots = slots.slice();
+        nextSlots[idx] = slot;
+        tx.set(ref, { speciesSlots: nextSlots, updatedAt: new Date() }, { merge: true });
+      });
+    } else {
+      const ref = db.doc(`biomeEncounterConfig/${configDocId}/individual/${speciesId}`);
+      await db.runTransaction(async (tx) => {
+        const snap = await tx.get(ref);
+        if (!snap.exists) return;
+        const row = snap.data() || {};
+        const captureLimitRaw = row.captureLimit;
+        const captureLimit = captureLimitRaw == null ? null : Math.max(0, Math.trunc(n(captureLimitRaw, 0)));
+        const currentCaptured = Math.max(0, Math.trunc(n(row.capturedCount, 0)));
+        if (captureLimit != null && currentCaptured >= captureLimit) {
+          exhausted = true;
+          remaining = 0;
+          return;
+        }
+        const nextCaptured = currentCaptured + 1;
+        remaining = captureLimit == null ? null : Math.max(0, captureLimit - nextCaptured);
+        exhausted = remaining === 0;
+        tx.set(
+          ref,
+          {
+            capturedCount: nextCaptured,
+            remainingCaptures: remaining,
+            updatedAt: new Date(),
+          },
+          { merge: true }
+        );
+      });
+    }
 
     return json(res, 200, { ok: true, exhausted, remaining });
   } catch (e) {
@@ -1839,3 +2594,163 @@ exports.registerBiomeCapture = onRequest({ region: "southamerica-east1", cors: t
     return json(res, 500, { error: e?.message || "Erro ao registrar captura por bioma." });
   }
 });
+
+/**
+ * npcCreatorStats: somente Admin SDK (cliente sem write — firestore.rules).
+ * +1 ao criar ovo com creatorNpcId; se capacidade do NPC (incubatorMaxEggs) excedida, remove o ovo.
+ */
+exports.npcCreatorStatsOnPlayerEggCreated = onDocumentCreated(
+  {
+    document: "players/{uid}/characters/{characterId}/eggs/{eggId}",
+    region: "southamerica-east1",
+  },
+  async (event) => {
+    const snap = event.data;
+    if (!snap) return;
+    const eggId = String(event.params.eggId || "");
+    if (!eggId || eggId === "_meta") return;
+    const data = snap.data() || {};
+    const npcId = String(data.creatorNpcId || "").trim();
+    if (!npcId) return;
+
+    const statsRef = db.doc(`npcCreatorStats/${npcId}`);
+    const npcRef = db.doc(`npcs/${npcId}`);
+    let rejectEgg = false;
+
+    try {
+      await db.runTransaction(async (tx) => {
+        const [statsSnap, npcSnap] = await Promise.all([tx.get(statsRef), tx.get(npcRef)]);
+        const maxEggs = Math.max(1, Math.trunc(n(npcSnap.data()?.incubatorMaxEggs, 6)));
+        const cur = statsSnap.exists ? Math.max(0, Math.trunc(n(statsSnap.data()?.activeEggCount, 0))) : 0;
+        if (cur >= maxEggs) {
+          rejectEgg = true;
+          return;
+        }
+        tx.set(statsRef, { activeEggCount: cur + 1, updatedAt: new Date() }, { merge: true });
+        tx.set(
+          snap.ref,
+          { _npcCreatorStatsApplied: true, updatedAt: new Date() },
+          { merge: true }
+        );
+      });
+
+      if (rejectEgg) {
+        await snap.ref.set(
+          { creatorNpcId: null, _npcCreatorStatsApplied: false, updatedAt: new Date() },
+          { merge: true }
+        );
+        await snap.ref.delete();
+        logger.warn("npcCreatorStats_eggRejectedOverCap", { eggId: snap.id, npcId });
+      }
+    } catch (e) {
+      logger.error("npcCreatorStatsOnPlayerEggCreated", e);
+    }
+  }
+);
+
+/** -1 ao remover ovo que estava contando na incubadora compartilhada. */
+exports.npcCreatorStatsOnPlayerEggDeleted = onDocumentDeleted(
+  {
+    document: "players/{uid}/characters/{characterId}/eggs/{eggId}",
+    region: "southamerica-east1",
+  },
+  async (event) => {
+    const snap = event.data;
+    if (!snap) return;
+    const eggId = String(event.params.eggId || "");
+    if (!eggId || eggId === "_meta") return;
+    const data = snap.data() || {};
+    const npcId = String(data.creatorNpcId || "").trim();
+    if (!npcId) return;
+    if (data._npcCreatorStatsApplied === false) return;
+    const countedByCf = data._npcCreatorStatsApplied === true;
+    const legacyNoFlag = data._npcCreatorStatsApplied === undefined || data._npcCreatorStatsApplied === null;
+    if (!countedByCf && !legacyNoFlag) return;
+
+    const statsRef = db.doc(`npcCreatorStats/${npcId}`);
+    try {
+      await db.runTransaction(async (tx) => {
+        const statsSnap = await tx.get(statsRef);
+        if (!statsSnap.exists) return;
+        const cur = Math.max(0, Math.trunc(n(statsSnap.data()?.activeEggCount, 0)));
+        tx.set(statsRef, { activeEggCount: Math.max(0, cur - 1), updatedAt: new Date() }, { merge: true });
+      });
+    } catch (e) {
+      logger.error("npcCreatorStatsOnPlayerEggDeleted", e);
+    }
+  }
+);
+
+const { evolvePokemon } = require("./evolvePokemon");
+exports.evolvePokemon = evolvePokemon;
+
+const coliseuBattleHistory = require("./coliseuBattleHistory");
+exports.coliseuBattleHistoryOnFinish = coliseuBattleHistory.coliseuBattleHistoryOnFinish;
+
+const coliseuPvpStart = require("./coliseuPvpStart");
+exports.startColiseuPvpBattleHttp = coliseuPvpStart.startColiseuPvpBattleHttp;
+exports.coliseuAutoSettleOnFinish = coliseuPvpStart.coliseuAutoSettleOnFinish;
+
+// Coliseu PvP — administração de sala (senha, escrow, heartbeat, cancel, kick).
+const coliseuAdmin = require("./coliseuAdmin");
+exports.createColiseuRoomHttp = coliseuAdmin.createColiseuRoomHttp;
+exports.joinColiseuRoomHttp = coliseuAdmin.joinColiseuRoomHttp;
+exports.cancelColiseuRoomHttp = coliseuAdmin.cancelColiseuRoomHttp;
+exports.kickColiseuOpponentHttp = coliseuAdmin.kickColiseuOpponentHttp;
+exports.touchColiseuRoomHttp = coliseuAdmin.touchColiseuRoomHttp;
+
+// Coliseu PvP — scheduled (orphan cleanup + turn timeout).
+const coliseuScheduled = require("./coliseuScheduled");
+exports.cleanupColiseuOrphans = coliseuScheduled.cleanupColiseuOrphans;
+exports.coliseuPvpTurnTimeoutTick = coliseuScheduled.coliseuPvpTurnTimeoutTick;
+
+// Coliseu PvP — validação cruzada server-side (hardening anti-cheat leve).
+const coliseuPvpResolveGuard = require("./coliseuPvpResolveGuard");
+exports.coliseuPvpResolveGuard = coliseuPvpResolveGuard.coliseuPvpResolveGuard;
+
+// Coliseu PvP — resolução de turno server-authoritative.
+const coliseuPvpServerResolve = require("./coliseuPvpServerResolve");
+exports.coliseuPvpServerResolve = coliseuPvpServerResolve.coliseuPvpServerResolve;
+
+const friendSocial = require("./friendSocial");
+exports.searchPlayersPublic = friendSocial.searchPlayersPublic;
+exports.sendFriendRequest = friendSocial.sendFriendRequest;
+exports.respondFriendRequest = friendSocial.respondFriendRequest;
+exports.ensurePlayerPublicId = friendSocial.ensurePlayerPublicId;
+exports.ensurePlayerPublicIdHttp = friendSocial.ensurePlayerPublicIdHttp;
+exports.ensureCharacterPublicId = friendSocial.ensureCharacterPublicId;
+exports.addFriendByPublicId = friendSocial.addFriendByPublicId;
+exports.addFriendByPublicIdHttp = friendSocial.addFriendByPublicIdHttp;
+exports.respondFriendRequestHttp = friendSocial.respondFriendRequestHttp;
+exports.removeFriend = friendSocial.removeFriend;
+exports.removeFriendHttp = friendSocial.removeFriendHttp;
+exports.ensureDirectChat = friendSocial.ensureDirectChat;
+exports.clearDirectChat = friendSocial.clearDirectChat;
+exports.markDirectChatRead = friendSocial.markDirectChatRead;
+
+const directChatUnread = require("./directChatUnread");
+exports.onDirectChatMessageCreated = directChatUnread.onDirectChatMessageCreated;
+
+const friendTrade = require("./friendTrade");
+exports.createFriendTrade = friendTrade.createFriendTrade;
+exports.completeFriendTrade = friendTrade.completeFriendTrade;
+exports.cancelFriendTrade = friendTrade.cancelFriendTrade;
+exports.createLiveFriendTrade = friendTrade.createLiveFriendTrade;
+exports.joinLiveFriendTrade = friendTrade.joinLiveFriendTrade;
+exports.setLiveFriendTradePick = friendTrade.setLiveFriendTradePick;
+exports.confirmLiveFriendTrade = friendTrade.confirmLiveFriendTrade;
+exports.cancelLiveFriendTrade = friendTrade.cancelLiveFriendTrade;
+
+const gameplaySecure = require("./gameplaySecure");
+exports.placeMysteryEggInIncubator = gameplaySecure.placeMysteryEggInIncubator;
+exports.placeEggInIncubator = gameplaySecure.placeEggInIncubator;
+exports.hatchEgg = gameplaySecure.hatchEgg;
+exports.healFullTeam = gameplaySecure.healFullTeam;
+const phase2Mutations = require("./phase2Mutations");
+exports.itemMutations = phase2Mutations.itemMutations;
+exports.itemMutationsHttp = phase2Mutations.itemMutationsHttp;
+exports.teamMutations = phase2Mutations.teamMutations;
+exports.teamMutationsHttp = phase2Mutations.teamMutationsHttp;
+exports.characterBootstrap = phase2Mutations.characterBootstrap;
+exports.characterBootstrapHttp = phase2Mutations.characterBootstrapHttp;
+exports.onCharacterCreatedBootstrap = phase2Mutations.onCharacterCreatedBootstrap;

@@ -43,7 +43,23 @@ export async function ensureDefaultMonetizationCatalog() {
     )
   );
 
-  void productIds;
+  try {
+    await Promise.all(
+      DEFAULT_MONETIZATION_PRODUCTS.filter((p) => !productIds.has(p.id)).map((p) =>
+        setDoc(
+          doc(db, "monetizationProducts", p.id),
+          {
+            ...serializeMonetizationProduct(p),
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          },
+          { merge: true }
+        )
+      )
+    );
+  } catch (e) {
+    console.error("ensureDefaultMonetizationCatalog products seed", e);
+  }
 }
 
 export async function loadVipPlans(includeInactive = true) {

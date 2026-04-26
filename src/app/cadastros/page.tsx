@@ -28,7 +28,8 @@ const cards: CadastroCard[] = [
   {
     href: "/biomas",
     title: "BIOMA",
-    description: "Configure os biomas, encontros, NPCs e cenarios de batalha.",
+    description:
+      "Cadastro de biomas e editor de mapa/rotas na mesma tela (abas Cadastro e Mapa e rotas).",
     accent: "from-lime-400 to-green-500",
   },
   {

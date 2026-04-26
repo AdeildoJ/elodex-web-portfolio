@@ -7,6 +7,8 @@ export type MonetizationProductType =
   | "ticket"
   | "egg"
   | "iv_reset"
+  | "km_boost"
+  | "fishing_bait"
   | "trainer_license";
 
 export type LegacyMonetizationProductType =
@@ -35,6 +37,8 @@ export const PRODUCT_TYPE_OPTIONS: Array<{ value: MonetizationProductType; label
   { value: "ticket", label: "Ticket" },
   { value: "egg", label: "Egg" },
   { value: "iv_reset", label: "IV Reset" },
+  { value: "km_boost", label: "Boost de KM" },
+  { value: "fishing_bait", label: "Isca/Anzol" },
   { value: "trainer_license", label: "Licenca de Treinador" },
 ];
 
@@ -120,6 +124,12 @@ export type MonetizationProductBenefitSet = {
   gymMainTeamSlots?: number | null;
   battleCastleTicketCount?: number | null;
   exclusiveEventTicketCount?: number | null;
+  kmGainMultiplier?: number | null;
+  kmBonusPercent?: number | null;
+  fishingBaitItemConfigId?: string | null;
+  fishingBaitUses?: number | null;
+  fishingBaitGroupIds?: string[] | null;
+  fishingBaitSpeciesIds?: number[] | null;
   metadata?: Record<string, string | number | boolean | null>;
 };
 
@@ -181,6 +191,23 @@ export type IvResetProductConfig = {
   kind: "iv_reset";
 };
 
+export type KmBoostProductConfig = {
+  kind: "km_boost";
+  /** Dias de validade do boost (entitlement). */
+  durationDays: number;
+  /** Ex.: 50 = +50% sobre KM rastreada (multiplicador 1,5). */
+  kmBonusPercent: number;
+};
+
+export type FishingBaitProductConfig = {
+  kind: "fishing_bait";
+  /** Corresponde a `itemsConfig/{id}`; se vazio, deriva do id do produto no sync. */
+  itemConfigId: string;
+  uses: number;
+  fishingGroupIds: string[];
+  fishingSpeciesIds: number[];
+};
+
 export type TrainerLicenseProductConfig = {
   kind: "trainer_license";
   durationDays: number;
@@ -201,6 +228,8 @@ export type MonetizationProductConfig =
   | TicketProductConfig
   | EggProductConfig
   | IvResetProductConfig
+  | KmBoostProductConfig
+  | FishingBaitProductConfig
   | TrainerLicenseProductConfig
   | LegacyProductConfig;
 
@@ -380,6 +409,42 @@ export function createProductDraft(
       benefits: { ivResetCount: 1, metadata: { productType: "iv_reset" } },
     };
   }
+  if (type === "km_boost") {
+    return {
+      ...base,
+      type: "km_boost",
+      durationDays: 7,
+      configuration: { kind: "km_boost", durationDays: 7, kmBonusPercent: 20 },
+      benefits: {
+        kmGainMultiplier: 1.2,
+        kmBonusPercent: 20,
+        metadata: { productType: "km_boost", durationDays: 7, kmBonusPercent: 20, kmGainMultiplier: 1.2 },
+      },
+    };
+  }
+  if (type === "fishing_bait") {
+    return {
+      ...base,
+      type: "fishing_bait",
+      durationDays: null,
+      configuration: {
+        kind: "fishing_bait",
+        itemConfigId: "",
+        uses: 1,
+        fishingGroupIds: [],
+        fishingSpeciesIds: [],
+      },
+      benefits: {
+        metadata: {
+          productType: "fishing_bait",
+          uses: 1,
+          itemConfigId: "",
+          fishingGroupIds: "",
+          fishingSpeciesIds: "",
+        },
+      },
+    };
+  }
   return {
     ...base,
     type: "trainer_license",
@@ -515,24 +580,105 @@ export function syncProductDerivedFields(product: SupportedMonetizationProductDo
     };
   }
 
-  const durationDays = clamp(Math.floor(toNumber(product.configuration.durationDays, 7)), 1, 7);
-  const xpBonusPercent = clamp(toNumber(product.configuration.xpBonusPercent, 0), 0, 100);
-  const shinyBonusPercent = clamp(toNumber(product.configuration.shinyBonusPercent, 0), 0, 100);
-  const biomeAccessIds = Array.from(
-    new Set(product.configuration.biomeAccessIds.map((value) => String(value).trim().toLowerCase()).filter(Boolean))
-  );
+  if (product.configuration.kind === "km_boost") {
+    const durationDays = clamp(Math.floor(toNumber(product.configuration.durationDays, 7)), 1, 30);
+    const kmBonusPercent = clamp(toNumber(product.configuration.kmBonusPercent, 0), 0, 500);
+    const kmGainMultiplier = 1 + kmBonusPercent / 100;
+    return {
+      ...base,
+      durationDays,
+      configuration: { kind: "km_boost", durationDays, kmBonusPercent },
+      benefits: {
+        kmGainMultiplier,
+        kmBonusPercent,
+        metadata: {
+          productType: "km_boost",
+          durationDays,
+          kmBonusPercent,
+          kmGainMultiplier,
+        },
+      },
+    };
+  }
+
+  if (product.configuration.kind === "fishing_bait") {
+    const docKey = String(base.id || base.code || "").trim().toLowerCase();
+    const itemConfigId = String(product.configuration.itemConfigId || docKey)
+      .trim()
+      .toLowerCase();
+    const uses = Math.max(1, Math.floor(toNumber(product.configuration.uses, 1)));
+    const fishingGroupIds = Array.from(
+      new Set(
+        (product.configuration.fishingGroupIds || [])
+          .map((g) => String(g || "").trim().toLowerCase())
+          .filter(Boolean)
+      )
+    );
+    const fishingSpeciesIds = Array.from(
+      new Set(
+        (product.configuration.fishingSpeciesIds || [])
+          .map((n) => Math.max(0, Math.floor(toNumber(n, 0))))
+          .filter((n) => n > 0)
+      )
+    );
+    return {
+      ...base,
+      durationDays: null,
+      configuration: {
+        kind: "fishing_bait",
+        itemConfigId,
+        uses,
+        fishingGroupIds,
+        fishingSpeciesIds,
+      },
+      benefits: {
+        fishingBaitItemConfigId: itemConfigId,
+        fishingBaitUses: uses,
+        fishingBaitGroupIds: fishingGroupIds,
+        fishingBaitSpeciesIds: fishingSpeciesIds,
+        metadata: {
+          productType: "fishing_bait",
+          itemConfigId,
+          uses,
+          fishingGroupIds: fishingGroupIds.join(","),
+          fishingSpeciesIds: fishingSpeciesIds.join(","),
+        },
+      },
+    };
+  }
+
+  if (product.configuration.kind === "trainer_license") {
+    const durationDays = clamp(Math.floor(toNumber(product.configuration.durationDays, 7)), 1, 7);
+    const xpBonusPercent = clamp(toNumber(product.configuration.xpBonusPercent, 0), 0, 100);
+    const shinyBonusPercent = clamp(toNumber(product.configuration.shinyBonusPercent, 0), 0, 100);
+    const biomeAccessIds = Array.from(
+      new Set(
+        (product.configuration.biomeAccessIds || []).map((value) => String(value).trim().toLowerCase()).filter(Boolean)
+      )
+    );
+    return {
+      ...base,
+      durationDays,
+      configuration: { kind: "trainer_license", durationDays, xpBonusPercent, shinyBonusPercent, biomeAccessIds },
+      benefits: {
+        trainerLicenseDays: durationDays,
+        metadata: {
+          productType: "trainer_license",
+          xpBonusPercent,
+          shinyBonusPercent,
+          biomeAccessIds: biomeAccessIds.join(","),
+        },
+      },
+    };
+  }
+
   return {
     ...base,
-    durationDays,
-    configuration: { kind: "trainer_license", durationDays, xpBonusPercent, shinyBonusPercent, biomeAccessIds },
+    durationDays: 7,
+    configuration: { kind: "trainer_license", durationDays: 7, xpBonusPercent: 0, shinyBonusPercent: 0, biomeAccessIds: [] },
     benefits: {
-      trainerLicenseDays: durationDays,
-      metadata: {
-        productType: "trainer_license",
-        xpBonusPercent,
-        shinyBonusPercent,
-        biomeAccessIds: biomeAccessIds.join(","),
-      },
+      trainerLicenseDays: 7,
+      metadata: { productType: "trainer_license", xpBonusPercent: 0, shinyBonusPercent: 0, biomeAccessIds: "" },
     },
   };
 }
@@ -688,6 +834,55 @@ function normalizeSupportedProduct(
 
   if (input.type === "iv_reset") {
     return syncProductDerivedFields({ ...common, type: "iv_reset", configuration: { kind: "iv_reset" } });
+  }
+
+  if (input.type === "km_boost") {
+    const cfg = (input.configuration as Partial<KmBoostProductConfig> | undefined) || {};
+    return syncProductDerivedFields({
+      ...common,
+      type: "km_boost",
+      configuration: {
+        kind: "km_boost",
+        durationDays: clamp(
+          Math.floor(toNumber(cfg.durationDays ?? input.durationDays ?? metadata.durationDays, 7)),
+          1,
+          30
+        ),
+        kmBonusPercent: clamp(
+          toNumber(cfg.kmBonusPercent ?? metadata.kmBonusPercent ?? input.benefits?.kmBonusPercent, 20),
+          0,
+          500
+        ),
+      },
+    });
+  }
+
+  if (input.type === "fishing_bait") {
+    const cfg = (input.configuration as Partial<FishingBaitProductConfig> | undefined) || {};
+    const metaGroups = toMetadataStringList(metadata, "fishingGroupIds");
+    const metaSpecies = toMetadataString(metadata, "fishingSpeciesIds")
+      .split(",")
+      .map((s) => Math.max(0, Math.floor(toNumber(s.trim(), 0))))
+      .filter((n) => n > 0);
+    const groupIds =
+      Array.isArray(cfg.fishingGroupIds) && cfg.fishingGroupIds.length
+        ? cfg.fishingGroupIds.map((g) => String(g || "").trim().toLowerCase()).filter(Boolean)
+        : metaGroups;
+    const speciesIds =
+      Array.isArray(cfg.fishingSpeciesIds) && cfg.fishingSpeciesIds.length
+        ? cfg.fishingSpeciesIds.map((n) => Math.max(0, Math.floor(toNumber(n, 0)))).filter((n) => n > 0)
+        : metaSpecies;
+    return syncProductDerivedFields({
+      ...common,
+      type: "fishing_bait",
+      configuration: {
+        kind: "fishing_bait",
+        itemConfigId: String(cfg.itemConfigId ?? metadata.itemConfigId ?? "").trim().toLowerCase(),
+        uses: Math.max(1, Math.floor(toNumber(cfg.uses ?? metadata.uses ?? input.benefits?.fishingBaitUses, 1))),
+        fishingGroupIds: groupIds,
+        fishingSpeciesIds: speciesIds,
+      },
+    });
   }
 
   return syncProductDerivedFields({
@@ -853,6 +1048,27 @@ export function validateMonetizationProduct(product: SupportedMonetizationProduc
       errors.push("Selecione ao menos um bioma liberado pela licenca.");
     }
   }
+  if (normalized.configuration.kind === "km_boost") {
+    if (normalized.configuration.durationDays < 1 || normalized.configuration.durationDays > 30) {
+      errors.push("Duracao do boost de KM deve ser entre 1 e 30 dias.");
+    }
+    if (normalized.configuration.kmBonusPercent < 0 || normalized.configuration.kmBonusPercent > 500) {
+      errors.push("Bonus de KM (%) deve ser entre 0 e 500.");
+    }
+  }
+  if (normalized.configuration.kind === "fishing_bait") {
+    if (!String(normalized.configuration.itemConfigId || "").trim()) {
+      errors.push("Defina o id do item em Itens (ou salve o produto com id/codigo para derivar o item).");
+    }
+    if (normalized.configuration.uses < 1) {
+      errors.push("Quantidade de usos por unidade deve ser >= 1.");
+    }
+    const hasGroups = normalized.configuration.fishingGroupIds.length > 0;
+    const hasSpecies = normalized.configuration.fishingSpeciesIds.length > 0;
+    if (!hasGroups && !hasSpecies) {
+      errors.push("Selecione ao menos um grupo de pesca e/ou uma especie alvo (Isca/Anzol).");
+    }
+  }
   return errors;
 }
 
@@ -887,6 +1103,14 @@ export function describeProductConfiguration(product: MonetizationProductDoc) {
   }
   if (product.configuration.kind === "iv_reset") {
     return "Item para resetar IV de Pokemon.";
+  }
+  if (product.configuration.kind === "km_boost") {
+    return `Boost de +${product.configuration.kmBonusPercent}% de KM rastreada por ${product.configuration.durationDays} dia(s).`;
+  }
+  if (product.configuration.kind === "fishing_bait") {
+    const g = product.configuration.fishingGroupIds.length;
+    const s = product.configuration.fishingSpeciesIds.length;
+    return `Isca/Anzol: item ${product.configuration.itemConfigId || "?"}, ${product.configuration.uses} uso(s), ${g} grupo(s), ${s} especie(s).`;
   }
   if (product.configuration.kind === "trainer_license") {
     return `Licenca de ${product.configuration.durationDays} dia(s) com ${product.configuration.xpBonusPercent}% EXP.`;

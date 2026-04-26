@@ -137,6 +137,7 @@ const mainItems: Item[] = [
   { href: "/pokedex", label: "Pokedex", icon: BookOpenIcon },
   { href: "/paineis", label: "Paineis", icon: PanelsIcon },
   { href: "/loja", label: "Loja", icon: StoreIcon },
+  { href: "/guia-pesca", label: "Guia pesca", icon: BookOpenIcon },
 ];
 
 const cadastroItems: Item[] = [

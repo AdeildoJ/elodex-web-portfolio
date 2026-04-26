@@ -22,6 +22,7 @@ type MoveJson = {
 };
 type MoveFromJson = Record<string, MoveJson>;
 type BiomeOption = { id: string; name: string };
+type FishingGroupOption = { id: string; name: string };
 
 function getPokeApiItemSpriteUrl(id: string) {
   return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${id}.png`;
@@ -32,6 +33,13 @@ function getFallbackByCategory(item: PokemonItem) {
     return "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/tm-normal.png";
   }
   return "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/unknown.png";
+}
+
+function prettifyMoveName(raw: string) {
+  return raw
+    .split("-")
+    .map((part) => (part ? part[0].toUpperCase() + part.slice(1) : part))
+    .join(" ");
 }
 
 function Row({ label, value }: { label: string; value: unknown }) {
@@ -76,6 +84,11 @@ export default function ItemModal({
   const moveMap = movesData as unknown as MoveFromJson;
   const move = item.moveId ? moveMap[item.moveId] ?? null : null;
 
+  const isMachineItem = item.category === "tm" || item.category === "hm" || item.category === "tr";
+  const machineMoveName = isMachineItem
+    ? prettifyMoveName(String(move?.name || item.moveNameCache || item.moveId || "").trim())
+    : "";
+
   const moveFlags =
     move?.flags && Array.isArray(move.flags) && move.flags.length > 0
       ? (move.flags as unknown[]).map((f) => (typeof f === "string" ? f : "")).filter(Boolean)
@@ -96,7 +109,16 @@ export default function ItemModal({
   const [grantType, setGrantType] = useState<"inventory" | "biome_access">("inventory");
   const [biomeAccessBiomeId, setBiomeAccessBiomeId] = useState("");
   const [biomeAccessDurationHoursText, setBiomeAccessDurationHoursText] = useState("24");
+  const [fishingBaitEnabled, setFishingBaitEnabled] = useState(false);
+  const [fishingConfigMode, setFishingConfigMode] = useState<"legacy" | "isca-anzol">("legacy");
+  const [fishingBaitTagsText, setFishingBaitTagsText] = useState("");
+  const [fishingBaseSuccessText, setFishingBaseSuccessText] = useState("98");
+  const [fishingSpawnWeightBonusText, setFishingSpawnWeightBonusText] = useState("10");
+  const [fishingIscaUsesText, setFishingIscaUsesText] = useState("10");
+  const [fishingIscaGroupIdsText, setFishingIscaGroupIdsText] = useState("");
+  const [fishingIscaSpeciesIdsText, setFishingIscaSpeciesIdsText] = useState("");
   const [biomeOptions, setBiomeOptions] = useState<BiomeOption[]>([]);
+  const [fishingGroupOptions, setFishingGroupOptions] = useState<FishingGroupOption[]>([]);
 
   const configDocRef = useMemo(() => doc(db, "itemsConfig", item.id), [item.id]);
 
@@ -155,6 +177,49 @@ export default function ItemModal({
               ? String(data.biomeAccessDurationHours)
               : "24"
           );
+          const fishingConfig =
+            data.fishingConfig && typeof data.fishingConfig === "object"
+              ? (data.fishingConfig as Record<string, unknown>)
+              : null;
+          setFishingBaitEnabled(Boolean(fishingConfig?.enabled));
+          const modeRaw = String(fishingConfig?.mode || "").trim().toLowerCase();
+          setFishingConfigMode(
+            modeRaw === "isca-anzol" || modeRaw === "isca_anzol" ? "isca-anzol" : "legacy"
+          );
+          setFishingBaitTagsText(
+            Array.isArray(fishingConfig?.attractTags)
+              ? (fishingConfig?.attractTags as unknown[]).map((tag) => String(tag || "").trim()).filter(Boolean).join(", ")
+              : ""
+          );
+          setFishingBaseSuccessText(
+            typeof fishingConfig?.baseSuccessPercent === "number" ? String(fishingConfig.baseSuccessPercent) : "98"
+          );
+          setFishingSpawnWeightBonusText(
+            typeof fishingConfig?.groupWeightBonusPercent === "number"
+              ? String(fishingConfig.groupWeightBonusPercent)
+              : "10"
+          );
+          setFishingIscaUsesText(
+            typeof fishingConfig?.uses === "number" && fishingConfig.uses > 0
+              ? String(fishingConfig.uses)
+              : "10"
+          );
+          setFishingIscaGroupIdsText(
+            Array.isArray(fishingConfig?.fishingGroupIds)
+              ? (fishingConfig.fishingGroupIds as unknown[])
+                  .map((id) => String(id || "").trim().toLowerCase())
+                  .filter(Boolean)
+                  .join(", ")
+              : ""
+          );
+          setFishingIscaSpeciesIdsText(
+            Array.isArray(fishingConfig?.fishingSpeciesIds)
+              ? (fishingConfig.fishingSpeciesIds as unknown[])
+                  .map((n) => String(Math.trunc(Number(n) || 0)))
+                  .filter((s) => s !== "0")
+                  .join(", ")
+              : ""
+          );
         } else {
           setSaleEnabled(false);
           setSellMode("game");
@@ -166,6 +231,14 @@ export default function ItemModal({
           setGrantType("inventory");
           setBiomeAccessBiomeId("");
           setBiomeAccessDurationHoursText("24");
+          setFishingBaitEnabled(false);
+          setFishingConfigMode("legacy");
+          setFishingBaitTagsText("");
+          setFishingBaseSuccessText("98");
+          setFishingSpawnWeightBonusText("10");
+          setFishingIscaUsesText("10");
+          setFishingIscaGroupIdsText("");
+          setFishingIscaSpeciesIdsText("");
         }
       } catch (e: unknown) {
         setErrorMsg(e instanceof Error ? e.message : "Falha ao carregar configuracao de loja.");
@@ -207,6 +280,29 @@ export default function ItemModal({
     };
   }, []);
 
+  useEffect(() => {
+    let alive = true;
+    async function loadFishingGroups() {
+      try {
+        const snap = await getDocs(collection(db, "fishingGroups"));
+        if (!alive) return;
+        const rows: FishingGroupOption[] = [];
+        snap.forEach((d) => {
+          const data = d.data() as { name?: string };
+          rows.push({ id: d.id.trim().toLowerCase(), name: String(data.name || d.id) });
+        });
+        rows.sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
+        setFishingGroupOptions(rows);
+      } catch {
+        if (alive) setFishingGroupOptions([]);
+      }
+    }
+    void loadFishingGroups();
+    return () => {
+      alive = false;
+    };
+  }, []);
+
   async function handleSave() {
     setOkMsg(null);
     setErrorMsg(null);
@@ -214,6 +310,21 @@ export default function ItemModal({
     const gamePrice = toNumberOrNull(gamePriceText.trim());
     const realPrice = toNumberOrNull(ecoinPriceText.trim());
     const biomeAccessDurationHours = toNumberOrNull(biomeAccessDurationHoursText.trim());
+    const fishingBaseSuccess = toNumberOrNull(fishingBaseSuccessText.trim());
+    const fishingSpawnWeightBonus = toNumberOrNull(fishingSpawnWeightBonusText.trim());
+    const fishingIscaUses = toNumberOrNull(fishingIscaUsesText.trim());
+    const fishingTags = fishingBaitTagsText
+      .split(/[,\|]/g)
+      .map((tag) => tag.trim().toLowerCase())
+      .filter(Boolean);
+    const iscaGroupIds = fishingIscaGroupIdsText
+      .split(/[,\n]/g)
+      .map((s) => s.trim().toLowerCase())
+      .filter(Boolean);
+    const iscaSpeciesIds = fishingIscaSpeciesIdsText
+      .split(/[,\n]/g)
+      .map((s) => Math.max(0, Math.trunc(Number(s.trim()) || 0)))
+      .filter((n) => n > 0);
 
     if (saleEnabled) {
       if (sellMode === "game" && (gamePrice === null || gamePrice === 0)) {
@@ -247,6 +358,28 @@ export default function ItemModal({
       }
     }
 
+    if (fishingBaitEnabled) {
+      if (fishingConfigMode === "isca-anzol") {
+        if (fishingIscaUses === null || fishingIscaUses < 1) {
+          setErrorMsg("Isca/Anzol: informe a quantidade de usos (numero inteiro >= 1).");
+          return;
+        }
+        if (iscaGroupIds.length === 0 && iscaSpeciesIds.length === 0) {
+          setErrorMsg("Isca/Anzol: informe ao menos um grupo de pesca (ID em fishingGroups) ou uma especie (ID).");
+          return;
+        }
+      } else {
+        if (fishingBaseSuccess === null || fishingBaseSuccess < 0 || fishingBaseSuccess > 100) {
+          setErrorMsg("Informe uma taxa base de sucesso valida para a isca (0 a 100).");
+          return;
+        }
+        if (fishingSpawnWeightBonus === null || fishingSpawnWeightBonus < 0) {
+          setErrorMsg("Informe um bonus valido de aparicao para a isca.");
+          return;
+        }
+      }
+    }
+
     const payload: ShopItemConfig = {
       saleEnabled,
       sellMode,
@@ -257,6 +390,29 @@ export default function ItemModal({
       biomeAccessBiomeId:
         grantType === "biome_access" ? String(biomeAccessBiomeId).trim().toLowerCase() : null,
       biomeAccessDurationHours: grantType === "biome_access" ? biomeAccessDurationHours : null,
+      fishingConfig: fishingBaitEnabled
+        ? fishingConfigMode === "isca-anzol" && fishingIscaUses != null
+          ? {
+              enabled: true,
+              mode: "isca-anzol",
+              uses: fishingIscaUses,
+              fishingGroupIds: iscaGroupIds,
+              fishingSpeciesIds: iscaSpeciesIds,
+              baseSuccessPercent: 98,
+              groupWeightBonusPercent: 0,
+              attractTags: [],
+            }
+          : {
+              enabled: true,
+              mode: "legacy",
+              baseSuccessPercent: fishingBaseSuccess,
+              groupWeightBonusPercent: fishingSpawnWeightBonus,
+              attractTags: fishingTags,
+              uses: null,
+              fishingGroupIds: null,
+              fishingSpeciesIds: null,
+            }
+        : null,
     };
 
     try {
@@ -269,6 +425,7 @@ export default function ItemModal({
           itemName: item.name,
           itemDescription: item.descriptionPtBr || item.effectPtBr || "",
           category: item.category || "outros",
+          imageUrl: preferred,
           pixPaymentUrl: pixPaymentUrl.trim(),
           creditPaymentUrl: creditPaymentUrl.trim(),
           debitPaymentUrl: debitPaymentUrl.trim(),
@@ -296,7 +453,12 @@ export default function ItemModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="sticky top-0 z-10 bg-slate-950 border-b border-slate-800 px-4 py-3 flex items-center justify-between">
-          <div className="font-semibold">{item.name}</div>
+          <div className="font-semibold">
+            {item.name}
+            {machineMoveName ? (
+              <span className="ml-2 text-slate-300 font-normal">- {machineMoveName}</span>
+            ) : null}
+          </div>
 
           <button
             className="px-3 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-sm"
@@ -333,7 +495,14 @@ export default function ItemModal({
                 <Row label="Categoria" value={item.category} />
                 <Row label="Subcategoria" value={item.subCategory} />
                 <Row label="Preco base (PokeAPI)" value={item.price} />
-                <Row label="MoveId" value={item.moveId} />
+                <Row
+                  label="Movimento"
+                  value={
+                    machineMoveName
+                      ? `${machineMoveName}${item.moveId ? ` (${item.moveId})` : ""}`
+                      : item.moveId
+                  }
+                />
                 <BoolRow label="Usavel em batalha" value={item.battleUsable} />
                 <BoolRow label="Usavel fora de batalha" value={item.overworldUsable} />
                 <BoolRow label="Consumivel" value={item.consumable} />
@@ -473,6 +642,124 @@ export default function ItemModal({
                       inputMode="numeric"
                     />
                   </div>
+                </div>
+
+                <div className="mt-4 rounded-lg border border-sky-900/50 bg-slate-950/70 p-3">
+                  <div className="text-sm font-semibold text-sky-200">Loja — Isca/Anzol e pesca classica</div>
+                  <div className="mt-1 text-xs text-slate-400">
+                    A opcao <b className="text-slate-200">Isca/Anzol</b> exige os tres campos abaixo (quantidade, grupos e/ou
+                    individuais). A entrega e feita junto com a mochila.
+                  </div>
+
+                  <label className="mt-3 flex items-center gap-2 text-xs text-slate-200">
+                    <input
+                      type="checkbox"
+                      checked={fishingBaitEnabled}
+                      onChange={(e) => {
+                        setFishingBaitEnabled(e.target.checked);
+                        if (!e.target.checked) setFishingConfigMode("legacy");
+                      }}
+                    />
+                    Tratar como item de pesca na loja
+                  </label>
+
+                  <div className="mt-3">
+                    <div className="text-xs text-slate-400 mb-1">Tipo de item (obrigatorio se for isca de loja)</div>
+                    <select
+                      className="w-full max-w-md px-3 py-2 rounded-md bg-slate-950 border border-slate-800 text-sm"
+                      value={fishingConfigMode}
+                      onChange={(e) => {
+                        const v = e.target.value === "isca-anzol" ? "isca-anzol" : "legacy";
+                        if (v === "isca-anzol") setFishingBaitEnabled(true);
+                        setFishingConfigMode(v);
+                      }}
+                    >
+                      <option value="legacy">Classica (tags, peso e taxa de gancho na tabela)</option>
+                      <option value="isca-anzol">Isca/Anzol</option>
+                    </select>
+                    <p className="mt-1 text-[10px] text-slate-500">
+                      Isca/Anzol: 98% de gancho, sorteio so entre grupos/individuais (intersecao com o bioma ou NPC) e
+                      consumo a cada tentativa, conforme o app.
+                    </p>
+                  </div>
+
+                  {fishingBaitEnabled && fishingConfigMode === "isca-anzol" ? (
+                    <div className="mt-3 space-y-3">
+                      <div>
+                        <div className="text-xs text-slate-200 mb-1 font-medium">Quantidade (obrigatorio)</div>
+                        <div className="text-[10px] text-slate-500 mb-1">Numero de usos da isca (tentativas) por unidade entregue na mochila.</div>
+                        <input
+                          className="w-full max-w-xs px-3 py-2 rounded-md bg-slate-950 border border-slate-800 text-sm"
+                          placeholder="ex.: 10"
+                          value={fishingIscaUsesText}
+                          onChange={(e) => setFishingIscaUsesText(e.target.value)}
+                          inputMode="numeric"
+                        />
+                      </div>
+                      <div>
+                        <div className="text-xs text-slate-200 mb-1 font-medium">Grupos de Pokemon (obrigatorio: este campo e/ou o seguinte)</div>
+                        <div className="text-[10px] text-slate-500 mb-1">IDs em <code className="text-cyan-400/90">fishingGroups</code>, separados por virgula (Admin: Pesca &gt; grupos).</div>
+                        <input
+                          className="w-full px-3 py-2 rounded-md bg-slate-950 border border-slate-800 text-sm"
+                          placeholder="ex.: agua-doce, rios"
+                          value={fishingIscaGroupIdsText}
+                          onChange={(e) => setFishingIscaGroupIdsText(e.target.value)}
+                        />
+                        {fishingGroupOptions.length ? (
+                          <div className="text-[10px] text-slate-500 mt-1">
+                            Cadastrados: {fishingGroupOptions.map((g) => `${g.name} (${g.id})`).join(" · ")}
+                          </div>
+                        ) : null}
+                      </div>
+                      <div>
+                        <div className="text-xs text-slate-200 mb-1 font-medium">Pokemon individuais (obrigatorio: este campo e/ou grupos acima)</div>
+                        <div className="text-[10px] text-slate-500 mb-1">IDs nacionais (species), separados por virgula.</div>
+                        <input
+                          className="w-full px-3 py-2 rounded-md bg-slate-950 border border-slate-800 text-sm"
+                          placeholder="ex.: 129, 130, 118"
+                          value={fishingIscaSpeciesIdsText}
+                          onChange={(e) => setFishingIscaSpeciesIdsText(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div>
+                        <div className="text-xs text-slate-400 mb-1">Tags atraidas</div>
+                        <input
+                          className="w-full px-3 py-2 rounded-md bg-slate-950 border border-slate-800 text-sm"
+                          placeholder="water, rare"
+                          value={fishingBaitTagsText}
+                          disabled={!fishingBaitEnabled}
+                          onChange={(e) => setFishingBaitTagsText(e.target.value)}
+                        />
+                      </div>
+
+                      <div>
+                        <div className="text-xs text-slate-400 mb-1">Taxa base de sucesso %</div>
+                        <input
+                          className="w-full px-3 py-2 rounded-md bg-slate-950 border border-slate-800 text-sm"
+                          placeholder="98"
+                          value={fishingBaseSuccessText}
+                          disabled={!fishingBaitEnabled}
+                          onChange={(e) => setFishingBaseSuccessText(e.target.value)}
+                          inputMode="numeric"
+                        />
+                      </div>
+
+                      <div>
+                        <div className="text-xs text-slate-400 mb-1">Bonus de aparicao %</div>
+                        <input
+                          className="w-full px-3 py-2 rounded-md bg-slate-950 border border-slate-800 text-sm"
+                          placeholder="10"
+                          value={fishingSpawnWeightBonusText}
+                          disabled={!fishingBaitEnabled}
+                          onChange={(e) => setFishingSpawnWeightBonusText(e.target.value)}
+                          inputMode="numeric"
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {errorMsg ? <div className="mt-3 text-sm text-red-300">{errorMsg}</div> : null}

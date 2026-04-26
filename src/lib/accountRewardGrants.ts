@@ -83,6 +83,17 @@ function deterministicId(parts: string[]) {
 async function resolveEcoinPackage(refIdOrCode: string) {
   const normalized = toLower(refIdOrCode);
   if (!normalized) return null;
+  const storeSnap = await adminDb.doc(`storePackages/${normalized}`).get();
+  if (storeSnap.exists) {
+    return { id: storeSnap.id, ...(storeSnap.data() as Record<string, unknown>) } as Record<string, unknown> & {
+      id: string;
+    };
+  }
+  const storeByCode = await adminDb.collection("storePackages").where("code", "==", normalized).limit(1).get();
+  if (!storeByCode.empty) {
+    const d = storeByCode.docs[0];
+    return { id: d.id, ...(d.data() as Record<string, unknown>) } as Record<string, unknown> & { id: string };
+  }
   const directSnap = await adminDb.doc(`ecoinPackages/${normalized}`).get();
   if (directSnap.exists) return { id: directSnap.id, ...(directSnap.data() as Record<string, unknown>) } as Record<string, unknown> & { id: string };
   const byCode = await adminDb.collection("ecoinPackages").where("code", "==", normalized).limit(1).get();
@@ -135,7 +146,7 @@ function isCharacterDeliveredMonetizedProduct(product: ProductLike | null | unde
   const metadata = benefits.metadata && typeof benefits.metadata === "object" ? (benefits.metadata as Record<string, unknown>) : {};
   const ticketSubtype = toLower(metadata.ticketSubtype || metadata.ticketType);
   return (
-    ["incubator", "iv_reset", "biome_ticket", "mystery_egg", "egg"].includes(normalized) ||
+    ["incubator", "iv_reset", "biome_ticket", "mystery_egg", "egg", "fishing_bait"].includes(normalized) ||
     (normalized === "ticket" && ticketSubtype === "biome")
   );
 }
@@ -145,7 +156,7 @@ export function resolveProductDeliveryScope(productType: unknown, explicitScope?
   if (explicit) return explicit;
   if (product && isCharacterDeliveredMonetizedProduct(product)) return "character_backpack";
   const normalized = toLower(productType);
-  if (["incubator", "iv_reset", "biome_ticket", "mystery_egg", "egg"].includes(normalized)) {
+  if (["incubator", "iv_reset", "biome_ticket", "mystery_egg", "egg", "fishing_bait"].includes(normalized)) {
     return "character_backpack";
   }
   return "account";
@@ -158,7 +169,7 @@ export function resolveVipIncludedItemDeliveryScope(
 ): RewardDeliveryScope {
   const explicit = resolveExplicitScope(item.deliveryScope);
   if (explicit) return explicit;
-  if (toLower(item.source) === "ecoin_package") return "account";
+  if (toLower(item.source) === "ecoin_package" || toLower(item.source) === "store_package") return "account";
   if (toLower(item.source) === "item_config") return "character_backpack";
   return resolveProductDeliveryScope(productType, undefined, product);
 }
@@ -184,14 +195,16 @@ export async function grantVipIncludedRewards(args: {
     ),
     Promise.all(
       includedItems
-        .filter((item) => toLower(item.source) === "ecoin_package")
+        .filter((item) => ["ecoin_package", "store_package"].includes(toLower(item.source)))
         .map((item) => resolveEcoinPackage(String(item.refId || item.refCode || "")))
     ),
   ]);
 
   const playerData = playerSnap.data() || {};
   const currentBalance = Math.max(0, Number(playerData.ecoinBalance || 0));
+  const currentKmBalance = Math.max(0, Number(playerData.kmsDisponiveis || 0));
   let nextEcoinBalance = currentBalance;
+  let nextKmBalance = currentKmBalance;
   let productIndex = 0;
   let packageIndex = 0;
 
@@ -199,10 +212,54 @@ export async function grantVipIncludedRewards(args: {
     const qty = Math.max(1, Math.floor(toNumber(item.quantity, 1)));
     const source = toLower(item.source);
 
-    if (source === "ecoin_package") {
+    if (source === "ecoin_package" || source === "store_package") {
       const pkg = packages[packageIndex++];
       if (!pkg) continue;
-      nextEcoinBalance += Math.max(0, Number(pkg.amount || 0)) * qty;
+      const items = pkg.items && typeof pkg.items === "object" ? (pkg.items as Record<string, unknown>) : {};
+      const fromItemsEcoin = Number(items.ecoin);
+      const fromItemsKm = Number(items.km);
+      const ecoinUnit = Number.isFinite(fromItemsEcoin)
+        ? fromItemsEcoin
+        : Number(pkg.ecoinAmount ?? pkg.amount ?? 0);
+      const kmUnit = Number.isFinite(fromItemsKm) ? fromItemsKm : Number(pkg.kmAmount || 0);
+      nextEcoinBalance += Math.max(0, ecoinUnit) * qty;
+      nextKmBalance += Math.max(0, kmUnit) * qty;
+      const boostRaw = items.boost && typeof items.boost === "object" ? (items.boost as Record<string, unknown>) : {};
+      const bp = Math.max(0, Math.floor(toNumber(boostRaw.bonusPercent, 0)));
+      let bh = Math.max(0, Math.floor(toNumber(boostRaw.durationHours, 0)));
+      if (bh <= 0) {
+        const legacyDays = Math.max(0, Math.floor(toNumber(boostRaw.durationDays, 0)));
+        if (legacyDays > 0) bh = legacyDays * 24;
+      }
+      if (bp > 0 && bh > 0) {
+        const mult = 1 + bp / 100;
+        const validUntilMs = Date.now() + bh * qty * 60 * 60 * 1000;
+        const entId = deterministicId(["vip_pkg_boost", args.sourceOrderId, String(pkg.id || item.refId), String(qty)]);
+        args.tx.set(
+          adminDb.doc(`players/${args.uid}/productEntitlements/${entId}`),
+          {
+            entitlementId: entId,
+            productId: String(pkg.id || item.refId || ""),
+            productCode: "vip-included-boost",
+            productType: "km_boost",
+            productName: String(pkg.name || item.name || "Boost KM"),
+            benefits: {
+              kmGainMultiplier: mult,
+              kmBonusPercent: bp,
+              metadata: { source: "vip_subscription", packageId: String(pkg.id || "") },
+            },
+            quantity: qty,
+            status: "active",
+            source: "vip_subscription",
+            orderId: args.sourceOrderId,
+            validUntil: new Date(validUntilMs),
+            validUntilMs,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+          { merge: true }
+        );
+      }
       continue;
     }
 
@@ -289,8 +346,12 @@ export async function grantVipIncludedRewards(args: {
     }
   }
 
-  if (nextEcoinBalance !== currentBalance) {
-    args.tx.set(args.playerRef, { ecoinBalance: nextEcoinBalance, updatedAt: new Date() }, { merge: true });
+  if (nextEcoinBalance !== currentBalance || nextKmBalance !== currentKmBalance) {
+    args.tx.set(
+      args.playerRef,
+      { ecoinBalance: nextEcoinBalance, kmsDisponiveis: nextKmBalance, updatedAt: new Date() },
+      { merge: true }
+    );
   }
 }
 

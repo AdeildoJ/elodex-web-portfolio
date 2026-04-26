@@ -24,3 +24,10 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 export const rtdb = getDatabase(app);
+
+/** Novo JWT com claims atuais (necessário após `setCustomUserClaims` no Auth). */
+export async function ensureFreshIdToken(): Promise<void> {
+  const user = auth.currentUser;
+  if (!user) throw new Error("Sessao expirada. Entre novamente.");
+  await user.getIdToken(true);
+}

@@ -3,12 +3,24 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "node scripts/generate-catalog-options.mjs && node scripts/generate-evolution-targets-admin.mjs && next dev --turbopack",
+    "prebuild": "node scripts/generate-catalog-options.mjs && node scripts/generate-evolution-targets-admin.mjs",
     "build": "next build",
+    "deploy:hosting": "npm run build && npx firebase-tools deploy --only hosting --project elodex-1c8a1",
+    "deploy:production": "npm run build && npx firebase-tools deploy --only hosting,firestore:rules,firestore:indexes,functions --project elodex-1c8a1",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prune-biome-refs": "node scripts/pruneStaleBiomeRefs.js",
+    "prune-biome-refs:dry": "node scripts/pruneStaleBiomeRefs.js --dry-run",
+    "e2e-pvp": "node e2e-pvp/asserter.js",
+    "e2e-pvp:dump-battle": "node e2e-pvp/asserter.js dump:battle",
+    "e2e-pvp:dump-room": "node e2e-pvp/asserter.js dump:room",
+    "migrate:reset-exp": "node scripts/migrate-reset-pokemon-exp-progress.mjs",
+    "export:biome-images": "node scripts/export-biome-images-zip.mjs"
   },
   "dependencies": {
+    "@elodex/pokemon-evolution": "file:../shared/pokemon-evolution",
+    "@xyflow/react": "^12.10.2",
     "axios": "^1.13.2",
     "firebase": "^12.1.0",
     "firebase-admin": "^13.6.0",
@@ -25,6 +37,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.4.6",
+    "jszip": "^3.10.1",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"

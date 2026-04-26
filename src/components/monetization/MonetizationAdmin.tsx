@@ -69,18 +69,33 @@ export default function MonetizationAdmin({ mode }: Props) {
   const [editingEcoin, setEditingEcoin] = useState<any | null>(null);
   const [biomeOptions, setBiomeOptions] = useState<SelectOption[]>([]);
   const [eventOptions, setEventOptions] = useState<SelectOption[]>([]);
+  const [speciesOptions, setSpeciesOptions] = useState<Array<{ id: number; label: string }>>([]);
+  const [fishingGroupOptions, setFishingGroupOptions] = useState<SelectOption[]>([]);
   const [vipOfferOptions, setVipOfferOptions] = useState<VipOfferOption[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<SupportedMonetizationProductDoc | null>(null);
 
   async function loadReferenceOptions() {
-    const [biomeSnap, missionEventSnap, itemsConfigSnap, monetizationSnap, ecoinSnap] = await Promise.all([
+    const [biomeSnap, missionEventSnap, itemsConfigSnap, monetizationSnap, ecoinSnap, fishingGroupSnap] = await Promise.all([
       getDocs(collection(db, "biomes")),
       getDocs(collection(db, "missionsEvents")),
       getDocs(collection(db, "itemsConfig")),
       getDocs(collection(db, "monetizationProducts")),
       getDocs(collection(db, "ecoinPackages")),
+      getDocs(collection(db, "fishingGroups")),
     ]);
+
+    let speciesCatalog: Array<{ id: number; label: string }> = [];
+    try {
+      const res = await fetch("/api/catalog/options.json");
+      if (res.ok) {
+        const data = (await res.json()) as { species?: Array<{ id: number; label: string }> };
+        if (Array.isArray(data?.species)) speciesCatalog = data.species;
+      }
+    } catch {
+      speciesCatalog = [];
+    }
+    setSpeciesOptions(speciesCatalog);
 
     const biomes = biomeSnap.docs
       .map((docSnap) => {
@@ -109,6 +124,19 @@ export default function MonetizationAdmin({ mode }: Props) {
 
     setBiomeOptions(biomes);
     setEventOptions(events);
+
+    const fishingGroupRows = fishingGroupSnap.docs
+      .map((docSnap) => {
+        const data = docSnap.data() as Record<string, unknown>;
+        const id = String(data.id || docSnap.id).trim().toLowerCase();
+        return {
+          id,
+          label: String(data.name || data.nome || id),
+        };
+      })
+      .filter((row) => row.id)
+      .sort((a, b) => a.label.localeCompare(b.label, "pt-BR"));
+    setFishingGroupOptions(fishingGroupRows);
 
     const offerRows: VipOfferOption[] = [];
 
@@ -165,7 +193,11 @@ export default function MonetizationAdmin({ mode }: Props) {
       if (mode === "vip") {
         tasks.push(loadVipPlans(true).then((rows) => setVipPlans(rows)));
       } else if (mode === "products") {
-        await purgeSeededMonetizationProducts();
+        try {
+          await purgeSeededMonetizationProducts();
+        } catch (e) {
+          console.error("purgeSeededMonetizationProducts", e);
+        }
         tasks.push(loadMonetizationProducts(true).then((rows) => setProducts(rows)));
       } else if (mode === "ecoin") {
         tasks.push(
@@ -791,6 +823,8 @@ export default function MonetizationAdmin({ mode }: Props) {
           product={editingProduct}
           biomes={biomeOptions}
           events={eventOptions}
+          speciesOptions={speciesOptions}
+          fishingGroupOptions={fishingGroupOptions}
           onClose={() => {
             setModalOpen(false);
             setEditingProduct(null);

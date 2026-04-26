@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { PokemonSpecies, PokemonType } from "@/components/pokedex/pokedexTypes";
 
 type PokemonGridProps = {
@@ -191,7 +191,6 @@ export default function PokemonGrid({
               </div>
 
               <div className="flex-1 flex flex-col items-center justify-center py-3">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 {sprite ? (
                   <img
                     src={sprite}

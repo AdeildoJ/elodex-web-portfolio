@@ -1,0 +1,78 @@
+{
+  "ok": true,
+  "dryRun": false,
+  "targetLevel": 25,
+  "playerDocsScanned": 49,
+  "pokemonDocumentsAffected": 3,
+  "uniqueTrainers": 3,
+  "trainers": [
+    {
+      "uid": "RZvjXnbUJlXgqH141YvuD58rVzC2",
+      "characterId": "KH1UEFoEwUMlRsc1exhh",
+      "characterName": "Elowen",
+      "pokemonWithBug": 1
+    },
+    {
+      "uid": "DBbQEp4paOWbwyII4ZBmPQQIhCB3",
+      "characterId": "bBkmqTW3X9oeU1Ek5XRc",
+      "characterName": "Luciel Valentine",
+      "pokemonWithBug": 1
+    },
+    {
+      "uid": "UWgyoJGya1T5w8741lMG0NmSVje2",
+      "characterId": "RGm6XkT2mPIomPrVHtlx",
+      "characterName": "Park Yuki",
+      "pokemonWithBug": 1
+    }
+  ],
+  "details": [
+    {
+      "path": "players/DBbQEp4paOWbwyII4ZBmPQQIhCB3/characters/bBkmqTW3X9oeU1Ek5XRc/time/slot_3",
+      "uid": "DBbQEp4paOWbwyII4ZBmPQQIhCB3",
+      "characterId": "bBkmqTW3X9oeU1Ek5XRc",
+      "characterName": "Luciel Valentine",
+      "speciesId": 908,
+      "speciesName": "Meowscarada",
+      "isStarter": true,
+      "oldLevel": 50,
+      "newLevel": 25,
+      "reason": "nested_mismatch",
+      "oldExp": {
+        "current": 145,
+        "toNext": 270
+      }
+    },
+    {
+      "path": "players/RZvjXnbUJlXgqH141YvuD58rVzC2/characters/KH1UEFoEwUMlRsc1exhh/time/slot_1",
+      "uid": "RZvjXnbUJlXgqH141YvuD58rVzC2",
+      "characterId": "KH1UEFoEwUMlRsc1exhh",
+      "characterName": "Elowen",
+      "speciesId": 181,
+      "speciesName": "Ampharos",
+      "isStarter": false,
+      "oldLevel": 32,
+      "newLevel": 25,
+      "reason": "nested_mismatch",
+      "oldExp": {
+        "current": 34,
+        "toNext": 180
+      }
+    },
+    {
+      "path": "players/UWgyoJGya1T5w8741lMG0NmSVje2/characters/RGm6XkT2mPIomPrVHtlx/time/slot_2",
+      "uid": "UWgyoJGya1T5w8741lMG0NmSVje2",
+      "characterId": "RGm6XkT2mPIomPrVHtlx",
+      "characterName": "Park Yuki",
+      "speciesId": 45,
+      "speciesName": "Vileplume",
+      "isStarter": false,
+      "oldLevel": 34,
+      "newLevel": 25,
+      "reason": "nested_mismatch",
+      "oldExp": {
+        "current": 123,
+        "toNext": 190
+      }
+    }
+  ]
+}

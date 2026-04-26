@@ -62,7 +62,6 @@ export default function NpcUploader({ value, onChange, storagePathHint }: Props)
         </div>
 
         {value ? (
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={value}
             alt="NPC"

@@ -28,6 +28,10 @@ type Props = {
   product: SupportedMonetizationProductDoc | null;
   biomes: Option[];
   events: Option[];
+  /** Especies do `public/api/catalog/options.json` (checkboxes Isca/Anzol). */
+  speciesOptions?: Array<{ id: number; label: string }>;
+  /** Documentos `fishingGroups/{id}`. */
+  fishingGroupOptions?: Option[];
   onClose: () => void;
   onSave: (product: SupportedMonetizationProductDoc) => Promise<void> | void;
 };
@@ -47,12 +51,18 @@ function parseNumber(value: string, fallback = 0) {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
+function clampInt(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, Math.floor(value)));
+}
+
 export default function MonetizationProductModal({
   open,
   saving,
   product,
   biomes,
   events,
+  speciesOptions = [],
+  fishingGroupOptions = [],
   onClose,
   onSave,
 }: Props) {
@@ -664,6 +674,219 @@ export default function MonetizationProductModal({
             {draft.configuration.kind === "iv_reset" ? (
               <div className="mt-4 rounded-lg border border-slate-700 bg-slate-950/60 p-3 text-sm text-slate-300">
                 Produto basico sem campos adicionais. O item sera usado futuramente para reset de IV.
+              </div>
+            ) : null}
+
+            {draft.configuration.kind === "km_boost" ? (
+              <div className="mt-4 grid gap-4 md:grid-cols-2">
+                <label className="text-sm text-slate-200">
+                  Duracao do boost (dias, 1–30)
+                  <input
+                    type="number"
+                    min="1"
+                    max="30"
+                    step="1"
+                    className="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+                    value={draft.configuration.durationDays}
+                    onChange={(e) => {
+                      const nextDays = clampInt(parseNumber(e.target.value, 7), 1, 30);
+                      setDraft((current) => {
+                        if (current.configuration.kind !== "km_boost") return current;
+                        return syncProductDerivedFields({
+                          ...current,
+                          durationDays: nextDays,
+                          configuration: {
+                            kind: "km_boost",
+                            durationDays: nextDays,
+                            kmBonusPercent: current.configuration.kmBonusPercent,
+                          },
+                        });
+                      });
+                    }}
+                  />
+                </label>
+                <label className="text-sm text-slate-200">
+                  Bonus de KM rastreada (%)
+                  <input
+                    type="number"
+                    min="0"
+                    max="500"
+                    step="1"
+                    className="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+                    value={draft.configuration.kmBonusPercent}
+                    onChange={(e) =>
+                      setDraft((current) => {
+                        if (current.configuration.kind !== "km_boost") return current;
+                        return syncProductDerivedFields({
+                          ...current,
+                          durationDays: current.durationDays ?? current.configuration.durationDays,
+                          configuration: {
+                            kind: "km_boost",
+                            durationDays: current.configuration.durationDays,
+                            kmBonusPercent: Math.min(500, Math.max(0, parseNumber(e.target.value, 0))),
+                          },
+                        });
+                      })
+                    }
+                  />
+                </label>
+                <div className="rounded-lg border border-slate-700 bg-slate-950/60 p-3 text-sm text-slate-300 md:col-span-2">
+                  O jogo aplica o multiplicador 1 + bonus/100 sobre a KM andada (entitlement ate expirar). Recompra reinicia
+                  a janela, como no pacote de loja.
+                </div>
+              </div>
+            ) : null}
+
+            {draft.configuration.kind === "fishing_bait" ? (
+              <div className="mt-4 space-y-4">
+                <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-3 text-sm text-slate-300">
+                  <div className="font-semibold text-slate-100">Item em Itens (loja)</div>
+                  <p className="mt-1">
+                    O <code className="text-emerald-300/90">itemConfigId</code> entregue na compra e o id do documento em{" "}
+                    <code className="text-emerald-300/90">itemsConfig</code>. Se vazio no formulario, usa o id/codigo do
+                    produto (apos salvar). Crie o item (ex. pokebola) com efeito adequado e preco, e alinhe o id.
+                  </p>
+                  <label className="mt-2 block text-slate-200">
+                    ID do item (opcional, sobrescreve derivacao)
+                    <input
+                      className="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+                      value={draft.configuration.itemConfigId}
+                      onChange={(e) =>
+                        setDraft((current) => {
+                          if (current.configuration.kind !== "fishing_bait") return current;
+                          return syncProductDerivedFields({
+                            ...current,
+                            configuration: {
+                              kind: "fishing_bait",
+                              itemConfigId: e.target.value.trim().toLowerCase(),
+                              uses: current.configuration.uses,
+                              fishingGroupIds: current.configuration.fishingGroupIds,
+                              fishingSpeciesIds: current.configuration.fishingSpeciesIds,
+                            },
+                          });
+                        })
+                      }
+                      placeholder="Vazio = mesmo id do produto"
+                    />
+                  </label>
+                </div>
+
+                <label className="text-sm text-slate-200">
+                  Usos por unidade comprada
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    className="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
+                    value={draft.configuration.uses}
+                    onChange={(e) =>
+                      setDraft((current) => {
+                        if (current.configuration.kind !== "fishing_bait") return current;
+                        return syncProductDerivedFields({
+                          ...current,
+                          configuration: {
+                            kind: "fishing_bait",
+                            itemConfigId: current.configuration.itemConfigId,
+                            uses: Math.max(1, Math.floor(parseNumber(e.target.value, 1))),
+                            fishingGroupIds: current.configuration.fishingGroupIds,
+                            fishingSpeciesIds: current.configuration.fishingSpeciesIds,
+                          },
+                        });
+                      })
+                    }
+                  />
+                </label>
+
+                <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-3">
+                  <div className="mb-2 text-sm font-semibold text-slate-100">Grupos de pesca (fishingGroups)</div>
+                  <div className="max-h-40 grid gap-2 overflow-y-auto md:grid-cols-2">
+                    {fishingGroupOptions.length ? (
+                      fishingGroupOptions.map((g) => {
+                        const checked = draft.configuration.kind === "fishing_bait" && draft.configuration.fishingGroupIds.includes(g.id);
+                        return (
+                          <label
+                            key={g.id}
+                            className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm ${
+                              checked ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-100" : "border-slate-700 bg-slate-950 text-slate-200"
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              onChange={() =>
+                                setDraft((current) => {
+                                  if (current.configuration.kind !== "fishing_bait") return current;
+                                  const nextIds = checked
+                                    ? current.configuration.fishingGroupIds.filter((x) => x !== g.id)
+                                    : [...current.configuration.fishingGroupIds, g.id];
+                                  return syncProductDerivedFields({
+                                    ...current,
+                                    configuration: {
+                                      kind: "fishing_bait",
+                                      itemConfigId: current.configuration.itemConfigId,
+                                      uses: current.configuration.uses,
+                                      fishingGroupIds: nextIds,
+                                      fishingSpeciesIds: current.configuration.fishingSpeciesIds,
+                                    },
+                                  });
+                                })
+                              }
+                            />
+                            {g.label}
+                          </label>
+                        );
+                      })
+                    ) : (
+                      <div className="text-sm text-amber-200/80">Nenhum grupo em `fishingGroups`. Cadastre em Pesca (DV).</div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-3">
+                  <div className="mb-2 text-sm font-semibold text-slate-100">Especies alvo (catalogo)</div>
+                  <div className="max-h-56 grid gap-1 overflow-y-auto md:grid-cols-2 xl:grid-cols-3">
+                    {speciesOptions.length ? (
+                      speciesOptions.map((s) => {
+                        const checked =
+                          draft.configuration.kind === "fishing_bait" && draft.configuration.fishingSpeciesIds.includes(s.id);
+                        return (
+                          <label
+                            key={s.id}
+                            className={`flex items-center gap-2 rounded border px-2 py-1 text-xs ${
+                              checked ? "border-emerald-500/30 bg-emerald-500/10" : "border-slate-800 bg-slate-950/80"
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              onChange={() =>
+                                setDraft((current) => {
+                                  if (current.configuration.kind !== "fishing_bait") return current;
+                                  const next = checked
+                                    ? current.configuration.fishingSpeciesIds.filter((x) => x !== s.id)
+                                    : [...current.configuration.fishingSpeciesIds, s.id].sort((a, b) => a - b);
+                                  return syncProductDerivedFields({
+                                    ...current,
+                                    configuration: {
+                                      kind: "fishing_bait",
+                                      itemConfigId: current.configuration.itemConfigId,
+                                      uses: current.configuration.uses,
+                                      fishingGroupIds: current.configuration.fishingGroupIds,
+                                      fishingSpeciesIds: next,
+                                    },
+                                  });
+                                })
+                              }
+                            />
+                            <span className="text-slate-200">{s.label}</span>
+                          </label>
+                        );
+                      })
+                    ) : (
+                      <div className="text-sm text-amber-200/80">Carregue o catalogo (options.json) no painel.</div>
+                    )}
+                  </div>
+                </div>
               </div>
             ) : null}
 

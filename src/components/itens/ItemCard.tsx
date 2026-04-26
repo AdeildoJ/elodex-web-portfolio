@@ -1,6 +1,10 @@
 "use client";
 
+import movesData from "@/data/moves.json";
 import type { PokemonItem, ShopItemConfig } from "./ItensPage";
+
+type MoveEntry = { name?: string | null };
+const movesMap = movesData as unknown as Record<string, MoveEntry>;
 
 function getPokeApiItemSpriteUrl(id: string) {
   return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${id}.png`;
@@ -11,6 +15,23 @@ function getFallbackByCategory(item: PokemonItem) {
     return "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/tm-normal.png";
   }
   return "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/unknown.png";
+}
+
+function prettifyMoveName(raw: string) {
+  return raw
+    .split("-")
+    .map((part) => (part ? part[0].toUpperCase() + part.slice(1) : part))
+    .join(" ");
+}
+
+function resolveMachineMoveName(item: PokemonItem): string | null {
+  const isMachine = item.category === "tm" || item.category === "hm" || item.category === "tr";
+  if (!isMachine) return null;
+  const moveId = String(item.moveId || "").trim().toLowerCase();
+  if (!moveId) return null;
+  const entry = movesMap[moveId];
+  const raw = String(entry?.name || item.moveNameCache || moveId).trim();
+  return raw ? prettifyMoveName(raw) : null;
 }
 
 function formatPrice(config?: ShopItemConfig) {
@@ -43,6 +64,7 @@ export default function ItemCard({
 
   const fallback = getFallbackByCategory(item);
   const priceText = formatPrice(shopConfig);
+  const machineMoveName = resolveMachineMoveName(item);
 
   return (
     <button
@@ -63,7 +85,12 @@ export default function ItemCard({
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <div className="text-slate-100 font-semibold truncate">{item.name}</div>
+          <div className="text-slate-100 font-semibold truncate">
+            {item.name}
+            {machineMoveName ? (
+              <span className="text-slate-300 font-normal"> - {machineMoveName}</span>
+            ) : null}
+          </div>
           {shopConfig?.saleEnabled ? (
             <span className="rounded bg-emerald-600/25 border border-emerald-600/40 px-2 py-0.5 text-[10px] text-emerald-300">
               NA LOJA

@@ -1,6 +1,7 @@
 export type AdminBiome = {
   id: string;
   name: string;
+  order?: number;
   description?: string;
   imageUrl?: string;
   hasDaycare?: boolean;
@@ -17,7 +18,10 @@ export type BiomeNpcRole =
   | "policial"
   | "ladrao"
   | "enfermeiro"
-  | "criador";
+  | "criador"
+  | "fisherman"
+  | "pescador"
+  | "pescadora";
 
 export type BiomeNpcConfig = {
   id: string;
@@ -27,16 +31,7 @@ export type BiomeNpcConfig = {
   specialistType?: string | null;
 };
 
-export const DEFAULT_ADMIN_BIOMES: AdminBiome[] = [
-  { id: "planice-sylphia", name: "PlaniceSylphia" },
-  { id: "floresta-esmeralda", name: "FlorestaEsmeralda" },
-  { id: "floresta-luminar", name: "FlorestaLuminar" },
-  { id: "caverna-luminar", name: "CavernaLuminar" },
-  { id: "caverna-luminar-subsolo", name: "CavernaLuminarSubSolo" },
-  { id: "praia-coralina", name: "PraiaCoralina" },
-  { id: "lago-estelar", name: "LagoEstelar" },
-  { id: "porto-azuria", name: "PortoAzuria" },
-];
+/** Lista legada removida: biomas vêm apenas do Firestore (`biomes`). */
+export const DEFAULT_ADMIN_BIOMES: AdminBiome[] = [];
 
-// Compatibilidade com código legado enquanto migramos para biomes/{id} no Firestore.
 export const ADMIN_BIOMES = DEFAULT_ADMIN_BIOMES;

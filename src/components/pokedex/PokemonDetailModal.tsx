@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { PokemonSpecies, PokemonType } from "@/components/pokedex/pokedexTypes";
 import movesJson from "@/data/moves.json";
@@ -259,28 +259,10 @@ type PokemonMoveEntry = {
   level?: number | null;
 };
 
-type LearnsetWithMove = {
-  entry: PokemonMoveEntry;
-  move: MoveData;
-};
-
-type GroupedMoves = {
-  levelUp: LearnsetWithMove[];
-  machine: LearnsetWithMove[];
-  egg: LearnsetWithMove[];
-  tutor: LearnsetWithMove[];
-};
-
 type PokemonDetailModalProps = {
   pokemon: PokemonSpecies;
   versionId: string;
   onClose: () => void;
-};
-
-const damageClassLabel = (dc: MoveData["damageClass"]) => {
-  if (dc === "physical") return "Físico";
-  if (dc === "special") return "Especial";
-  return "Status";
 };
 
 const typeBadges = (t: PokemonType) => t.charAt(0).toUpperCase() + t.slice(1);
@@ -324,16 +306,13 @@ function toTitle(s: string) {
 export default function PokemonDetailModal({ pokemon, versionId, onClose }: PokemonDetailModalProps) {
   const [activeTab, setActiveTab] = useState<"encyclopedia" | "types" | "moves" | "config">("encyclopedia");
 
-  const [config, setConfig] = useState<PokemonConfig | null>(null);
+  const [, setConfig] = useState<PokemonConfig | null>(null);
   const [configLoaded, setConfigLoaded] = useState(false);
-  const [saving, setSaving] = useState(false);
-
   const [previewLevel, setPreviewLevel] = useState<number>(30);
   const [showShiny, setShowShiny] = useState(false);
 
-  const [movesLoading, setMovesLoading] = useState(false);
-  const [learnsetEntries, setLearnsetEntries] = useState<PokemonMoveEntry[]>([]);
-  const [movesData, setMovesData] = useState<Record<string, MoveData>>({});
+  const [, setLearnsetEntries] = useState<PokemonMoveEntry[]>([]);
+  const [, setMovesData] = useState<Record<string, MoveData>>({});
   const [movesLoaded, setMovesLoaded] = useState(false);
 
   // Sempre que mudar de espécie/versão, limpa estado
@@ -381,8 +360,6 @@ export default function PokemonDetailModal({ pokemon, versionId, onClose }: Poke
   useEffect(() => {
     if (activeTab !== "moves") return;
     if (movesLoaded) return;
-
-    setMovesLoading(true);
 
     try {
       // ✅ Forms: tenta baseSpeciesId → dexNumber → id
@@ -436,23 +413,9 @@ export default function PokemonDetailModal({ pokemon, versionId, onClose }: Poke
     } catch (error) {
       console.error("Erro ao carregar movimentos a partir dos JSONs:", error);
     } finally {
-      setMovesLoading(false);
+      // no-op
     }
   }, [activeTab, movesLoaded, pokemon.id]);
-
-  async function handleSave() {
-    if (!config) return;
-    try {
-      setSaving(true);
-      const docId = `${versionId}_${pokemon.id}`;
-      const ref = doc(db, "pokedexConfig", docId);
-      await setDoc(ref, config, { merge: true });
-    } catch (err) {
-      console.error("Erro ao salvar configuração da Pokédex:", err);
-    } finally {
-      setSaving(false);
-    }
-  }
 
   const normalizedBaseStats = useMemo(
     () => normalizeBaseStats((pokemon as any).baseStats),
@@ -463,39 +426,6 @@ export default function PokemonDetailModal({ pokemon, versionId, onClose }: Poke
     () => calcPreviewStats(normalizedBaseStats as any, previewLevel),
     [normalizedBaseStats, previewLevel]
   );
-
-  const groupedMoves = useMemo<GroupedMoves>(() => {
-    const base: GroupedMoves = { levelUp: [], machine: [], egg: [], tutor: [] };
-
-    for (const entry of learnsetEntries) {
-      const move = movesData[entry.moveId];
-      if (!move) continue;
-
-      const methodKey: keyof GroupedMoves =
-        entry.method === "level-up"
-          ? "levelUp"
-          : entry.method === "machine"
-          ? "machine"
-          : entry.method === "egg"
-          ? "egg"
-          : "tutor";
-
-      base[methodKey].push({ entry, move });
-    }
-
-    base.levelUp.sort((a, b) => {
-      const la = a.entry.level ?? 0;
-      const lb = b.entry.level ?? 0;
-      if (la !== lb) return la - lb;
-      return a.move.name.localeCompare(b.move.name);
-    });
-
-    base.machine.sort((a, b) => a.move.name.localeCompare(b.move.name));
-    base.egg.sort((a, b) => a.move.name.localeCompare(b.move.name));
-    base.tutor.sort((a, b) => a.move.name.localeCompare(b.move.name));
-
-    return base;
-  }, [learnsetEntries, movesData]);
 
   // ✅ Preferir matchups do JSON quando existir
   const jsonMatchups = getAny<any>(pokemon as any, "typeMatchups", null);
@@ -537,7 +467,6 @@ export default function PokemonDetailModal({ pokemon, versionId, onClose }: Poke
         <div className="flex items-start gap-4 border-b border-slate-800 px-5 py-4">
           <div className="flex items-center gap-4 flex-1">
             <div className="relative flex flex-col items-center justify-center">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               {currentSprite ? (
                 <img
                   src={currentSprite}

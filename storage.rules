@@ -28,5 +28,17 @@ service firebase.storage {
       allow read: if isSignedIn();
       allow write: if isAdmin();
     }
+
+    // Capas dos pacotes da loja (aparecem no app). Leitura pública; gravação só admin.
+    match /storePackages/{packageId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Avatar e assets do jogador: só o próprio usuário pode gravar em seu path
+    match /players/{userId}/characters/{characterId}/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && request.auth.uid == userId;
+    }
   }
 }

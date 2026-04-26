@@ -26,7 +26,7 @@ export default function LoginPage() {
 
       (async () => {
         try {
-          const tokenResult = await user.getIdTokenResult();
+          const tokenResult = await user.getIdTokenResult(true);
           const isAdmin = tokenResult.claims.admin === true;
 
           if (isAdmin) {
@@ -58,7 +58,7 @@ export default function LoginPage() {
         senha
       );
 
-      const tokenResult = await cred.user.getIdTokenResult();
+      const tokenResult = await cred.user.getIdTokenResult(true);
       const isAdmin = tokenResult.claims.admin === true;
 
       if (isAdmin) {

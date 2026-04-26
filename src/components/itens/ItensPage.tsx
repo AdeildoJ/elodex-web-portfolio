@@ -33,7 +33,9 @@ export type ItemSubCategory =
   | "captura"
   | "fuga"
   | "boost-batalha"
-  | "experiencia";
+  | "experiencia"
+  /** Isca/Anzol: restrição por grupos (fishingGroups) e espécies; 98% gancho; bônus XP pós-derrota. */
+  | "isca-anzol";
 
 export type PokemonItem = {
   id: string;
@@ -70,6 +72,18 @@ export type ShopItemConfig = {
   grantType?: "inventory" | "biome_access";
   biomeAccessBiomeId?: string | null;
   biomeAccessDurationHours?: number | null;
+  fishingConfig?: {
+    enabled: boolean;
+    /** `legacy` = tags/ pesos; `isca-anzol` = restrição + 98% + consumo por usos. */
+    mode?: "legacy" | "isca-anzol" | null;
+    baseSuccessPercent: number | null;
+    groupWeightBonusPercent: number | null;
+    attractTags: string[];
+    /** Isca/Anzol: usos entregues por unidade comprada (quantidade no inventário = tentativas). */
+    uses?: number | null;
+    fishingGroupIds?: string[] | null;
+    fishingSpeciesIds?: number[] | null;
+  } | null;
 };
 
 const CATEGORIES: ItemCategory[] = [
@@ -97,6 +111,7 @@ const SUBCATEGORIES: ItemSubCategory[] = [
   "fuga",
   "boost-batalha",
   "experiencia",
+  "isca-anzol",
 ];
 
 const VIRTUAL_SHOP_ITEMS: PokemonItem[] = [
