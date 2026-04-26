@@ -57,6 +57,18 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Rotas entre biomas (acesso: KM, ticket, requisitos)
+    match /biomeRoutes/{id} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Regras dinâmicas de evolução configuradas pelo admin/web
+    match /evolutionConfigRules/{id} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
     // Cadastro de NPCs (admin/web)
     match /npcs/{id} {
       allow read: if isSignedIn();
@@ -265,7 +277,7 @@ service cloud.firestore {
     // ColeÃ§Ã£o unificada apenas para CONFIGURAÃ‡ÃƒO
     // (nÃ£o Ã© execuÃ§Ã£o de jogo)
     match /missionsEvents/{id} {
-      allow read:  if isAdmin();
+      allow read:  if isSignedIn();
       allow write: if isAdmin();
     }
 
